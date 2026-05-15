@@ -17,7 +17,7 @@ imageInput.addEventListener("change", (e) => {
   if (selectedFile) {
     preview.src = URL.createObjectURL(selectedFile);
     preview.style.display = "block";
-    showAlert("✅ Image selected successfully.", "success");
+    showAlert("✅ تم اختيار الصورة بنجاح.", "success");
   }
 });
 
@@ -31,7 +31,7 @@ openCameraButton.addEventListener("click", async () => {
     stopCameraButton.style.display = "inline-block";
     clearAlert();
   } catch (err) {
-    showAlert("❌ Camera access denied or unavailable.", "danger");
+    showAlert("❌ تم رفض الوصول للكاميرا أو أنها غير متاحة.", "danger");
   }
 });
 
@@ -46,7 +46,7 @@ captureButton.addEventListener("click", () => {
     selectedFile = new File([blob], "captured.png", { type: "image/png" });
     preview.src = URL.createObjectURL(selectedFile);
     preview.style.display = "block";
-    showAlert("✅ Image captured successfully.", "success");
+    showAlert("✅ تم التقاط الصورة بنجاح.", "success");
   });
 });
 
@@ -58,20 +58,20 @@ stopCameraButton.addEventListener("click", () => {
   cameraStream.style.display = "none";
   captureButton.style.display = "none";
   stopCameraButton.style.display = "none";
-  showAlert("✔️ Camera stopped.", "secondary");
+  showAlert("✔️ تم إيقاف الكاميرا.", "secondary");
 });
 
 // 📤 Send to /users/verify_login
 sendButton.addEventListener("click", async () => {
   if (!selectedFile) {
-    showAlert("❌ Please select or capture an image first.", "danger");
+    showAlert("❌ يرجى تحديد أو التقاط صورة أولاً.", "danger");
     return;
   }
 
   const formData = new FormData();
   formData.append("image", selectedFile);
 
-  showAlert("⏳ Verifying, please wait...", "info");
+  showAlert("⏳ جاري التحقق، يرجى الانتظار...", "info");
 
   try {
     const response = await fetch("/users/verify_login", {
@@ -82,17 +82,17 @@ sendButton.addEventListener("click", async () => {
 
     if (response.ok) {
       showAlert(
-        `✅ Login successful. Welcome,  <strong>${data.user.name}</strong>`,
+        `✅ تم تسجيل الدخول بنجاح. أهلاً بك، <strong>${data.user.name}</strong>`,
         "success"
       );
     } else {
       showAlert(
-        `❌ ${data.error || "Access Denied. Please try again."}`,
+        `❌ ${data.error || "تم رفض الوصول. يرجى المحاولة مرة أخرى."}`,
         "danger"
       );
     }
   } catch (error) {
-    showAlert("❌ Network error. Please try again.", "danger");
+    showAlert("❌ خطأ في الشبكة. يرجى المحاولة مرة أخرى.", "danger");
   }
 });
 
