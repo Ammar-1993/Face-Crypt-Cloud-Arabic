@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>FaceCrypt Cloud - Upload Image</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 50px;
+    }
+
+    form {
+      margin: 20px auto;
+      width: 300px;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    input[type="file"] {
+      margin: 10px 0;
+    }
+
+    button {
+      padding: 10px 20px;
+    }
+  </style>
+</head>
+
+<body>
+  <div style="text-align:center; margin: 30px 0;">
+    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="FaceCrypt Logo" width="180">
+  </div>
+  <h1>Face Crypt Cloud</h1>
+  <h2>Upload Your Face Image</h2>
+
+  <form action="/upload" method="post" enctype="multipart/form-data">
+    <!-- <input type="file" name="image" accept="image/*" required> -->
+    <input type="file" name="image" accept="image/*">
+    <br>
+    <button type="submit">Upload Image</button>
+  </form>
+
+  {% if message %}
+  {% if "✅" in message %}
+  <p style="color: green; font-weight: bold;">{{ message }}</p>
+  {% else %}
+  <p style="color: red; font-weight: bold;">{{ message }}</p>
+  {% endif %}
+  {% endif %}
+
+</body>
+
+</html>

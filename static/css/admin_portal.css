@@ -1,0 +1,77 @@
+body {
+  background-color: #f8f9fa;
+  padding: 20px;
+}
+
+h1,
+h3,
+h4 {
+  text-align: center;
+}
+
+.card {
+  margin-bottom: 20px;
+}
+
+#loginSection,
+#adminPanel {
+  max-width: 800px;
+  margin: auto;
+}
+
+.hidden {
+  display: none;
+}
+
+.alert {
+  margin-top: 10px;
+}
+
+.stat-box {
+  padding: 12px;
+  border-radius: 8px;
+  margin: 6px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.bg-stat-success {
+  background-color: #28a745;
+  color: white;
+}
+
+.bg-stat-failure {
+  background-color: #dc3545;
+  color: white;
+}
+
+.bg-stat-blocked {
+  background-color: #ffc107;
+  color: #212529;
+}
+
+.bg-stat-soft {
+  background-color: #6c757d;
+  color: white;
+}
+
+#refreshButton {
+  font-size: 0.9rem;
+  padding: 4px 8px;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+  background-color: #f8f9fa;
+}
+
+.table-striped tbody tr:hover {
+  background-color: #e2e6ea;
+}
+
+#paginationControls {
+  margin-top: 10px;
+  text-align: center;
+}
