@@ -8,22 +8,22 @@ users_bp = Blueprint('users', __name__, url_prefix='/users')
 def add_user():
     data = request.json
     if not data or 'user_id' not in data or 'user_data' not in data:
-        return jsonify({"error": "Invalid request"}), 400
+        return jsonify({"error": "طلب غير صالح"}), 400
 
     user_id = data['user_id']
     user_data = data['user_data']
     firebase_utils.add_user_to_firestore(user_id, user_data)
-    return jsonify({"message": f"✅ User {user_id} added successfully."})
+    return jsonify({"message": f"✅ تم إضافة المستخدم {user_id} بنجاح."})
 
 @users_bp.route('/delete', methods=['POST'])
 def delete_user():
     data = request.json
     if not data or 'user_id' not in data:
-        return jsonify({"error": "Invalid request"}), 400
+        return jsonify({"error": "طلب غير صالح"}), 400
 
     user_id = data['user_id']
     firebase_utils.delete_user_from_firestore(user_id)
-    return jsonify({"message": f"✅ User {user_id} deleted successfully."})
+    return jsonify({"message": f"✅ تم حذف المستخدم {user_id} بنجاح."})
 
 @users_bp.route('/list', methods=['GET'])
 def list_users():
@@ -60,11 +60,11 @@ def is_soft_blocked(user):
 @users_bp.route('/verify_login', methods=['POST'])
 def verify_login():
     if 'image' not in request.files:
-        return jsonify({"error": "❌ No image provided"}), 400
+        return jsonify({"error": "❌ لم يتم تقديم أي صورة"}), 400
 
     image_file = request.files['image']
     if image_file.filename == '':
-        return jsonify({"error": "❌ Empty file name"}), 400
+        return jsonify({"error": "❌ اسم الملف فارغ"}), 400
 
     try:
         image_array = face_utils.load_image_from_request(image_file)
@@ -77,7 +77,7 @@ def verify_login():
             if is_soft_blocked(user):
                 firebase_utils.log_audit_event(user['id'], "User_Login", status='soft_block', ip_address=request.remote_addr)
                 return jsonify({
-                    "message": "❌ Too many failed attempts. Please try again in 5 minutes."
+                    "message": "❌ تم تجاوز عدد المحاولات الفاشلة. يرجى المحاولة مرة أخرى بعد 5 دقائق."
                 }), 403
 
         matched_user = None
@@ -117,7 +117,7 @@ def verify_login():
             firebase_utils.log_audit_event(user_id, "User_Login", status='success', ip_address=request.remote_addr)
 
             return jsonify({
-                "message": f"✅ Login successful. Welcome, {matched_user.get('name', '[User Name]')}",
+                "message": f"✅ تم تسجيل الدخول بنجاح. أهلاً بك، {matched_user.get('name', '[User Name]')}",
                 "user": {
                     "id": matched_user['id'],
                     "name": matched_user.get('name'),
@@ -144,10 +144,10 @@ def verify_login():
             firebase_utils.log_audit_event(user_id, "User_Login", status='failure', ip_address=request.remote_addr)
 
         return jsonify({
-            "message": "❌ Login failed. Face does not match our records.",
+            "message": "❌ فشل تسجيل الدخول. الوجه لا يتطابق مع سجلاتنا.",
         }), 403
 
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
     except Exception as e:
-        return jsonify({"error": f"❌ Internal server error: {str(e)}"}), 500
+        return jsonify({"error": f"❌ خطأ داخلي في الخادم: {str(e)}"}), 500

@@ -23,19 +23,19 @@ def admin_login():
         firebase_utils.log_audit_event(
             "admin", "Admin_Login", status="failure", ip_address=request.remote_addr
         )
-        return jsonify({"error": "❌ Password required"}), 400
+        return jsonify({"error": "❌ كلمة المرور مطلوبة"}), 400
 
     password = data["password"]
     if password == ADMIN_PASSWORD:
         firebase_utils.log_audit_event(
             "admin", "Admin_Login", status="success", ip_address=request.remote_addr
         )
-        return jsonify({"message": "✅ Welcome, Admin"}), 200
+        return jsonify({"message": "✅ أهلاً بك أيها المسؤول"}), 200
     else:
         firebase_utils.log_audit_event(
             "admin", "Admin_Login", status="failure", ip_address=request.remote_addr
         )
-        return jsonify({"error": "Invalid Password"}), 403
+        return jsonify({"error": "كلمة مرور غير صالحة"}), 403
 
 
 # ✅ /admin/add_user
@@ -47,7 +47,7 @@ def admin_add_user():
     image_file = request.files.get("image")
 
     if not user_id or not name or not email or not image_file:
-        return jsonify({"error": "❌ Missing required fields"}), 400
+        return jsonify({"error": "❌ حقول مطلوبة مفقودة"}), 400
 
     try:
         image_array = face_utils.load_image_from_request(image_file)
@@ -73,12 +73,12 @@ def admin_add_user():
         }
 
         firebase_utils.add_user_to_firestore(user_id, user_data)
-        return jsonify({"message": "User was added successfully"}), 200
+        return jsonify({"message": "تم إضافة المستخدم بنجاح"}), 200
 
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
     except Exception as e:
-        return jsonify({"error": f"Internal server error: {str(e)}"}), 500
+        return jsonify({"error": f"خطأ داخلي في الخادم: {str(e)}"}), 500
 
 
 # ✅ /admin/delete_user
@@ -86,15 +86,15 @@ def admin_add_user():
 def admin_delete_user():
     data = request.get_json()
     if not data or "user_id" not in data:
-        return jsonify({"error": "❌ user_id is required"}), 400
+        return jsonify({"error": "❌ معرف المستخدم مطلوب"}), 400
 
     user_id = data["user_id"]
 
     try:
         firebase_utils.delete_user_from_firestore(user_id)
-        return jsonify({"message": " User was deleted successfully"}), 200
+        return jsonify({"message": "تم حذف المستخدم بنجاح"}), 200
     except Exception as e:
-        return jsonify({"error": f"❌ Internal server error: {str(e)}"}), 500
+        return jsonify({"error": f"❌ خطأ داخلي في الخادم: {str(e)}"}), 500
 
 
 # ✅ /admin/list_users
@@ -117,7 +117,7 @@ def admin_list_users():
         return jsonify({"users": response}), 200
 
     except Exception as e:
-        return jsonify({"error": f"❌ Internal server error: {str(e)}"}), 500
+        return jsonify({"error": f"❌ خطأ داخلي في الخادم: {str(e)}"}), 500
 
 
 # ✅ /admin/audit_logs
@@ -136,7 +136,7 @@ def admin_audit_logs():
         return jsonify({"logs": logs}), 200
 
     except Exception as e:
-        return jsonify({"error": f"❌ Internal server error: {str(e)}"}), 500
+        return jsonify({"error": f"❌ خطأ داخلي في الخادم: {str(e)}"}), 500
 
 @admin_bp.route('/stats', methods=['GET'])
 def admin_stats():
@@ -191,13 +191,13 @@ def admin_stats():
         })
 
     except Exception as e:
-        return jsonify({"error": f"❌ Internal server error: {str(e)}"}), 500
+        return jsonify({"error": f"❌ خطأ داخلي في الخادم: {str(e)}"}), 500
     
 @admin_bp.route('/unblock_user', methods=['POST'])
 def admin_unblock_user():
     data = request.get_json()
     if not data or 'user_id' not in data:
-        return jsonify({"error": "❌ user_id is required"}), 400
+        return jsonify({"error": "❌ معرف المستخدم مطلوب"}), 400
 
     user_id = data['user_id']
 
@@ -218,10 +218,10 @@ def admin_unblock_user():
             ip_address=request.remote_addr
         )
 
-        return jsonify({"message": "✅ User unblocked successfully"}), 200
+        return jsonify({"message": "✅ تم فك حظر المستخدم بنجاح"}), 200
 
     except Exception as e:
-        return jsonify({"error": f"❌ Internal server error: {str(e)}"}), 500
+        return jsonify({"error": f"❌ خطأ داخلي في الخادم: {str(e)}"}), 500
 
 # @admin_bp.route('/clear_audit_logs', methods=['POST'])
 # def admin_clear_audit_logs():
@@ -269,9 +269,9 @@ def admin_clear_audit_logs():
             status='success'
         )
 
-        return jsonify({"message": f"✅ Deleted {total_count} audit logs."}), 200
+        return jsonify({"message": f"✅ تم مسح {total_count} من سجلات التدقيق."}), 200
 
     except Exception as e:
-        return jsonify({"error": f"❌ Internal server error: {str(e)}"}), 500
+        return jsonify({"error": f"❌ خطأ داخلي في الخادم: {str(e)}"}), 500
 
 

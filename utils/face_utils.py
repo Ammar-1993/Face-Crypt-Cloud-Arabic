@@ -26,15 +26,15 @@ def extract_face_encoding(image_array):
     """
     try:
         if image_array.dtype != np.uint8:
-            raise ValueError(f"Unsupported dtype: {image_array.dtype}")
+            raise ValueError(f"نوع البيانات غير مدعوم: {image_array.dtype}")
         if len(image_array.shape) != 3 or image_array.shape[2] != 3:
-            raise ValueError(f"Unsupported shape: {image_array.shape}")
+            raise ValueError(f"شكل غير مدعوم: {image_array.shape}")
         encodings = face_recognition.face_encodings(image_array)
         if len(encodings) == 0:
-            raise ValueError("No face was detected. Please try again with a clear photo.")
+            raise ValueError("لم يتم اكتشاف أي وجه. يرجى المحاولة مرة أخرى بصورة واضحة.")
         return encodings[0]
     except Exception as e:
-        raise ValueError(f"Face encoding failed: {str(e)}")
+        raise ValueError(f"فشل في ترميز الوجه: {str(e)}")
 
 
 def compare_encodings(known_encoding, unknown_encoding, tolerance=0.6):
@@ -43,7 +43,7 @@ def compare_encodings(known_encoding, unknown_encoding, tolerance=0.6):
     Returns True if they match within the given tolerance.
     """
     if known_encoding is None or unknown_encoding is None:
-        raise ValueError("❌ One or both encodings are invalid.")
+        raise ValueError("❌ أحد التشفيرات أو كلاهما غير صالح.")
     results = face_recognition.compare_faces([known_encoding], unknown_encoding, tolerance=tolerance)
     return results[0]
 
