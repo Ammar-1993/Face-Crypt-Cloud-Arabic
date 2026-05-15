@@ -1,4 +1,28 @@
 const API_BASE = "http://127.0.0.1:8080";
+
+// Translation Helpers
+function translateStatus(status) {
+  if (!status) return "";
+  const s = status.toLowerCase();
+  if (s === "success") return "نجاح";
+  if (s === "failed") return "فشل";
+  if (s === "blocked") return "محظور";
+  if (s === "soft_block") return "حظر مؤقت";
+  return status;
+}
+
+function translateEvent(event) {
+  if (!event) return "";
+  const e = event.toLowerCase();
+  if (e === "user_login") return "دخول مستخدم";
+  if (e === "admin_login") return "دخول مسؤول";
+  if (e === "add_user") return "إضافة مستخدم";
+  if (e === "delete_user") return "حذف مستخدم";
+  if (e === "unblock_user") return "فك حظر مستخدم";
+  if (e === "clear_logs") return "مسح السجلات";
+  return event;
+}
+
 function show(elem) {
   elem.classList.remove("hidden");
 }
@@ -44,7 +68,7 @@ async function addUser() {
   if (!userId) {
     setText(
       "addUserMessage",
-      `<span class="text-danger">❌ Please enter a User ID.</span>`
+      `<span class="text-danger">❌ يرجى إدخال معرف المستخدم.</span>`
     );
     return;
   }
@@ -53,7 +77,7 @@ async function addUser() {
   if (!name) {
     setText(
       "addUserMessage",
-      `<span class="text-danger">❌ Please enter the Name.</span>`
+      `<span class="text-danger">❌ يرجى إدخال الاسم.</span>`
     );
     return;
   }
@@ -63,14 +87,14 @@ async function addUser() {
   if (!email) {
     setText(
       "addUserMessage",
-      `<span class="text-danger">❌ Please enter the Email address.</span>`
+      `<span class="text-danger">❌ يرجى إدخال البريد الإلكتروني.</span>`
     );
     return;
   }
   if (!emailPattern.test(email)) {
     setText(
       "addUserMessage",
-      `<span class="text-danger">❌ Please enter a valid Email address.</span>`
+      `<span class="text-danger">❌ يرجى إدخال بريد إلكتروني صالح.</span>`
     );
     return;
   }
@@ -79,7 +103,7 @@ async function addUser() {
   if (!image) {
     setText(
       "addUserMessage",
-      `<span class="text-danger">❌ Please choose an Image.</span>`
+      `<span class="text-danger">❌ يرجى اختيار صورة.</span>`
     );
     return;
   }
@@ -128,7 +152,7 @@ async function deleteUser() {
   if (!userId) {
     setText(
       "deleteUserMessage",
-      `<span class="text-danger">❌ Please select a user to delete.</span>`
+      `<span class="text-danger">❌ يرجى تحديد مستخدم لحذفه.</span>`
     );
     return;
   }
@@ -176,11 +200,11 @@ function renderAuditLogs(logs) {
   const end = start + rowsPerPage;
   const pageData = logs.slice(start, end);
 
-  pageIndicator.textContent = `Page ${currentPage} of ${totalPages}`;
+  pageIndicator.textContent = `صفحة ${currentPage} من ${totalPages}`;
 
   if (!pageData || pageData.length === 0) {
     table.innerHTML =
-      '<tr><td colspan="4" class="text-center">No logs found.</td></tr>';
+      '<tr><td colspan="4" class="text-center">لم يتم العثور على سجلات.</td></tr>';
     return;
   }
 
@@ -189,13 +213,13 @@ function renderAuditLogs(logs) {
     const row = document.createElement("tr");
 
     // ✨ زر الفك
-    let statusCell = log.status || "";
+    let statusCell = translateStatus(log.status);
     if (log.status === "blocked") {
       statusCell += ` <button class="btn btn-sm btn-outline-success ms-2" onclick="unblockUser('${log.user_id}')">🔓</button>`;
     }
 
     row.innerHTML = `
-      <td>${log.event || ""}</td>
+      <td>${translateEvent(log.event)}</td>
       <td>${statusCell}</td>
       <td>${log.user_id || ""}</td>
       <td>${formatTimestamp(log.timestamp)}</td>
@@ -240,8 +264,8 @@ function filterAuditLogs() {
   const query = document.getElementById("auditSearch").value.toLowerCase();
   const filtered = allAuditLogs.filter(
     (log) =>
-      (log.event || "").toLowerCase().includes(query) ||
-      (log.status || "").toLowerCase().includes(query) ||
+      (translateEvent(log.event) || "").toLowerCase().includes(query) ||
+      (translateStatus(log.status) || "").toLowerCase().includes(query) ||
       (log.user_id || "").toLowerCase().includes(query) ||
       (log.timestamp || "").toLowerCase().includes(query)
   );
@@ -271,11 +295,11 @@ async function refreshStats() {
       document.getElementById("statTotalUsers").textContent =
         data.total_users ?? 0; // Added for total users
     } else {
-      alert("❌ Failed to fetch stats");
+      alert("❌ فشل في جلب الإحصائيات");
     }
   } catch (e) {
     console.error(e);
-    alert("❌ Error fetching stats");
+    alert("❌ خطأ في جلب الإحصائيات");
   }
 }
 
@@ -283,20 +307,20 @@ async function refreshAuditLogs() {
   try {
     setText(
       "auditLogsTable",
-      '<tr><td colspan="4" class="text-center">Loading...</td></tr>'
+      '<tr><td colspan="4" class="text-center">جاري التحميل...</td></tr>'
     );
     await fetchAuditLogs();
   } catch (e) {
     console.error(e);
     setText(
       "auditLogsTable",
-      '<tr><td colspan="4" class="text-center text-danger">❌ Failed to refresh logs.</td></tr>'
+      '<tr><td colspan="4" class="text-center text-danger">❌ فشل في تحديث السجلات.</td></tr>'
     );
   }
 }
 
 async function unblockUser(userId) {
-  if (!confirm(`Are you sure you want to unblock user ${userId}?`)) return;
+  if (!confirm(`هل أنت متأكد أنك تريد فك حظر المستخدم ${userId}؟`)) return;
 
   try {
     const res = await fetch(`${API_BASE}/admin/unblock_user`, {
@@ -311,18 +335,18 @@ async function unblockUser(userId) {
       await fetchAuditLogs();
       await refreshStats();
     } else {
-      alert(`❌ Error: ${data.error}`);
+      alert(`❌ خطأ: ${data.error}`);
     }
   } catch (e) {
     console.error(e);
-    alert("❌ Error unblocking user");
+    alert("❌ خطأ في فك حظر المستخدم");
   }
 }
 
 async function clearAuditLogs() {
   if (
     !confirm(
-      "⚠️ Are you sure you want to delete ALL audit logs? This cannot be undone."
+      "⚠️ هل أنت متأكد من رغبتك في حذف جميع سجلات التدقيق؟ لا يمكن التراجع عن هذا الإجراء."
     )
   )
     return;
@@ -338,10 +362,10 @@ async function clearAuditLogs() {
       await fetchAuditLogs();
       await refreshStats();
     } else {
-      alert(`❌ Error: ${data.error}`);
+      alert(`❌ خطأ: ${data.error}`);
     }
   } catch (e) {
     console.error(e);
-    alert("❌ Error clearing audit logs.");
+    alert("❌ خطأ في مسح سجلات التدقيق.");
   }
 }
