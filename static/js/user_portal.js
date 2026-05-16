@@ -106,3 +106,19 @@ function showAlert(message, type) {
 function clearAlert() {
   resultDiv.innerHTML = "";
 }
+
+// Custom File Upload Label Logic
+document.addEventListener('DOMContentLoaded', () => {
+  const imageUploadInput = document.getElementById("imageUpload");
+  const userFileLabel = document.getElementById("userFileLabel");
+  
+  if (imageUploadInput && userFileLabel) {
+    imageUploadInput.addEventListener("change", (e) => {
+      if (e.target.files.length > 0) {
+        userFileLabel.innerText = '📁 ' + e.target.files[0].name;
+      } else {
+        userFileLabel.innerText = "📁 اختر صورة من الجهاز...";
+      }
+    });
+  }
+});
