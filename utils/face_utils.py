@@ -13,7 +13,12 @@ def load_image_from_request(file):
     Loads an image from a Flask request file object.
     Ensures RGB format and converts to a NumPy array.
     """
-    image = Image.open(BytesIO(file.read())).convert('RGB')
+    file.seek(0)
+    data = file.read()
+    if not data:
+        raise ValueError("❌ لم يتم استلام أي بيانات للصورة.")
+        
+    image = Image.open(BytesIO(data)).convert('RGB')
     image = image.resize((500, 500))  # Optional resize to standardize
     image_array = np.asarray(image, dtype=np.uint8)
     image_array = np.ascontiguousarray(image_array)

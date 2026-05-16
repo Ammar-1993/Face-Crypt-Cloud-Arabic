@@ -1,124 +1,159 @@
-const imageInput = document.getElementById("imageUpload");
+const API_BASE = "";
+
 const preview = document.getElementById("preview");
-const resultDiv = document.getElementById("result");
-const sendButton = document.getElementById("sendButton");
-
-const openCameraButton = document.getElementById("openCamera");
-const cameraStream = document.getElementById("cameraStream");
 const captureButton = document.getElementById("captureButton");
+const openCameraButton = document.getElementById("openCamera");
 const stopCameraButton = document.getElementById("stopCameraButton");
+const sendButton = document.getElementById("sendButton");
+const retakeButton = document.getElementById("retakeButton");
+const cameraStream = document.getElementById("cameraStream");
+const openCameraContainer = openCameraButton.parentElement;
 
-let selectedFile = null;
 let stream = null;
 
-// 📁 Upload from file
-imageInput.addEventListener("change", (e) => {
-  selectedFile = e.target.files[0];
-  if (selectedFile) {
-    preview.src = URL.createObjectURL(selectedFile);
-    preview.style.display = "block";
-    showAlert("✅ تم اختيار الصورة بنجاح.", "success");
-  }
-});
-
-// 📷 Open Camera
+/**
+ * State 1: Start Camera
+ */
 openCameraButton.addEventListener("click", async () => {
   try {
     stream = await navigator.mediaDevices.getUserMedia({ video: true });
     cameraStream.srcObject = stream;
+    
+    // UI Transitions
     cameraStream.style.display = "block";
+    preview.style.display = "none";
+    openCameraContainer.style.display = "none";
+    
     captureButton.style.display = "inline-block";
     stopCameraButton.style.display = "inline-block";
-    clearAlert();
-  } catch (err) {
-    showAlert("❌ تم رفض الوصول للكاميرا أو أنها غير متاحة.", "danger");
+    
+    sendButton.style.display = "none";
+    retakeButton.style.display = "none";
+  } catch (error) {
+    showAlert("❌ فشل في الوصول إلى الكاميرا. يرجى التأكد من منح الأذونات.", "danger");
   }
 });
 
-// 📸 Capture Frame
+/**
+ * State 2: Capture Photo
+ */
 captureButton.addEventListener("click", () => {
   const canvas = document.createElement("canvas");
   canvas.width = cameraStream.videoWidth;
   canvas.height = cameraStream.videoHeight;
   const ctx = canvas.getContext("2d");
   ctx.drawImage(cameraStream, 0, 0);
-  canvas.toBlob((blob) => {
-    selectedFile = new File([blob], "captured.png", { type: "image/png" });
-    preview.src = URL.createObjectURL(selectedFile);
-    preview.style.display = "block";
-    showAlert("✅ تم التقاط الصورة بنجاح.", "success");
-  });
-});
 
-// ✖️ Stop Camera
-stopCameraButton.addEventListener("click", () => {
-  if (stream) {
-    stream.getTracks().forEach((track) => track.stop());
-  }
+  preview.src = canvas.toDataURL("image/jpeg");
+  
+  // UI Transitions
+  preview.style.display = "block";
   cameraStream.style.display = "none";
   captureButton.style.display = "none";
   stopCameraButton.style.display = "none";
-  showAlert("✔️ تم إيقاف الكاميرا.", "secondary");
+  
+  sendButton.style.display = "inline-block";
+  retakeButton.style.display = "inline-block";
+
+  // Stop camera stream to save resources
+  if (stream) {
+    stream.getTracks().forEach((track) => track.stop());
+  }
 });
 
-// 📤 Send to /users/verify_login
+/**
+ * State 3: Retake Photo
+ */
+retakeButton.addEventListener("click", () => {
+  // Reset UI and re-trigger camera
+  preview.style.display = "none";
+  sendButton.style.display = "none";
+  retakeButton.style.display = "none";
+  
+  openCameraButton.click(); 
+});
+
+/**
+ * Helper: Stop Camera manually
+ */
+stopCameraButton.addEventListener("click", () => {
+  if (stream) {
+    stream.getTracks().forEach((track) => track.stop());
+    cameraStream.style.display = "none";
+    captureButton.style.display = "none";
+    stopCameraButton.style.display = "none";
+    openCameraContainer.style.display = "block";
+  }
+});
+
+/**
+ * Verification Logic (Backend Submission)
+ */
 sendButton.addEventListener("click", async () => {
-  if (!selectedFile) {
-    showAlert("❌ يرجى تحديد أو التقاط صورة أولاً.", "danger");
+  const imageData = preview.src;
+  if (!imageData || imageData === "#") {
+    showAlert("❌ يرجى التقاط صورة أولاً.", "danger");
     return;
   }
 
-  const formData = new FormData();
-  formData.append("image", selectedFile);
-
-  showAlert("⏳ جاري التحقق، يرجى الانتظار...", "info");
-
   try {
-    const response = await fetch("/users/verify_login", {
+    // Show loading state if desired, but here we just proceed to fetch
+    const blob = dataURLtoBlob(imageData);
+
+    if (blob.size === 0) {
+        throw new Error("❌ فشل في إنشاء بيانات الصورة.");
+    }
+
+    const formData = new FormData();
+    formData.append("image", blob, "capture.jpg");
+
+    const response = await fetch(`${API_BASE}/users/verify_login`, {
       method: "POST",
       body: formData,
     });
     const data = await response.json();
 
     if (response.ok) {
-      showAlert(
-        `✅ تم تسجيل الدخول بنجاح. أهلاً بك، <strong>${data.user.name}</strong>`,
-        "success"
-      );
+      showAlert(`✅ تم تسجيل الدخول بنجاح. أهلاً بك، <strong>${data.user.name}</strong>`, "success");
     } else {
-      showAlert(
-        `❌ ${data.error || "تم رفض الوصول. يرجى المحاولة مرة أخرى."}`,
-        "danger"
-      );
+      showAlert(`❌ ${data.error || "تم رفض الوصول. يرجى المحاولة مرة أخرى."}`, "danger");
     }
   } catch (error) {
     showAlert("❌ خطأ في الشبكة. يرجى المحاولة مرة أخرى.", "danger");
   }
 });
 
-// Alert Utility
-function showAlert(message, type) {
-  resultDiv.innerHTML = `
-    <div class="alert alert-${type}" role="alert">
-      ${message}
-    </div>`;
-}
-function clearAlert() {
-  resultDiv.innerHTML = "";
+/**
+ * Utility: Convert DataURL to Blob
+ */
+function dataURLtoBlob(dataurl) {
+    const byteString = atob(dataurl.split(',')[1]);
+    const mimeString = dataurl.split(',')[0].split(':')[1].split(';')[0];
+    const ab = new ArrayBuffer(byteString.length);
+    const ia = new Uint8Array(ab);
+    for (let i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
+    }
+    return new Blob([ab], {type: mimeString});
 }
 
-// Custom File Upload Label Logic
-document.addEventListener('DOMContentLoaded', () => {
-  const imageUploadInput = document.getElementById("imageUpload");
-  const userFileLabel = document.getElementById("userFileLabel");
-  
-  if (imageUploadInput && userFileLabel) {
-    imageUploadInput.addEventListener("change", (e) => {
-      if (e.target.files.length > 0) {
-        userFileLabel.innerText = '📁 ' + e.target.files[0].name;
-      } else {
-        userFileLabel.innerText = "📁 اختر صورة من الجهاز...";
-      }
-    });
+// SweetAlert2 Toast Mixin
+const Toast = Swal.mixin({
+  toast: true,
+  position: 'bottom-end',
+  showConfirmButton: false,
+  timer: 3000,
+  timerProgressBar: true,
+  didOpen: (toast) => {
+    toast.addEventListener('mouseenter', Swal.stopTimer)
+    toast.addEventListener('mouseleave', Swal.resumeTimer)
   }
 });
+
+function showAlert(message, type) {
+  let iconType = type === 'danger' ? 'error' : (type === 'success' ? 'success' : 'info');
+  Toast.fire({
+    icon: iconType,
+    html: message
+  });
+}
