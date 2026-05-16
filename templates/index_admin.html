@@ -27,24 +27,30 @@
 
     <!-- Admin Panel -->
     <div id="adminPanel" class="hidden">
-      <!-- Add User -->
-      <div class="card p-4 shadow">
-        <h4>➕ إضافة مستخدم جديد</h4>
-        <input type="text" id="newUserId" class="form-control mb-2" placeholder="معرف المستخدم" required>
-        <input type="text" id="newUserName" class="form-control mb-2" placeholder="الاسم" required>
-        <input type="email" id="newUserEmail" class="form-control mb-2" placeholder="البريد الإلكتروني" required>
-        <label for="newUserImage" class="btn btn-outline-secondary w-100 mb-2" id="fileLabel">📷 اختر صورة بصمة الوجه...</label>
-        <input type="file" id="newUserImage" class="form-control mb-2" accept="image/*" style="display: none;" required>
-        <button class="btn btn-success w-100" onclick="addUser()">إضافة مستخدم</button>
-        <div id="addUserMessage"></div>
-      </div>
+      <div class="row g-3 mb-4">
+        <div class="col-md-6">
+          <!-- Add User -->
+          <div class="card p-4 shadow h-100">
+            <h4>➕ إضافة مستخدم جديد</h4>
+            <input type="text" id="newUserId" class="form-control mb-2" placeholder="معرف المستخدم" required>
+            <input type="text" id="newUserName" class="form-control mb-2" placeholder="الاسم" required>
+            <input type="email" id="newUserEmail" class="form-control mb-2" placeholder="البريد الإلكتروني" required>
+            <label for="newUserImage" class="btn btn-outline-secondary w-100 mb-2" id="fileLabel">📷 اختر صورة بصمة الوجه...</label>
+            <input type="file" id="newUserImage" class="form-control mb-2" accept="image/*" style="display: none;" required>
+            <button class="btn btn-success w-100" onclick="addUser()">إضافة مستخدم</button>
+            <div id="addUserMessage"></div>
+          </div>
+        </div>
 
-      <!-- Delete User -->
-      <div class="card p-4 shadow">
-        <h4>❌ حذف مستخدم</h4>
-        <select id="deleteUserId" class="form-select mb-2"></select>
-        <button class="btn btn-danger w-100" onclick="deleteUser()">حذف مستخدم</button>
-        <div id="deleteUserMessage"></div>
+        <div class="col-md-6">
+          <!-- Delete User -->
+          <div class="card p-4 shadow h-100">
+            <h4>❌ حذف مستخدم</h4>
+            <select id="deleteUserId" class="form-select mb-2"></select>
+            <button class="btn btn-danger w-100" onclick="deleteUser()">حذف مستخدم</button>
+            <div id="deleteUserMessage"></div>
+          </div>
+        </div>
       </div>
 
       <!-- Audit Logs -->
