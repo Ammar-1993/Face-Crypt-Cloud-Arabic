@@ -38,28 +38,55 @@ let currentPage = 1;
 const rowsPerPage = 10;
 
 async function adminLogin() {
-  const password = document.getElementById("adminPassword").value;
-  const res = await fetch(`${API_BASE}/admin/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ password }),
-  });
-  const data = await res.json();
-  if (res.ok) {
+  const passwordInput = document.getElementById("adminPassword");
+  const password = passwordInput.value.trim();
+
+  if (!password) {
     setText(
       "loginMessage",
-      `<span class="text-success">✅ ${data.message}</span>`
+      `<span class="text-danger">❌ الرجاء إدخال كلمة المرور أولاً.</span>`
     );
-    hide(document.getElementById("loginSection"));
-    show(document.getElementById("adminPanel"));
-    await loadUsers();
-    await fetchAuditLogs();
-    await refreshStats();
-  } else {
+    return;
+  }
+
+  const loginBtn = document.getElementById("adminLoginBtn");
+  const originalBtnText = loginBtn.innerHTML;
+
+  loginBtn.disabled = true;
+  loginBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> جاري التحقق...`;
+
+  try {
+    const res = await fetch(`${API_BASE}/admin/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ password }),
+    });
+    const data = await res.json();
+    if (res.ok) {
+      setText(
+        "loginMessage",
+        `<span class="text-success">✅ ${data.message}</span>`
+      );
+      hide(document.getElementById("loginSection"));
+      show(document.getElementById("adminPanel"));
+      await loadUsers();
+      await fetchAuditLogs();
+      await refreshStats();
+    } else {
+      setText(
+        "loginMessage",
+        `<span class="text-danger">❌ ${data.error}</span>`
+      );
+    }
+  } catch (error) {
+    console.error(error);
     setText(
       "loginMessage",
-      `<span class="text-danger">❌ ${data.error}</span>`
+      `<span class="text-danger">❌ خطأ في الشبكة أو خادم الويب غير متصل.</span>`
     );
+  } finally {
+    loginBtn.disabled = false;
+    loginBtn.innerHTML = originalBtnText;
   }
 }
 
