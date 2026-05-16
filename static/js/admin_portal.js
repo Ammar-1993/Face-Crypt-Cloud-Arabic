@@ -408,11 +408,15 @@ async function clearAuditLogs() {
   });
 }
 
-// Custom File Upload Label Logic
-document.addEventListener('DOMContentLoaded', () => {
+// Initialization and UI Logic
+document.addEventListener("DOMContentLoaded", () => {
+  // 1. Initialize Bootstrap Tooltips
+  const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+  tooltipTriggerList.map((tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl));
+
+  // 2. Custom File Upload Label Logic
   const newUserImageInput = document.getElementById("newUserImage");
   const fileLabel = document.getElementById("fileLabel");
-  
   if (newUserImageInput && fileLabel) {
     newUserImageInput.addEventListener("change", (e) => {
       if (e.target.files.length > 0) {

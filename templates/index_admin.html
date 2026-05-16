@@ -97,58 +97,59 @@
         </div>
         <div class="row g-2 text-center">
           <div class="col-6 col-md-3">
-            <div class="card stat-card-hover shadow-sm border-0 border-start border-primary border-4 p-2">
+            <div class="card stat-card-hover shadow-sm border-0 border-start border-primary border-4 p-2" data-bs-toggle="tooltip" data-bs-placement="top" title="عدد جميع محاولات تسجيل الدخول (الناجحة والفاشلة) المسجلة في السحابة.">
               <span id="statTotal" class="fs-3 fw-bold text-primary">-</span>
-              <span class="text-muted fs-6 mt-2">كل المحاولات ✅</span>
+              <span class="text-muted fs-6 mt-2">إجمالي المحاولات 📊</span>
             </div>
           </div>
           <div class="col-6 col-md-3">
-            <div class="card stat-card-hover shadow-sm border-0 border-start border-success border-4 p-2">
+            <div class="card stat-card-hover shadow-sm border-0 border-start border-success border-4 p-2" data-bs-toggle="tooltip" data-bs-placement="top" title="عدد مرات التعرف على الوجه وتسجيل الدخول بنجاح.">
               <span id="statSuccess" class="fs-3 fw-bold text-success">-</span>
-              <span class="text-muted fs-6 mt-2">الناجحة ✅</span>
+              <span class="text-muted fs-6 mt-2">دخول ناجح ✅</span>
             </div>
           </div>
           <div class="col-6 col-md-3">
-            <div class="card stat-card-hover shadow-sm border-0 border-start border-danger border-4 p-2">
+            <div class="card stat-card-hover shadow-sm border-0 border-start border-danger border-4 p-2" data-bs-toggle="tooltip" data-bs-placement="top" title="عدد المرات التي فشل فيها النظام في مطابقة الوجه.">
               <span id="statFailed" class="fs-3 fw-bold text-danger">-</span>
-              <span class="text-muted fs-6 mt-2">الفاشلة ❌</span>
+              <span class="text-muted fs-6 mt-2">محاولات فاشلة ❌</span>
             </div>
           </div>
           <div class="col-6 col-md-3">
-            <div class="card stat-card-hover shadow-sm border-0 border-start border-secondary border-4 p-2">
+            <div class="card stat-card-hover shadow-sm border-0 border-start border-secondary border-4 p-2" data-bs-toggle="tooltip" data-bs-placement="top" title="إجمالي المرات التي أصدر فيها النظام قراراً بالحظر النهائي (تاريخياً).">
               <span id="statBlockedEvents" class="fs-3 fw-bold text-secondary">-</span>
-              <span class="text-muted fs-6 mt-2">أحداث حظر 🔒</span>
+              <span class="text-muted fs-6 mt-2">أحداث الحظر النهائي 🔒</span>
             </div>
           </div>
           <div class="col-6 col-md-3">
-            <div class="card stat-card-hover shadow-sm border-0 border-start border-warning border-4 p-2">
+            <div class="card stat-card-hover shadow-sm border-0 border-start border-warning border-4 p-2" data-bs-toggle="tooltip" data-bs-placement="top" title="إجمالي المرات التي تم فيها إيقاف مستخدم مؤقتاً بسبب المحاولات الخاطئة.">
               <span id="statSoftBlockEvents" class="fs-3 fw-bold text-warning">-</span>
-              <span class="text-muted fs-6 mt-2">حظر مؤقت 🕒</span>
+              <span class="text-muted fs-6 mt-2">أحداث الحظر المؤقت 🕒</span>
             </div>
           </div>
           <div class="col-6 col-md-3">
-            <div class="card stat-card-hover shadow-sm border-0 border-start border-dark border-4 p-2">
+            <div class="card stat-card-hover shadow-sm border-0 border-start border-dark border-4 p-2" data-bs-toggle="tooltip" data-bs-placement="top" title="العدد الحالي للمستخدمين المحظورين نهائياً في هذه اللحظة.">
               <span id="statBlockedUsers" class="fs-3 fw-bold text-dark">-</span>
-              <span class="text-muted fs-6 mt-2">محظورين 🔒</span>
+              <span class="text-muted fs-6 mt-2">مستخدمون محظورون 🔒</span>
             </div>
           </div>
           <div class="col-6 col-md-3">
-            <div class="card stat-card-hover shadow-sm border-0 border-start border-info border-4 p-2">
+            <div class="card stat-card-hover shadow-sm border-0 border-start border-info border-4 p-2" data-bs-toggle="tooltip" data-bs-placement="top" title="العدد الحالي للمستخدمين الموقوفين مؤقتاً (لمدة 5 دقائق) في هذه اللحظة.">
               <span id="statSoftBlockedUsers" class="fs-3 fw-bold text-info">-</span>
-              <span class="text-muted fs-6 mt-2">محظور مؤقتاً 🕒</span>
+              <span class="text-muted fs-6 mt-2">في الحظر المؤقت 🕒</span>
             </div>
           </div>
           <div class="col-6 col-md-3">
-            <div class="card stat-card-hover shadow-sm border-0 border-start border-primary border-4 p-2">
+            <div class="card stat-card-hover shadow-sm border-0 border-start border-primary border-4 p-2" data-bs-toggle="tooltip" data-bs-placement="top" title="إجمالي عدد الأشخاص المسجلين في قاعدة بيانات السحابة.">
               <span id="statTotalUsers" class="fs-3 fw-bold text-primary">-</span>
-              <span class="text-muted fs-6 mt-2">المستخدمين 👤</span>
+              <span class="text-muted fs-6 mt-2">إجمالي المستخدمين 👤</span>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- ملف الجافاسكريبت المخصص -->
+    <!-- ملفات الجافاسكريبت -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ url_for('static', filename='js/admin_portal.js') }}"></script>
 </body>
 
