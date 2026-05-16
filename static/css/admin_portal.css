@@ -76,3 +76,13 @@ h4 {
   margin-top: 10px;
   text-align: center;
 }
+
+/* Stat Card Hover Animation */
+.stat-card-hover {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.stat-card-hover:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15) !important;
+}
