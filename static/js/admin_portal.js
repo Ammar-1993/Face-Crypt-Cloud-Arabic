@@ -369,3 +369,19 @@ async function clearAuditLogs() {
     alert("❌ خطأ في مسح سجلات التدقيق.");
   }
 }
+
+// Custom File Upload Label Logic
+document.addEventListener('DOMContentLoaded', () => {
+  const newUserImageInput = document.getElementById("newUserImage");
+  const fileLabel = document.getElementById("fileLabel");
+  
+  if (newUserImageInput && fileLabel) {
+    newUserImageInput.addEventListener("change", (e) => {
+      if (e.target.files.length > 0) {
+        fileLabel.innerText = '📷 ' + e.target.files[0].name;
+      } else {
+        fileLabel.innerText = "📷 اختر صورة بصمة الوجه...";
+      }
+    });
+  }
+});

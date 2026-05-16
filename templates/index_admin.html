@@ -33,7 +33,8 @@
         <input type="text" id="newUserId" class="form-control mb-2" placeholder="معرف المستخدم" required>
         <input type="text" id="newUserName" class="form-control mb-2" placeholder="الاسم" required>
         <input type="email" id="newUserEmail" class="form-control mb-2" placeholder="البريد الإلكتروني" required>
-        <input type="file" id="newUserImage" class="form-control mb-2" accept="image/*" required>
+        <label for="newUserImage" class="btn btn-outline-secondary w-100 mb-2" id="fileLabel">📷 اختر صورة بصمة الوجه...</label>
+        <input type="file" id="newUserImage" class="form-control mb-2" accept="image/*" style="display: none;" required>
         <button class="btn btn-success w-100" onclick="addUser()">إضافة مستخدم</button>
         <div id="addUserMessage"></div>
       </div>
