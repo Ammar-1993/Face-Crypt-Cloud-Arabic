@@ -221,11 +221,11 @@ function renderAuditLogs(logs) {
   const end = start + rowsPerPage;
   const pageData = logs.slice(start, end);
 
-  pageIndicator.textContent = `صفحة ${currentPage} من ${totalPages}`;
+  pageIndicator.textContent = `صفحة ${currentPage} من ${totalPages || 1}`;
 
   if (!pageData || pageData.length === 0) {
     table.innerHTML =
-      '<tr><td colspan="4" class="text-center">لم يتم العثور على سجلات.</td></tr>';
+      '<tr><td colspan="5" class="text-center">لم يتم العثور على سجلات.</td></tr>';
     return;
   }
 
@@ -233,17 +233,28 @@ function renderAuditLogs(logs) {
   pageData.forEach((log) => {
     const row = document.createElement("tr");
 
-    // ✨ زر الفك
-    let statusCell = translateStatus(log.status);
-    if (log.status === "blocked") {
-      statusCell += ` <button class="btn btn-sm btn-outline-success ms-2" onclick="unblockUser('${log.user_id}')">🔓</button>`;
+    // 🏷️ Status Badges Logic
+    let badgeClass = "bg-secondary";
+    const status = log.status;
+    if (status === "success") badgeClass = "bg-success";
+    else if (status === "failure") badgeClass = "bg-danger";
+    else if (status === "soft_block") badgeClass = "bg-warning text-dark";
+    else if (status === "blocked") badgeClass = "bg-dark";
+
+    const statusBadge = `<span class="badge ${badgeClass}">${translateStatus(status)}</span>`;
+
+    // 🛠️ Dedicated Actions Column Logic
+    let actionCell = "";
+    if (status === "blocked") {
+      actionCell = '<button class="btn btn-sm btn-outline-success rounded-pill px-3" onclick="unblockUser(\'' + log.user_id + '\')">فك الحظر</button>';
     }
 
     row.innerHTML = `
       <td>${translateEvent(log.event)}</td>
-      <td>${statusCell}</td>
+      <td class="text-center">${statusBadge}</td>
       <td>${log.user_id || ""}</td>
       <td dir="ltr" class="text-center" style="unicode-bidi: plaintext;">${formatTimestamp(log.timestamp)}</td>
+      <td class="text-center">${actionCell}</td>
     `;
     table.appendChild(row);
   });
@@ -328,14 +339,14 @@ async function refreshAuditLogs() {
   try {
     setText(
       "auditLogsTable",
-      '<tr><td colspan="4" class="text-center">جاري التحميل...</td></tr>'
+      '<tr><td colspan="5" class="text-center">جاري التحميل...</td></tr>'
     );
     await fetchAuditLogs();
   } catch (e) {
     console.error(e);
     setText(
       "auditLogsTable",
-      '<tr><td colspan="4" class="text-center text-danger">❌ فشل في تحديث السجلات.</td></tr>'
+      '<tr><td colspan="5" class="text-center text-danger">❌ فشل في تحديث السجلات.</td></tr>'
     );
   }
 }
