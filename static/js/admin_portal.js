@@ -5,7 +5,7 @@ function translateStatus(status) {
   if (!status) return "";
   const s = status.toLowerCase();
   if (s === "success") return "نجاح";
-  if (s === "failed") return "فشل";
+  if (s === "failed" || s === "failure") return "فشل";
   if (s === "blocked") return "محظور";
   if (s === "soft_block") return "حظر مؤقت";
   return status;
@@ -18,8 +18,8 @@ function translateEvent(event) {
   if (e === "admin_login") return "دخول مسؤول";
   if (e === "add_user") return "إضافة مستخدم";
   if (e === "delete_user") return "حذف مستخدم";
-  if (e === "unblock_user") return "فك حظر مستخدم";
-  if (e === "clear_logs") return "مسح السجلات";
+  if (e === "unblock_user" || e === "admin_unblock") return "فك حظر مستخدم";
+  if (e === "clear_logs" || e === "clear_audit_logs") return "مسح سجلات التدقيق";
   return event;
 }
 
