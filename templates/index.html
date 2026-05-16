@@ -13,7 +13,7 @@
 
 <body>
   <div style="text-align:center; margin: 30px 0;">
-    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="FaceCrypt Logo" width="180">
+    <img src="{{ url_for('static', filename='images/Picture1.png') }}" alt="FaceCrypt Logo" width="180">
   </div>
   <div class="container">
     <h1>سحابة الملامح المشفرة - بوابة المستخدم</h1>
@@ -26,9 +26,11 @@
 
     <!-- Camera and Preview Container -->
     <div id="cameraContainer" class="text-center mt-4">
-      <video id="cameraStream" class="rounded shadow-sm border" width="100%" style="max-width:400px; display:none;" autoplay playsinline></video>
-      <img id="preview" class="rounded shadow-sm border" src="#" alt="معاينة" style="display:none; max-width:400px; width:100%;">
-      
+      <video id="cameraStream" class="rounded shadow-sm border" width="100%" style="max-width:400px; display:none;"
+        autoplay playsinline></video>
+      <img id="preview" class="rounded shadow-sm border" src="#" alt="معاينة"
+        style="display:none; max-width:400px; width:100%;">
+
       <div class="mt-3">
         <button id="captureButton" class="btn btn-warning btn-lg" style="display:none;">📸 التقاط الصورة</button>
         <button id="stopCameraButton" class="btn btn-secondary" style="display:none;">✖️ إغلاق الكاميرا</button>
@@ -43,6 +45,13 @@
 
     <!-- Result -->
     <div id="result" class="mt-4"></div>
+
+    <!-- Security Disclaimer -->
+    <div class="mt-4 text-center text-secondary" style="font-size: 0.85rem; line-height: 1.6;">
+      <span title="سياسة الأمان">🛡️ <strong>حماية الحساب:</strong></span><br>
+      <span class="text-muted">٣ محاولات فاشلة = حظر مؤقت (٥ دقائق).</span><br>
+      <span class="text-muted">٥ محاولات فاشلة = حظر دائم (يتطلب مراجعة مسؤول النظام).</span>
+    </div>
   </div>
 
   <!-- رابط ملف JS المخصص -->

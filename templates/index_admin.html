@@ -13,7 +13,7 @@
 
 <body>
   <div style="text-align:center; margin: 30px 0;">
-    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="FaceCrypt Logo" width="180">
+    <img src="{{ url_for('static', filename='images/Picture1.png') }}" alt="FaceCrypt Logo" width="180">
   </div>
   <div class="container">
     <h1 class="mb-4">سحابة الملامح المشفرة - بوابة المسؤول</h1>
@@ -36,8 +36,10 @@
             <input type="text" id="newUserId" class="form-control mb-2" placeholder="معرف المستخدم" required>
             <input type="text" id="newUserName" class="form-control mb-2" placeholder="الاسم" required>
             <input type="email" id="newUserEmail" class="form-control mb-2" placeholder="البريد الإلكتروني" required>
-            <label for="newUserImage" class="btn btn-outline-secondary w-100 mb-2" id="fileLabel">📷 اختر صورة بصمة الوجه...</label>
-            <input type="file" id="newUserImage" class="form-control mb-2" accept="image/*" style="display: none;" required>
+            <label for="newUserImage" class="btn btn-outline-secondary w-100 mb-2" id="fileLabel">📷 اختر صورة بصمة
+              الوجه...</label>
+            <input type="file" id="newUserImage" class="form-control mb-2" accept="image/*" style="display: none;"
+              required>
             <button class="btn btn-success w-100" onclick="addUser()">إضافة مستخدم</button>
             <div id="addUserMessage"></div>
           </div>
@@ -94,53 +96,68 @@
       <div class="card p-4 shadow">
         <div class="d-flex justify-content-between align-items-center mb-3">
           <h4 class="mb-0">📊 الإحصائيات</h4>
-          <button id="refreshButton" class="btn btn-sm btn-secondary" onclick="refreshStats()">🔄 تحديث الإحصائيات</button>
+          <button id="refreshButton" class="btn btn-sm btn-secondary" onclick="refreshStats()">🔄 تحديث
+            الإحصائيات</button>
         </div>
         <div class="row g-2 text-center">
           <div class="col-6 col-md-3">
-            <div class="card stat-card-hover shadow-sm border-0 border-start border-primary border-4 p-2" data-bs-toggle="tooltip" data-bs-placement="top" title="عدد جميع محاولات تسجيل الدخول (الناجحة والفاشلة) المسجلة في السحابة.">
+            <div class="card stat-card-hover shadow-sm border-0 border-start border-primary border-4 p-2"
+              data-bs-toggle="tooltip" data-bs-placement="top"
+              title="عدد جميع محاولات تسجيل الدخول (الناجحة والفاشلة) المسجلة في السحابة.">
               <span id="statTotal" class="fs-3 fw-bold text-primary">-</span>
               <span class="text-muted fs-6 mt-2">إجمالي المحاولات 📊</span>
             </div>
           </div>
           <div class="col-6 col-md-3">
-            <div class="card stat-card-hover shadow-sm border-0 border-start border-success border-4 p-2" data-bs-toggle="tooltip" data-bs-placement="top" title="عدد مرات التعرف على الوجه وتسجيل الدخول بنجاح.">
+            <div class="card stat-card-hover shadow-sm border-0 border-start border-success border-4 p-2"
+              data-bs-toggle="tooltip" data-bs-placement="top" title="عدد مرات التعرف على الوجه وتسجيل الدخول بنجاح.">
               <span id="statSuccess" class="fs-3 fw-bold text-success">-</span>
               <span class="text-muted fs-6 mt-2">دخول ناجح ✅</span>
             </div>
           </div>
           <div class="col-6 col-md-3">
-            <div class="card stat-card-hover shadow-sm border-0 border-start border-danger border-4 p-2" data-bs-toggle="tooltip" data-bs-placement="top" title="عدد المرات التي فشل فيها النظام في مطابقة الوجه.">
+            <div class="card stat-card-hover shadow-sm border-0 border-start border-danger border-4 p-2"
+              data-bs-toggle="tooltip" data-bs-placement="top" title="عدد المرات التي فشل فيها النظام في مطابقة الوجه.">
               <span id="statFailed" class="fs-3 fw-bold text-danger">-</span>
               <span class="text-muted fs-6 mt-2">محاولات فاشلة ❌</span>
             </div>
           </div>
           <div class="col-6 col-md-3">
-            <div class="card stat-card-hover shadow-sm border-0 border-start border-secondary border-4 p-2" data-bs-toggle="tooltip" data-bs-placement="top" title="إجمالي المرات التي أصدر فيها النظام قراراً بالحظر النهائي (تاريخياً).">
+            <div class="card stat-card-hover shadow-sm border-0 border-start border-secondary border-4 p-2"
+              data-bs-toggle="tooltip" data-bs-placement="top"
+              title="إجمالي المرات التي أصدر فيها النظام قراراً بالحظر النهائي (تاريخياً).">
               <span id="statBlockedEvents" class="fs-3 fw-bold text-secondary">-</span>
               <span class="text-muted fs-6 mt-2">أحداث الحظر النهائي 🔒</span>
             </div>
           </div>
           <div class="col-6 col-md-3">
-            <div class="card stat-card-hover shadow-sm border-0 border-start border-warning border-4 p-2" data-bs-toggle="tooltip" data-bs-placement="top" title="إجمالي المرات التي تم فيها إيقاف مستخدم مؤقتاً بسبب المحاولات الخاطئة.">
+            <div class="card stat-card-hover shadow-sm border-0 border-start border-warning border-4 p-2"
+              data-bs-toggle="tooltip" data-bs-placement="top"
+              title="إجمالي المرات التي تم فيها إيقاف مستخدم مؤقتاً بسبب المحاولات الخاطئة.">
               <span id="statSoftBlockEvents" class="fs-3 fw-bold text-warning">-</span>
               <span class="text-muted fs-6 mt-2">أحداث الحظر المؤقت 🕒</span>
             </div>
           </div>
           <div class="col-6 col-md-3">
-            <div class="card stat-card-hover shadow-sm border-0 border-start border-dark border-4 p-2" data-bs-toggle="tooltip" data-bs-placement="top" title="العدد الحالي للمستخدمين المحظورين نهائياً في هذه اللحظة.">
+            <div class="card stat-card-hover shadow-sm border-0 border-start border-dark border-4 p-2"
+              data-bs-toggle="tooltip" data-bs-placement="top"
+              title="العدد الحالي للمستخدمين المحظورين نهائياً في هذه اللحظة.">
               <span id="statBlockedUsers" class="fs-3 fw-bold text-dark">-</span>
               <span class="text-muted fs-6 mt-2">مستخدمون محظورون 🔒</span>
             </div>
           </div>
           <div class="col-6 col-md-3">
-            <div class="card stat-card-hover shadow-sm border-0 border-start border-info border-4 p-2" data-bs-toggle="tooltip" data-bs-placement="top" title="العدد الحالي للمستخدمين الموقوفين مؤقتاً (لمدة 5 دقائق) في هذه اللحظة.">
+            <div class="card stat-card-hover shadow-sm border-0 border-start border-info border-4 p-2"
+              data-bs-toggle="tooltip" data-bs-placement="top"
+              title="العدد الحالي للمستخدمين الموقوفين مؤقتاً (لمدة 5 دقائق) في هذه اللحظة.">
               <span id="statSoftBlockedUsers" class="fs-3 fw-bold text-info">-</span>
               <span class="text-muted fs-6 mt-2">في الحظر المؤقت 🕒</span>
             </div>
           </div>
           <div class="col-6 col-md-3">
-            <div class="card stat-card-hover shadow-sm border-0 border-start border-primary border-4 p-2" data-bs-toggle="tooltip" data-bs-placement="top" title="إجمالي عدد الأشخاص المسجلين في قاعدة بيانات السحابة.">
+            <div class="card stat-card-hover shadow-sm border-0 border-start border-primary border-4 p-2"
+              data-bs-toggle="tooltip" data-bs-placement="top"
+              title="إجمالي عدد الأشخاص المسجلين في قاعدة بيانات السحابة.">
               <span id="statTotalUsers" class="fs-3 fw-bold text-primary">-</span>
               <span class="text-muted fs-6 mt-2">إجمالي المستخدمين 👤</span>
             </div>
