@@ -165,34 +165,38 @@ async function deleteUser() {
     return;
   }
 
-  const result = await Swal.fire({
-    title: "⚠️ هل أنت متأكد من حذف هذا المستخدم نهائياً؟ لا يمكن التراجع عن هذه الخطوة.",
+  Swal.fire({
+    title: 'تأكيد الإجراء',
+    text: '⚠️ هل أنت متأكد من حذف هذا المستخدم نهائياً؟ لا يمكن التراجع عن هذه الخطوة.',
     icon: 'warning',
     showCancelButton: true,
-    confirmButtonText: 'نعم',
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'نعم، متأكد',
     cancelButtonText: 'إلغاء'
-  });
-  if (!result.isConfirmed) return;
+  }).then(async (result) => {
+    if (result.isConfirmed) {
+      const res = await fetch(`${API_BASE}/admin/delete_user`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user_id: userId }),
+      });
 
-  const res = await fetch(`${API_BASE}/admin/delete_user`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ user_id: userId }),
+      const data = await res.json();
+      if (res.ok) {
+        setText(
+          "deleteUserMessage",
+          `<span class="text-success">✅ ${data.message}</span>`
+        );
+        await loadUsers();
+      } else {
+        setText(
+          "deleteUserMessage",
+          `<span class="text-danger">❌ ${data.error}</span>`
+        );
+      }
+    }
   });
-
-  const data = await res.json();
-  if (res.ok) {
-    setText(
-      "deleteUserMessage",
-      `<span class="text-success">✅ ${data.message}</span>`
-    );
-    await loadUsers();
-  } else {
-    setText(
-      "deleteUserMessage",
-      `<span class="text-danger">❌ ${data.error}</span>`
-    );
-  }
 }
 
 async function fetchAuditLogs() {
@@ -337,54 +341,71 @@ async function refreshAuditLogs() {
 }
 
 async function unblockUser(userId) {
-  if (!confirm(`هل أنت متأكد أنك تريد فك حظر المستخدم ${userId}؟`)) return;
+  Swal.fire({
+    title: 'تأكيد الإجراء',
+    text: `هل أنت متأكد أنك تريد فك حظر المستخدم ${userId}؟`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'نعم، متأكد',
+    cancelButtonText: 'إلغاء'
+  }).then(async (result) => {
+    if (result.isConfirmed) {
+      try {
+        const res = await fetch(`${API_BASE}/admin/unblock_user`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ user_id: userId }),
+        });
 
-  try {
-    const res = await fetch(`${API_BASE}/admin/unblock_user`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ user_id: userId }),
-    });
-
-    const data = await res.json();
-    if (res.ok) {
-      alert(data.message);
-      await fetchAuditLogs();
-      await refreshStats();
-    } else {
-      alert(`❌ خطأ: ${data.error}`);
+        const data = await res.json();
+        if (res.ok) {
+          alert(data.message);
+          await fetchAuditLogs();
+          await refreshStats();
+        } else {
+          alert(`❌ خطأ: ${data.error}`);
+        }
+      } catch (e) {
+        console.error(e);
+        alert("❌ خطأ في فك حظر المستخدم");
+      }
     }
-  } catch (e) {
-    console.error(e);
-    alert("❌ خطأ في فك حظر المستخدم");
-  }
+  });
 }
 
 async function clearAuditLogs() {
-  if (
-    !confirm(
-      "⚠️ هل أنت متأكد من رغبتك في حذف جميع سجلات التدقيق؟ لا يمكن التراجع عن هذا الإجراء."
-    )
-  )
-    return;
+  Swal.fire({
+    title: 'تأكيد الإجراء',
+    text: '⚠️ هل أنت متأكد من رغبتك في حذف جميع سجلات التدقيق؟ لا يمكن التراجع عن هذا الإجراء.',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'نعم، متأكد',
+    cancelButtonText: 'إلغاء'
+  }).then(async (result) => {
+    if (result.isConfirmed) {
+      try {
+        const res = await fetch(`${API_BASE}/admin/clear_audit_logs`, {
+          method: "POST",
+        });
 
-  try {
-    const res = await fetch(`${API_BASE}/admin/clear_audit_logs`, {
-      method: "POST",
-    });
-
-    const data = await res.json();
-    if (res.ok) {
-      alert(data.message);
-      await fetchAuditLogs();
-      await refreshStats();
-    } else {
-      alert(`❌ خطأ: ${data.error}`);
+        const data = await res.json();
+        if (res.ok) {
+          alert(data.message);
+          await fetchAuditLogs();
+          await refreshStats();
+        } else {
+          alert(`❌ خطأ: ${data.error}`);
+        }
+      } catch (e) {
+        console.error(e);
+        alert("❌ خطأ في مسح سجلات التدقيق.");
+      }
     }
-  } catch (e) {
-    console.error(e);
-    alert("❌ خطأ في مسح سجلات التدقيق.");
-  }
+  });
 }
 
 // Custom File Upload Label Logic
