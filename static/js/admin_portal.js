@@ -243,7 +243,7 @@ function renderAuditLogs(logs) {
       <td>${translateEvent(log.event)}</td>
       <td>${statusCell}</td>
       <td>${log.user_id || ""}</td>
-      <td>${formatTimestamp(log.timestamp)}</td>
+      <td dir="ltr" class="text-center" style="unicode-bidi: plaintext;">${formatTimestamp(log.timestamp)}</td>
     `;
     table.appendChild(row);
   });
