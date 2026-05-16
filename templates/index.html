@@ -19,16 +19,27 @@
     <h1>سحابة الملامح المشفرة - بوابة المستخدم</h1>
     <p>تسجيل الدخول الآمن ببصمة الوجه</p>
 
-    <!-- Camera Section -->
-    <button id="openCamera" class="btn btn-primary">📷 فتح الكاميرا</button>
-    <video id="cameraStream" width="300" autoplay playsinline style="display:none;"></video>
-    <button id="captureButton" class="btn btn-warning mt-2" style="display:none;">📸 التقاط</button>
-    <button id="stopCameraButton" class="btn btn-secondary mt-2" style="display:none;">✖️ إيقاف الكاميرا</button>
+    <!-- Input Options Section (Camera OR File Upload) -->
+    <div class="row align-items-center mt-4 mb-4">
+      <div class="col-md-5">
+        <button id="openCamera" class="btn btn-primary w-100 py-2">📷 فتح الكاميرا</button>
+      </div>
+      <div class="col-md-2 text-center my-3 my-md-0 text-muted fw-bold fs-5">
+        أو
+      </div>
+      <div class="col-md-5">
+        <label for="imageUpload" class="btn btn-outline-secondary w-100 py-2 m-0" id="userFileLabel">📁 اختر صورة من الجهاز...</label>
+        <input type="file" id="imageUpload" accept="image/*" style="display: none;" />
+      </div>
+    </div>
 
-    <!-- Upload Section -->
-    <div class="mt-3">
-      <label for="imageUpload" class="btn btn-outline-secondary w-100 mb-3" id="userFileLabel">📁 اختر صورة من الجهاز...</label>
-      <input type="file" id="imageUpload" accept="image/*" class="form-control mt-2" style="display: none;" />
+    <!-- Camera Video Stream Area (Appears Below when Active) -->
+    <div class="text-center">
+      <video id="cameraStream" class="rounded shadow-sm" width="100%" style="max-width:300px; display:none;" autoplay playsinline></video>
+      <div class="mt-2">
+        <button id="captureButton" class="btn btn-warning" style="display:none;">📸 التقاط</button>
+        <button id="stopCameraButton" class="btn btn-secondary" style="display:none;">✖️ إيقاف الكاميرا</button>
+      </div>
     </div>
 
     <!-- Preview -->
