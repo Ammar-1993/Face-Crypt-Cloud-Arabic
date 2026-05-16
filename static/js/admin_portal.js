@@ -316,11 +316,11 @@ async function refreshStats() {
       document.getElementById("statTotalUsers").textContent =
         data.total_users ?? 0; // Added for total users
     } else {
-      alert("❌ فشل في جلب الإحصائيات");
+      Swal.fire({ text: "❌ فشل في جلب الإحصائيات", icon: 'error', confirmButtonText: 'حسناً' });
     }
   } catch (e) {
     console.error(e);
-    alert("❌ خطأ في جلب الإحصائيات");
+    Swal.fire({ text: "❌ خطأ في جلب الإحصائيات", icon: 'error', confirmButtonText: 'حسناً' });
   }
 }
 
@@ -361,15 +361,15 @@ async function unblockUser(userId) {
 
         const data = await res.json();
         if (res.ok) {
-          alert(data.message);
+          Swal.fire({ text: data.message, icon: 'success', confirmButtonText: 'حسناً' });
           await fetchAuditLogs();
           await refreshStats();
         } else {
-          alert(`❌ خطأ: ${data.error}`);
+          Swal.fire({ text: `❌ خطأ: ${data.error}`, icon: 'error', confirmButtonText: 'حسناً' });
         }
       } catch (e) {
         console.error(e);
-        alert("❌ خطأ في فك حظر المستخدم");
+        Swal.fire({ text: "❌ خطأ في فك حظر المستخدم", icon: 'error', confirmButtonText: 'حسناً' });
       }
     }
   });
@@ -394,15 +394,15 @@ async function clearAuditLogs() {
 
         const data = await res.json();
         if (res.ok) {
-          alert(data.message);
+          Swal.fire({ text: data.message, icon: 'success', confirmButtonText: 'حسناً' });
           await fetchAuditLogs();
           await refreshStats();
         } else {
-          alert(`❌ خطأ: ${data.error}`);
+          Swal.fire({ text: `❌ خطأ: ${data.error}`, icon: 'error', confirmButtonText: 'حسناً' });
         }
       } catch (e) {
         console.error(e);
-        alert("❌ خطأ في مسح سجلات التدقيق.");
+        Swal.fire({ text: "❌ خطأ في مسح سجلات التدقيق.", icon: 'error', confirmButtonText: 'حسناً' });
       }
     }
   });
