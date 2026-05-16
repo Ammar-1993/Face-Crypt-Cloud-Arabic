@@ -2,20 +2,21 @@ const API_BASE = "";
 
 const preview = document.getElementById("preview");
 const captureButton = document.getElementById("captureButton");
-const openCameraButton = document.getElementById("openCamera");
+const btnOpenCamera = document.getElementById("btnOpenCamera");
 const stopCameraButton = document.getElementById("stopCameraButton");
 const sendButton = document.getElementById("sendButton");
 const retakeButton = document.getElementById("retakeButton");
 const btnCancelCamera = document.getElementById("btnCancelCamera");
 const cameraStream = document.getElementById("cameraStream");
-const openCameraContainer = openCameraButton.parentElement;
+const openCameraWrapper = document.getElementById("openCameraWrapper");
+const securityDisclaimer = document.getElementById("securityDisclaimer");
 
 let stream = null;
 
 /**
  * State 1: Start Camera
  */
-openCameraButton.addEventListener("click", async () => {
+btnOpenCamera.addEventListener("click", async () => {
   try {
     stream = await navigator.mediaDevices.getUserMedia({ video: true });
     cameraStream.srcObject = stream;
@@ -23,7 +24,8 @@ openCameraButton.addEventListener("click", async () => {
     // UI Transitions
     cameraStream.style.display = "block";
     preview.style.display = "none";
-    openCameraContainer.style.display = "none";
+    openCameraWrapper.classList.add("d-none");
+    securityDisclaimer.classList.add("d-none");
     
     captureButton.style.display = "inline-block";
     stopCameraButton.style.display = "inline-block";
@@ -74,7 +76,7 @@ retakeButton.addEventListener("click", () => {
   retakeButton.style.display = "none";
   btnCancelCamera.style.display = "none";
   
-  openCameraButton.click(); 
+  btnOpenCamera.click(); 
 });
 
 /**
@@ -91,7 +93,8 @@ btnCancelCamera.addEventListener("click", () => {
   retakeButton.style.display = "none";
   btnCancelCamera.style.display = "none";
   
-  openCameraContainer.style.display = "block";
+  openCameraWrapper.classList.remove("d-none");
+  securityDisclaimer.classList.remove("d-none");
   preview.src = "#";
 });
 
@@ -104,7 +107,8 @@ stopCameraButton.addEventListener("click", () => {
     cameraStream.style.display = "none";
     captureButton.style.display = "none";
     stopCameraButton.style.display = "none";
-    openCameraContainer.style.display = "block";
+    openCameraWrapper.classList.remove("d-none");
+    securityDisclaimer.classList.remove("d-none");
   }
 });
 

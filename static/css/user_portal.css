@@ -10,19 +10,20 @@ h1 {
 }
 
 #cameraContainer {
-  max-width: 400px;
-  margin: 20px auto;
+  max-width: 500px;
+  margin: 10px auto;
 }
 
-video,
-img#preview {
-  display: block;
-  margin: 0 auto;
+#cameraContainer video, #cameraContainer img {
+  max-height: 350px;
   width: 100%;
-  max-width: 400px;
-  border-radius: 15px;
+  max-width: 500px;
+  object-fit: cover;
+  margin: 0 auto;
+  border-radius: 12px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.15);
   transition: all 0.3s ease;
+  display: block;
 }
 
 video {
@@ -43,4 +44,20 @@ img#preview {
 #captureButton,
 #stopCameraButton {
   margin-top: 10px;
+}
+
+#securityDisclaimer {
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+  transition: all 0.3s ease;
+}
+
+#securityDisclaimer h6 {
+  font-size: 1.1rem;
+}
+
+#securityDisclaimer .badge {
+  min-width: 100px;
+  font-weight: 600;
 }
