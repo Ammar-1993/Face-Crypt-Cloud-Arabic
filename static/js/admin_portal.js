@@ -165,7 +165,14 @@ async function deleteUser() {
     return;
   }
 
-  if (!confirm("⚠️ هل أنت متأكد من حذف هذا المستخدم نهائياً؟ لا يمكن التراجع عن هذه الخطوة.")) return;
+  const result = await Swal.fire({
+    title: "⚠️ هل أنت متأكد من حذف هذا المستخدم نهائياً؟ لا يمكن التراجع عن هذه الخطوة.",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'نعم',
+    cancelButtonText: 'إلغاء'
+  });
+  if (!result.isConfirmed) return;
 
   const res = await fetch(`${API_BASE}/admin/delete_user`, {
     method: "POST",
