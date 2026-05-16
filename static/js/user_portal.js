@@ -96,8 +96,13 @@ sendButton.addEventListener("click", async () => {
     return;
   }
 
+  // 1. Immediate Disable & Loading UI
+  sendButton.disabled = true;
+  retakeButton.disabled = true;
+  const originalBtnContent = sendButton.innerHTML;
+  sendButton.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> جاري التحقق...`;
+
   try {
-    // Show loading state if desired, but here we just proceed to fetch
     const blob = dataURLtoBlob(imageData);
 
     if (blob.size === 0) {
@@ -120,6 +125,11 @@ sendButton.addEventListener("click", async () => {
     }
   } catch (error) {
     showAlert("❌ خطأ في الشبكة. يرجى المحاولة مرة أخرى.", "danger");
+  } finally {
+    // 2. Safe Restoration
+    sendButton.disabled = false;
+    retakeButton.disabled = false;
+    sendButton.innerHTML = originalBtnContent;
   }
 });
 
