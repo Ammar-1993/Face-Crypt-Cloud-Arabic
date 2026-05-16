@@ -6,6 +6,7 @@ const openCameraButton = document.getElementById("openCamera");
 const stopCameraButton = document.getElementById("stopCameraButton");
 const sendButton = document.getElementById("sendButton");
 const retakeButton = document.getElementById("retakeButton");
+const btnCancelCamera = document.getElementById("btnCancelCamera");
 const cameraStream = document.getElementById("cameraStream");
 const openCameraContainer = openCameraButton.parentElement;
 
@@ -29,6 +30,7 @@ openCameraButton.addEventListener("click", async () => {
     
     sendButton.style.display = "none";
     retakeButton.style.display = "none";
+    btnCancelCamera.style.display = "none";
   } catch (error) {
     showAlert("❌ فشل في الوصول إلى الكاميرا. يرجى التأكد من منح الأذونات.", "danger");
   }
@@ -54,6 +56,7 @@ captureButton.addEventListener("click", () => {
   
   sendButton.style.display = "inline-block";
   retakeButton.style.display = "inline-block";
+  btnCancelCamera.style.display = "inline-block";
 
   // Stop camera stream to save resources
   if (stream) {
@@ -69,8 +72,27 @@ retakeButton.addEventListener("click", () => {
   preview.style.display = "none";
   sendButton.style.display = "none";
   retakeButton.style.display = "none";
+  btnCancelCamera.style.display = "none";
   
   openCameraButton.click(); 
+});
+
+/**
+ * State 4: Cancel Camera/Preview
+ */
+btnCancelCamera.addEventListener("click", () => {
+  if (stream) {
+    stream.getTracks().forEach((track) => track.stop());
+  }
+  cameraStream.style.display = "none";
+  preview.style.display = "none";
+  
+  sendButton.style.display = "none";
+  retakeButton.style.display = "none";
+  btnCancelCamera.style.display = "none";
+  
+  openCameraContainer.style.display = "block";
+  preview.src = "#";
 });
 
 /**
