@@ -89,47 +89,52 @@
           <button id="refreshButton" class="btn btn-sm btn-secondary" onclick="refreshStats()">🔄 تحديث الإحصائيات</button>
         </div>
         <div class="row g-2 text-center">
-          <!-- كارد بعرض كامل -->
-          <div class="col-12">
-            <div class="stat-box bg-stat-success">
-              ✅ إجمالي المحاولات: <span id="statTotal">-</span>
+          <div class="col-6 col-md-3">
+            <div class="card shadow-sm border-0 border-start border-primary border-4 p-2">
+              <span id="statTotal" class="fs-3 fw-bold text-primary">-</span>
+              <span class="text-muted small mt-1">كل المحاولات ✅</span>
             </div>
           </div>
-          <!-- الكروت الرئيسية الأخرى في الوسط -->
-          <div class="col-md-6">
-            <div class="stat-box bg-stat-success">
-              ✅ المحاولات الناجحة: <span id="statSuccess">-</span>
+          <div class="col-6 col-md-3">
+            <div class="card shadow-sm border-0 border-start border-success border-4 p-2">
+              <span id="statSuccess" class="fs-3 fw-bold text-success">-</span>
+              <span class="text-muted small mt-1">الناجحة ✅</span>
             </div>
           </div>
-          <div class="col-md-6">
-            <div class="stat-box bg-stat-failure">
-              ❌ المحاولات الفاشلة: <span id="statFailed">-</span>
+          <div class="col-6 col-md-3">
+            <div class="card shadow-sm border-0 border-start border-danger border-4 p-2">
+              <span id="statFailed" class="fs-3 fw-bold text-danger">-</span>
+              <span class="text-muted small mt-1">الفاشلة ❌</span>
             </div>
           </div>
-          <div class="col-md-6">
-            <div class="stat-box bg-stat-blocked">
-              🔒 أحداث الحظر: <span id="statBlockedEvents">-</span>
+          <div class="col-6 col-md-3">
+            <div class="card shadow-sm border-0 border-start border-secondary border-4 p-2">
+              <span id="statBlockedEvents" class="fs-3 fw-bold text-secondary">-</span>
+              <span class="text-muted small mt-1">أحداث حظر 🔒</span>
             </div>
           </div>
-          <div class="col-md-6">
-            <div class="stat-box bg-stat-soft">
-              🕒 أحداث الحظر المؤقت: <span id="statSoftBlockEvents">-</span>
+          <div class="col-6 col-md-3">
+            <div class="card shadow-sm border-0 border-start border-warning border-4 p-2">
+              <span id="statSoftBlockEvents" class="fs-3 fw-bold text-warning">-</span>
+              <span class="text-muted small mt-1">حظر مؤقت 🕒</span>
             </div>
           </div>
-          <div class="col-md-6">
-            <div class="stat-box bg-stat-blocked">
-              🔒 المستخدمين المحظورين: <span id="statBlockedUsers">-</span>
+          <div class="col-6 col-md-3">
+            <div class="card shadow-sm border-0 border-start border-dark border-4 p-2">
+              <span id="statBlockedUsers" class="fs-3 fw-bold text-dark">-</span>
+              <span class="text-muted small mt-1">محظورين 🔒</span>
             </div>
           </div>
-          <div class="col-md-6">
-            <div class="stat-box bg-stat-soft">
-              🕒 المستخدمين المحظورين مؤقتاً: <span id="statSoftBlockedUsers">-</span>
+          <div class="col-6 col-md-3">
+            <div class="card shadow-sm border-0 border-start border-info border-4 p-2">
+              <span id="statSoftBlockedUsers" class="fs-3 fw-bold text-info">-</span>
+              <span class="text-muted small mt-1">محظور مؤقتاً 🕒</span>
             </div>
           </div>
-          <!-- الكارد الأخير بعرض كامل -->
-          <div class="col-12">
-            <div class="stat-box bg-primary" style="color:white;">
-              👤 إجمالي المستخدمين: <span id="statTotalUsers">-</span>
+          <div class="col-6 col-md-3">
+            <div class="card shadow-sm border-0 border-start border-primary border-4 p-2">
+              <span id="statTotalUsers" class="fs-3 fw-bold text-primary">-</span>
+              <span class="text-muted small mt-1">المستخدمين 👤</span>
             </div>
           </div>
         </div>
