@@ -136,6 +136,14 @@ async function addUser() {
 async function loadUsers() {
   const select = document.getElementById("deleteUserId");
   select.innerHTML = "";
+  
+  const defaultOption = document.createElement("option");
+  defaultOption.text = "اختر مستخدماً للحذف...";
+  defaultOption.value = "";
+  defaultOption.disabled = true;
+  defaultOption.selected = true;
+  select.add(defaultOption);
+
   const res = await fetch(`${API_BASE}/admin/list_users`);
   const data = await res.json();
 
@@ -156,6 +164,8 @@ async function deleteUser() {
     );
     return;
   }
+
+  if (!confirm("⚠️ هل أنت متأكد من حذف هذا المستخدم نهائياً؟ لا يمكن التراجع عن هذه الخطوة.")) return;
 
   const res = await fetch(`${API_BASE}/admin/delete_user`, {
     method: "POST",
