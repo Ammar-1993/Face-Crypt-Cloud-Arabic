@@ -490,17 +490,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // 3. Admin Password Complexity & Keyboard Check Logic
-  const strengthProgressWrapper = document.getElementById("strengthProgressWrapper");
-  const passwordStrengthBar = document.getElementById("passwordStrengthBar");
-  const passwordRequirements = document.getElementById("passwordRequirements");
   const arabicWarning = document.getElementById("arabicWarning");
   
-  const reqLength = document.getElementById("reqLength");
-  const reqUpper = document.getElementById("reqUpper");
-  const reqLower = document.getElementById("reqLower");
-  const reqNumber = document.getElementById("reqNumber");
-  const reqSymbol = document.getElementById("reqSymbol");
-
   let arabicWarningTimeout = null;
 
   if (adminPasswordInput) {
@@ -517,97 +508,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         val = this.value;
       }
-
-      // Hide if empty
-      if (!val) {
-        if (strengthProgressWrapper) strengthProgressWrapper.style.display = "none";
-        if (passwordRequirements) passwordRequirements.style.display = "none";
-        if (passwordStrengthBar) {
-          passwordStrengthBar.style.width = "0%";
-          passwordStrengthBar.innerText = "0%";
-          passwordStrengthBar.classList.remove("bg-danger", "bg-warning", "bg-success");
-        }
-        return;
-      }
-
-      // Show UI elements
-      if (strengthProgressWrapper) strengthProgressWrapper.style.display = "block";
-      if (passwordRequirements) passwordRequirements.style.display = "block";
-
-      // Calculate Strength Score (0 to 5)
-      let score = 0;
-      
-      // 1. Length Check
-      if (val.length >= 12) {
-        score++;
-        updateReq(reqLength, true);
-      } else {
-        updateReq(reqLength, false);
-      }
-
-      // 2. Uppercase Check
-      if (/[A-Z]/.test(val)) {
-        score++;
-        updateReq(reqUpper, true);
-      } else {
-        updateReq(reqUpper, false);
-      }
-
-      // 3. Lowercase Check
-      if (/[a-z]/.test(val)) {
-        score++;
-        updateReq(reqLower, true);
-      } else {
-        updateReq(reqLower, false);
-      }
-
-      // 4. Number Check
-      if (/\d/.test(val)) {
-        score++;
-        updateReq(reqNumber, true);
-      } else {
-        updateReq(reqNumber, false);
-      }
-
-      // 5. Symbol Check
-      if (/[\W_]/.test(val)) {
-        score++;
-        updateReq(reqSymbol, true);
-      } else {
-        updateReq(reqSymbol, false);
-      }
-
-      // Update Progress Bar
-      const percentage = (score / 5) * 100;
-      if (passwordStrengthBar) {
-        passwordStrengthBar.style.width = percentage + "%";
-        passwordStrengthBar.innerText = percentage + "%";
-        
-        // Remove all bg color classes
-        passwordStrengthBar.classList.remove("bg-danger", "bg-warning", "bg-success");
-        
-        // Dynamically add color class
-        if (score <= 2) {
-          passwordStrengthBar.classList.add("bg-danger");
-        } else if (score <= 4) {
-          passwordStrengthBar.classList.add("bg-warning");
-        } else {
-          passwordStrengthBar.classList.add("bg-success");
-        }
-      }
     });
-  }
-
-  function updateReq(element, isValid) {
-    if (!element) return;
-    if (isValid) {
-      element.classList.remove("text-danger");
-      element.classList.add("text-success");
-      element.innerText = element.innerText.replace("❌", "✅");
-    } else {
-      element.classList.remove("text-success");
-      element.classList.add("text-danger");
-      element.innerText = element.innerText.replace("✅", "❌");
-    }
   }
 });

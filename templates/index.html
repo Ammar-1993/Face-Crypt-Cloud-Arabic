@@ -21,8 +21,16 @@
     <p class="mb-3">تسجيل الدخول الآمن ببصمة الوجه</p>
 
     <!-- Main Action: Open Camera -->
-    <div id="openCameraWrapper" class="d-grid gap-2 col-8 col-md-6 mx-auto mt-2">
-      <button id="btnOpenCamera" class="btn btn-primary btn-lg py-2">📷 فتح الكاميرا للتحقق</button>
+    <div id="openCameraWrapper" class="d-grid gap-2 col-10 col-md-8 mx-auto mt-4">
+      <button id="btnOpenCamera" class="btn btn-modern-primary py-3 shadow-lg">
+        <div class="d-flex align-items-center justify-content-center">
+          <i class="bi bi-camera-fill fs-3 me-3"></i>
+          <div class="text-start">
+            <span class="d-block fw-bold fs-4">بدء التحقق من الوجه</span>
+            <small class="d-block opacity-75" style="font-size: 0.85rem;">افتح الكاميرا لتسجيل دخول آمن</small>
+          </div>
+        </div>
+      </button>
     </div>
 
     <!-- Camera and Preview Container -->
@@ -30,9 +38,13 @@
       <video id="cameraStream" autoplay playsinline style="display:none;"></video>
       <img id="preview" src="#" alt="معاينة" style="display:none;">
 
-      <div class="mt-2">
-        <button id="captureButton" class="btn btn-warning btn-lg" style="display:none;">📸 التقاط الصورة</button>
-        <button id="stopCameraButton" class="btn btn-secondary" style="display:none;">✖️ إغلاق الكاميرا</button>
+      <div class="mt-3 d-flex justify-content-center gap-3">
+        <button id="captureButton" class="btn btn-warning btn-lg px-4 py-2 fw-bold shadow-sm" style="display:none;">
+          <i class="bi bi-camera-fill me-2"></i> التقاط الصورة
+        </button>
+        <button id="stopCameraButton" class="btn btn-outline-secondary btn-lg px-4 py-2 fw-bold shadow-sm" style="display:none;">
+          <i class="bi bi-x-circle-fill me-2"></i> إغلاق الكاميرا
+        </button>
       </div>
     </div>
 

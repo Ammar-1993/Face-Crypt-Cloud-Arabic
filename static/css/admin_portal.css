@@ -94,38 +94,6 @@ h4 {
   font-size: 1.1rem;
 }
 
-/* Password Strength & Requirements */
-#passwordRequirements {
-  background-color: #fcfcfc;
-  border-radius: 8px;
-  padding: 10px;
-  border: 1px dashed #e0e0e0;
-}
-
-#passwordRequirements .row {
-  margin-right: 0;
-  margin-left: 0;
-}
-
-#passwordRequirements .col-6 {
-  padding: 4px 0;
-  display: flex;
-  align-items: center;
-}
-
-.progress {
-  background-color: #e9ecef;
-  border-radius: 5px;
-  overflow: hidden;
-}
-
-.progress-bar {
-  font-weight: bold;
-  font-size: 0.75rem;
-  line-height: 10px;
-  text-shadow: 1px 1px 1px rgba(0,0,0,0.2);
-}
-
 #arabicWarning {
   display: block;
   font-weight: 600;
