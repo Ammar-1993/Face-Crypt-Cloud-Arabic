@@ -15,7 +15,7 @@ h1 {
 }
 
 #cameraContainer video, #cameraContainer img {
-  max-height: 350px;
+  max-height: 300px;
   width: 100%;
   max-width: 500px;
   object-fit: cover;
