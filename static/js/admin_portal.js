@@ -1,4 +1,4 @@
-const API_BASE = "http://127.0.0.1:8080";
+const API_BASE = "";
 
 // Translation Helpers
 function translateStatus(status) {
@@ -275,8 +275,12 @@ function renderAuditLogs(logs) {
 
     // 🛠️ Dedicated Actions Column Logic
     let actionCell = "";
-    if (status === "blocked") {
-      actionCell = '<button class="btn btn-sm btn-outline-success rounded-pill px-3" onclick="unblockUser(\'' + log.user_id + '\')">فك الحظر</button>';
+    if (status === "blocked" || status === "soft_block") {
+      if (log.user_id && log.user_id !== "unknown") {
+        actionCell = `<button class="btn btn-sm btn-outline-success rounded-pill px-3" onclick="unblockUser('${log.user_id}')">فك حظر مستخدم</button>`;
+      } else if (log.ip_address) {
+        actionCell = `<button class="btn btn-sm btn-outline-warning rounded-pill px-3" onclick="unblockIP('${log.ip_address}')">فك حظر IP</button>`;
+      }
     }
 
     row.innerHTML = `
@@ -287,6 +291,43 @@ function renderAuditLogs(logs) {
       <td class="text-center">${actionCell}</td>
     `;
     table.appendChild(row);
+  });
+}
+
+// ... existing formatTimestamp, nextPage, prevPage, filterAuditLogs, refreshStats, refreshAuditLogs, unblockUser ...
+
+async function unblockIP(ipAddress) {
+  Swal.fire({
+    title: 'تأكيد الإجراء',
+    text: `هل أنت متأكد أنك تريد فك حظر عنوان IP ${ipAddress}؟`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#ffc107',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'نعم، متأكد',
+    cancelButtonText: 'إلغاء'
+  }).then(async (result) => {
+    if (result.isConfirmed) {
+      try {
+        const res = await fetch(`${API_BASE}/admin/unblock_ip`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ip_address: ipAddress }),
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+          Swal.fire({ text: data.message, icon: 'success', confirmButtonText: 'حسناً' });
+          await fetchAuditLogs();
+          await refreshStats();
+        } else {
+          Swal.fire({ text: `❌ خطأ: ${data.error}`, icon: 'error', confirmButtonText: 'حسناً' });
+        }
+      } catch (e) {
+        console.error(e);
+        Swal.fire({ text: "❌ خطأ في فك حظر IP", icon: 'error', confirmButtonText: 'حسناً' });
+      }
+    }
   });
 }
 

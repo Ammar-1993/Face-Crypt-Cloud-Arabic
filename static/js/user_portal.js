@@ -147,7 +147,23 @@ sendButton.addEventListener("click", async () => {
     if (response.ok) {
       showAlert(`✅ تم تسجيل الدخول بنجاح. أهلاً بك، <strong>${data.user.name}</strong>`, "success");
     } else {
-      showAlert(`❌ ${data.error || "تم رفض الوصول. يرجى المحاولة مرة أخرى."}`, "danger");
+      const errorMessage = data.error || "تم رفض الوصول. يرجى المحاولة مرة أخرى.";
+      if (errorMessage.includes("حظر") || errorMessage.includes("تجاوز عدد المحاولات")) {
+          // Special "Attractive & Modern" Alert for Bans
+          Swal.fire({
+            icon: 'warning',
+            title: 'تنبيه أمني',
+            html: `<div class="text-center p-2">${errorMessage}</div>`,
+            confirmButtonText: 'حسناً',
+            confirmButtonColor: '#ffc107',
+            background: '#fff9e6',
+            showClass: {
+              popup: 'animate__animated animate__shakeX'
+            }
+          });
+      } else {
+          showAlert(`❌ ${errorMessage}`, "danger");
+      }
     }
   } catch (error) {
     showAlert("❌ خطأ في الشبكة. يرجى المحاولة مرة أخرى.", "danger");

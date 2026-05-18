@@ -30,35 +30,39 @@ def list_users():
     users = firebase_utils.get_all_users()
     return jsonify({"users": users})
 
-def is_soft_blocked(user):
-    if user.get("soft_block", False):
-        soft_block_time = user.get("soft_block_time", 0)
+def is_ip_banned(ip_address):
+    status = firebase_utils.get_ip_status(ip_address)
+    
+    if status.get("blocked", False):
+        return True, "permanent"
+    
+    if status.get("soft_block", False):
+        soft_block_time = status.get("soft_block_time", 0)
         if int(time.time()) - soft_block_time < 300:
-            # ✅ زيادة المحاولة أثناء soft_block
-            failed_attempts = user.get('failed_attempts', 0) + 1
-            update_data = {"failed_attempts": failed_attempts}
-
-            if failed_attempts >= 5:
-                update_data["blocked"] = True
-                status = 'blocked'
-            else:
-                status = 'soft_block'
-
-            firebase_utils.update_user_fields(user['id'], update_data)
-            firebase_utils.log_audit_event(user['id'], "User_Login", status=status, ip_address=request.remote_addr)
-            return True
+            return True, "temporary"
         else:
-            # ✅ انتهت مدة soft_block -> إعادة التعيين
-            firebase_utils.update_user_fields(user['id'], {
-                "soft_block": False,
-                "soft_block_time": None,
-                "failed_attempts": 0
-            })
-    return False
+            # Reset soft block if time expired
+            firebase_utils.reset_ip_status(ip_address)
+            
+    return False, None
 
 
 @users_bp.route('/verify_login', methods=['POST'])
 def verify_login():
+    ip_address = request.remote_addr
+    
+    # 1. Check IP Ban Status
+    banned, ban_type = is_ip_banned(ip_address)
+    if banned:
+        if ban_type == "permanent":
+            return jsonify({
+                "error": "❌ تم حظر هذا الجهاز بشكل دائم لتجاوز عدد المحاولات المسموح بها. يرجى مراجعة المسؤول."
+            }), 403
+        else:
+            return jsonify({
+                "error": "❌ تم حظر المحاولات مؤقتاً. يرجى المحاولة مرة أخرى بعد 5 دقائق."
+            }), 403
+
     if 'image' not in request.files:
         return jsonify({"error": "❌ لم يتم تقديم أي صورة"}), 400
 
@@ -72,13 +76,6 @@ def verify_login():
 
         users = firebase_utils.get_all_users()
         print(f"✅ Retrieved {len(users)} users from Firestore")
-
-        for user in users:
-            if is_soft_blocked(user):
-                firebase_utils.log_audit_event(user['id'], "User_Login", status='soft_block', ip_address=request.remote_addr)
-                return jsonify({
-                    "message": "❌ تم تجاوز عدد المحاولات الفاشلة. يرجى المحاولة مرة أخرى بعد 5 دقائق."
-                }), 403
 
         matched_user = None
         for user in users:
@@ -109,12 +106,16 @@ def verify_login():
 
         if matched_user:
             user_id = matched_user['id']
+            # Reset IP status on success
+            firebase_utils.reset_ip_status(ip_address)
+            
+            # Reset user fields
             firebase_utils.update_user_fields(user_id, {
                 "failed_attempts": 0,
                 "soft_block": False,
                 "soft_block_time": None
             })
-            firebase_utils.log_audit_event(user_id, "User_Login", status='success', ip_address=request.remote_addr)
+            firebase_utils.log_audit_event(user_id, "User_Login", status='success', ip_address=ip_address)
 
             return jsonify({
                 "message": f"✅ تم تسجيل الدخول بنجاح. أهلاً بك، {matched_user.get('name', '[User Name]')}",
@@ -125,27 +126,26 @@ def verify_login():
                 }
             }), 200
 
-        for user in users:
-            user_id = user['id']
-            if user.get('blocked', False):
-                continue
+        # 2. Handle Failure and Increment IP Attempts
+        status = firebase_utils.get_ip_status(ip_address)
+        failed_attempts = status.get('failed_attempts', 0) + 1
+        
+        update_data = {"failed_attempts": failed_attempts}
+        
+        if failed_attempts == 3:
+            update_data["soft_block"] = True
+            update_data["soft_block_time"] = int(time.time())
+            msg = "❌ فشل التحقق (3 محاولات). تم حظرك مؤقتاً لمدة 5 دقائق."
+        elif failed_attempts >= 5:
+            update_data["blocked"] = True
+            msg = "❌ تم حظر هذا الجهاز بشكل دائم بعد 5 محاولات فاشلة."
+        else:
+            msg = f"❌ فشل التحقق. المحاولات الفاشلة: {failed_attempts} من 5."
 
-            failed_attempts = user.get('failed_attempts', 0) + 1
-            update_data = {"failed_attempts": failed_attempts}
+        firebase_utils.update_ip_status(ip_address, update_data)
+        firebase_utils.log_audit_event("unknown", "User_Login", status='failure', ip_address=ip_address)
 
-            if failed_attempts == 3:
-                update_data["soft_block"] = True
-                update_data["soft_block_time"] = int(time.time())
-
-            if failed_attempts >= 5:
-                update_data["blocked"] = True
-
-            firebase_utils.update_user_fields(user_id, update_data)
-            firebase_utils.log_audit_event(user_id, "User_Login", status='failure', ip_address=request.remote_addr)
-
-        return jsonify({
-            "message": "❌ فشل تسجيل الدخول. الوجه لا يتطابق مع سجلاتنا.",
-        }), 403
+        return jsonify({"error": msg}), 403
 
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
