@@ -223,30 +223,6 @@ def admin_unblock_user():
     except Exception as e:
         return jsonify({"error": f"❌ خطأ داخلي في الخادم: {str(e)}"}), 500
 
-@admin_bp.route('/unblock_ip', methods=['POST'])
-def admin_unblock_ip():
-    data = request.get_json()
-    if not data or 'ip_address' not in data:
-        return jsonify({"error": "❌ عنوان IP مطلوب"}), 400
-
-    ip_address = data['ip_address']
-
-    try:
-        firebase_utils.reset_ip_status(ip_address)
-
-        # سجل في Audit Logs
-        firebase_utils.log_audit_event(
-            "admin",
-            "Admin_Unblock_IP",
-            status="success",
-            ip_address=ip_address
-        )
-
-        return jsonify({"message": f"✅ تم فك حظر عنوان IP {ip_address} بنجاح"}), 200
-
-    except Exception as e:
-        return jsonify({"error": f"❌ خطأ داخلي في الخادم: {str(e)}"}), 500
-
 # @admin_bp.route('/clear_audit_logs', methods=['POST'])
 # def admin_clear_audit_logs():
 #     try:

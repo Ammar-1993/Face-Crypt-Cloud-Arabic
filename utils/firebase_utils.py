@@ -68,29 +68,3 @@ def update_user_fields(user_id, data):
     doc_ref = db.collection('users').document(user_id)
     doc_ref.update(data)
     print(f"✅ Updated user {user_id} with: {data}")
-
-def get_ip_status(ip_address):
-    """
-    Retrieves the status of a specific IP address from the 'ip_tracking' collection.
-    """
-    doc_ref = db.collection('ip_tracking').document(ip_address)
-    doc = doc_ref.get()
-    if doc.exists:
-        return doc.to_dict()
-    return {"failed_attempts": 0, "blocked": False, "soft_block": False}
-
-def update_ip_status(ip_address, data):
-    """
-    Updates or sets the status of a specific IP address in the 'ip_tracking' collection.
-    """
-    doc_ref = db.collection('ip_tracking').document(ip_address)
-    doc_ref.set(data, merge=True)
-    print(f"✅ Updated IP {ip_address} with: {data}")
-
-def reset_ip_status(ip_address):
-    """
-    Resets the status of a specific IP address.
-    """
-    doc_ref = db.collection('ip_tracking').document(ip_address)
-    doc_ref.delete()
-    print(f"✅ Reset IP status for {ip_address}")
