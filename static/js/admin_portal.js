@@ -66,12 +66,24 @@ async function adminLogin() {
     });
     const data = await res.json();
     if (res.ok) {
-      setText(
-        "loginMessage",
-        `<span class="text-success">✅ ${data.message}</span>`
-      );
-      hide(document.getElementById("loginSection"));
-      show(document.getElementById("adminPanel"));
+      // Professional & Distinctive Welcome Message
+      Swal.fire({
+        icon: 'success',
+        title: 'تم التحقق بنجاح',
+        html: `<div class="text-center"><h5>${data.message}</h5><p class="text-muted mt-2">جاري تحويلك إلى لوحة التحكم خلال 5 ثوانٍ...</p></div>`,
+        timer: 5000,
+        timerProgressBar: true,
+        showConfirmButton: false,
+        allowOutsideClick: false,
+        showClass: {
+          popup: 'animate__animated animate__fadeInDown'
+        },
+        willClose: () => {
+          hide(document.getElementById("loginSection"));
+          show(document.getElementById("adminPanel"));
+        }
+      });
+
       await loadUsers();
       await fetchAuditLogs();
       await refreshStats();
