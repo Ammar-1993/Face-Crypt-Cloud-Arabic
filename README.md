@@ -89,18 +89,22 @@ pip-audit -r requirements.txt
 
 ### 4. إعداد المتغيرات البيئية (Environment Setup)
 
-قم بإنشاء ملف باسم `.env` في المسار الرئيسي للمشروع، وأضف بداخله القيم السرية التالية:
+قم بإنشاء ملف باسم `.env` في المسار الرئيسي للمشروع، وأضف بداخله القيم السرية التالية (تأكد من مطابقة أسماء المتغيرات تماماً):
 
 ```env
-# مفتاح تشفير الجلسات والبيانات الحيوية (يتم توليده عبر مكتبة cryptography)
-SECRET_KEY=your_generated_fernet_key_here
+# مفتاح تشفير البيانات الحيوية (يتم توليده عبر مكتبة cryptography - Fernet)
+FACECRYPT_SECRET_KEY=your_generated_fernet_key_here
+
+# مفتاح تشفير الجلسات وحماية CSRF (يجب أن يكون قيمة عشوائية طويلة، ومختلفاً عن مفتاح Fernet)
+# يمكنك توليده عبر الأمر: python -c "import secrets; print(secrets.token_hex(32))"
+FACECRYPT_FLASK_SECRET_KEY=your_generated_flask_secret_key_here
 
 # كلمة مرور الدخول للوحة تحكم المسؤول (يتم التحقق منها من الذاكرة مباشرة)
 FACECRYPT_ADMIN_PASSWORD=YourStrongAdminPassword
 
 # مسار مفتاح فايربيس ورابط التخزين الخاص بمشروعك السحابي
-SERVICE_ACCOUNT_PATH=firebase/serviceAccountKey.json
-STORAGE_BUCKET=your-firebase-project-id.appspot.com
+FACECRYPT_SERVICE_ACCOUNT_PATH=firebase/serviceAccountKey.json
+FACECRYPT_STORAGE_BUCKET=your-firebase-project-id.appspot.com
 
 # إعدادات التشغيل (اختياري)
 FLASK_DEBUG=False
@@ -140,6 +144,8 @@ waitress-serve --port=8080 wsgi:app
 ## 🌍 النشر في بيئة الإنتاج (Production Deployment)
 
 لضمان أمان البيانات الحيوية (مثل صور الوجوه وكلمات المرور) عند النشر على خوادم حقيقية، يجب **تأمين الاتصال باستخدام HTTPS/TLS**. إرسال البيانات الحساسة عبر HTTP غير المشفر يعرضها لخطر الاعتراض (Man-in-the-Middle Attacks).
+
+**ملاحظة هامة جداً:** التطبيق مهيأ لإنشاء ملفات تعريف ارتباط (Cookies) آمنة فقط (`SESSION_COOKIE_SECURE = True`). إذا قمت بتشغيل التطبيق عبر اتصال `HTTP` غير مشفر في بيئة الإنتاج، فلن يقوم المتصفح بحفظ جلسة الإدارة، مما سيؤدي إلى فشل تسجيل الدخول بصمت (لن تتمكن من الدخول للوحة التحكم إطلاقاً). لذلك فإن HTTPS هو **متطلب تشغيلي إلزامي** وليس مجرد توصية.
 
 ### 1. الخادم الوكيل العكسي وتشفير الاتصال (Reverse Proxy & TLS)
 يجب وضع التطبيق خلف خادم وكيل عكسي (Reverse Proxy) مثل Nginx أو Caddy ليتولى مهمة تشفير الاتصال (TLS Termination).
@@ -182,5 +188,5 @@ waitress-serve --listen=127.0.0.1:8080 wsgi:app
 ### 3. قائمة التحقق قبل النشر (Pre-Deployment Checklist)
 قبل إطلاق النظام، تأكد من الآتي:
 - [ ] **تعطيل وضع التطوير:** التأكد تماماً من تعيين `FLASK_DEBUG=False`.
-- [ ] **إدارة الأسرار السرية:** عدم رفع ملف `.env` لمستودعات الكود. يجب إعداد جميع المتغيرات السرية (مثل `SECRET_KEY`, `FACECRYPT_ADMIN_PASSWORD`) عبر "مدير الأسرار" الخاص بمنصة الاستضافة (Secret Manager) أو كمتغيرات بيئية على الخادم بشكل آمن.
+- [ ] **إدارة الأسرار السرية:** عدم رفع ملف `.env` لمستودعات الكود. يجب إعداد جميع المتغيرات السرية (مثل `FACECRYPT_SECRET_KEY`, `FACECRYPT_FLASK_SECRET_KEY`, `FACECRYPT_ADMIN_PASSWORD`) عبر "مدير الأسرار" الخاص بمنصة الاستضافة (Secret Manager) أو كمتغيرات بيئية على الخادم بشكل آمن، مع التأكد من تعيين قيمة فريدة وقوية لـ `FACECRYPT_FLASK_SECRET_KEY`.
 - [ ] **شهادات SSL/TLS صالحة ومفعلة:** لضمان تشفير البيانات المرسلة بين المستخدم والخادم.

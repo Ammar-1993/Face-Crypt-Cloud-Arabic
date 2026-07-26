@@ -14,7 +14,17 @@ ADMIN_PASSWORD = os.environ.get('FACECRYPT_ADMIN_PASSWORD')
 SERVICE_ACCOUNT_PATH = os.environ.get('FACECRYPT_SERVICE_ACCOUNT_PATH')
 STORAGE_BUCKET = os.environ.get('FACECRYPT_STORAGE_BUCKET')
 SECRET_KEY = os.environ.get('FACECRYPT_SECRET_KEY')
-FLASK_SECRET_KEY = os.environ.get('FLASK_SECRET_KEY', 'default_flask_secret_key')
+FLASK_SECRET_KEY = os.environ.get('FACECRYPT_FLASK_SECRET_KEY')
+
+missing_vars = []
+if not ADMIN_PASSWORD: missing_vars.append('FACECRYPT_ADMIN_PASSWORD')
+if not SERVICE_ACCOUNT_PATH: missing_vars.append('FACECRYPT_SERVICE_ACCOUNT_PATH')
+if not STORAGE_BUCKET: missing_vars.append('FACECRYPT_STORAGE_BUCKET')
+if not SECRET_KEY: missing_vars.append('FACECRYPT_SECRET_KEY')
+if not FLASK_SECRET_KEY: missing_vars.append('FACECRYPT_FLASK_SECRET_KEY')
+
+if missing_vars:
+    raise RuntimeError(f"Missing required environment variables: {', '.join(missing_vars)}")
 
 logger.info("✅ SECRET_KEY loaded: %s", bool(SECRET_KEY))
 logger.info("✅ ADMIN_PASSWORD loaded: %s", bool(ADMIN_PASSWORD))
