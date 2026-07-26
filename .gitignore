@@ -15,3 +15,5 @@ __pycache__/
 # 4. ملفات النظام العشوائية
 .DS_Store
 Thumbs.db
+
+GEMINI.md
