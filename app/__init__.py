@@ -40,9 +40,14 @@ def create_app():
 
     import traceback
     from flask import jsonify
+    from werkzeug.exceptions import HTTPException
 
     @app.errorhandler(Exception)
     def handle_exception(e):
+        # Pass through normal HTTP errors (404, 405, etc.) so they aren't logged as 500s
+        if isinstance(e, HTTPException):
+            return e
+            
         logger.error("Unhandled Exception: %s\n%s", str(e), traceback.format_exc())
         
         if app.debug:
