@@ -16,7 +16,16 @@ def test_admin_login_failure(client, mock_firebase):
         assert 'error' in response.json
 
 def test_admin_list_users_unauthenticated(client, mock_firebase):
+    response = client.get('/admin/list_users')
+    assert response.status_code == 401
     
+    data = response.json
+    assert 'error' in data
+
+def test_admin_list_users(client, mock_firebase):
+    """Test /admin/list_users GET request."""
+    with client.session_transaction() as sess:
+        sess['admin_logged_in'] = True
     response = client.get('/admin/list_users')
     assert response.status_code == 200
     

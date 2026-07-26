@@ -88,6 +88,7 @@ async function adminLogin() {
     const res = await fetch(`${API_BASE}/admin/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      credentials: "include",
       body: JSON.stringify({ password }),
     });
     const data = await res.json();
