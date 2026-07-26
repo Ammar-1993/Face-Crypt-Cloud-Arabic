@@ -136,3 +136,51 @@ waitress-serve --port=8080 wsgi:app
 * **حدود حجم الملفات (Upload Limits):** لتقليل هجمات حرمان الخدمة (DoS) الناتجة عن الإرهاق الحسابي لمعالجة الصور، تم تقييد حجم الطلبات المرفوعة إلى 5 ميغابايت كحد أقصى.
 * **استرداد حساب الإدارة (Recovery):** وصول المسؤول (Admin) معزول تماماً عن قاعدة البيانات. في حال نسيان كلمة المرور الإدارية، يمكن لمهندس النظام استعادتها فوراً بتحديث المتغير `FACECRYPT_ADMIN_PASSWORD` في بيئة الخادم.
 * **قواعد أمان قاعدة البيانات (Firestore Security Rules):** تم إضافة ملف `firestore.rules` لرفض كافة اتصالات العميل المباشرة (Client-Side). النظام يعتمد كلياً على بيئة (Admin SDK) داخل الواجهة الخلفية (Flask)، مما يضمن عدم إمكانية الوصول إلى البيانات الحيوية من المتصفح مباشرة كطبقة حماية إضافية (Defense-in-Depth).
+
+## 🌍 النشر في بيئة الإنتاج (Production Deployment)
+
+لضمان أمان البيانات الحيوية (مثل صور الوجوه وكلمات المرور) عند النشر على خوادم حقيقية، يجب **تأمين الاتصال باستخدام HTTPS/TLS**. إرسال البيانات الحساسة عبر HTTP غير المشفر يعرضها لخطر الاعتراض (Man-in-the-Middle Attacks).
+
+### 1. الخادم الوكيل العكسي وتشفير الاتصال (Reverse Proxy & TLS)
+يجب وضع التطبيق خلف خادم وكيل عكسي (Reverse Proxy) مثل Nginx أو Caddy ليتولى مهمة تشفير الاتصال (TLS Termination).
+
+**مثال لإعداد Nginx (Nginx Configuration Example):**
+```nginx
+server {
+    listen 80;
+    server_name yourdomain.com;
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl;
+    server_name yourdomain.com;
+
+    ssl_certificate /etc/letsencrypt/live/yourdomain.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/yourdomain.com/privkey.pem;
+
+    location / {
+        proxy_pass http://127.0.0.1:8080; # توجيه الطلبات إلى خادم Waitress
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
+
+### 2. تشغيل التطبيق (Application Server)
+* ⚠️ **تحذير:** لا تستخدم خادم Flask المدمج (`python app.py`) في بيئة الإنتاج.
+* استخدم دائماً خادم إنتاج مخصص مثل `Waitress` (المتضمن بالفعل في الاعتمادات).
+* تأكد من أن التطبيق يعمل ومقيد بالشبكة المحلية (`localhost` أو `127.0.0.1`) وأنه غير متاح للوصول الخارجي المباشر، بل فقط من خلال الخادم الوكيل (Reverse Proxy).
+
+```bash
+# التشغيل الصحيح في الإنتاج
+waitress-serve --listen=127.0.0.1:8080 wsgi:app
+```
+
+### 3. قائمة التحقق قبل النشر (Pre-Deployment Checklist)
+قبل إطلاق النظام، تأكد من الآتي:
+- [ ] **تعطيل وضع التطوير:** التأكد تماماً من تعيين `FLASK_DEBUG=False`.
+- [ ] **إدارة الأسرار السرية:** عدم رفع ملف `.env` لمستودعات الكود. يجب إعداد جميع المتغيرات السرية (مثل `SECRET_KEY`, `FACECRYPT_ADMIN_PASSWORD`) عبر "مدير الأسرار" الخاص بمنصة الاستضافة (Secret Manager) أو كمتغيرات بيئية على الخادم بشكل آمن.
+- [ ] **شهادات SSL/TLS صالحة ومفعلة:** لضمان تشفير البيانات المرسلة بين المستخدم والخادم.
