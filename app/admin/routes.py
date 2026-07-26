@@ -114,6 +114,7 @@ def admin_delete_user():
 # ✅ /admin/list_users
 @admin_bp.route("/list_users", methods=["GET"])
 @login_required
+def admin_list_users():
     users = firebase_utils.get_all_users()
     response = [
         {
@@ -133,6 +134,7 @@ def admin_delete_user():
 # ✅ /admin/audit_logs
 @admin_bp.route("/audit_logs", methods=["GET"])
 @login_required
+def admin_audit_logs():
     logs_ref = db.collection("audit_logs")
     docs = logs_ref.stream()
 
@@ -146,6 +148,7 @@ def admin_delete_user():
 
 @admin_bp.route('/stats', methods=['GET'])
 @login_required
+def admin_stats():
     # 📌 قراءة سجلات الأحداث
     logs_ref = config.db.collection('audit_logs').stream()
     total = 0
@@ -246,6 +249,7 @@ def admin_unblock_user():
 
 @admin_bp.route('/clear_audit_logs', methods=['POST'])
 @login_required
+def admin_clear_audit_logs():
     logs_ref = config.db.collection('audit_logs')
     docs = list(logs_ref.stream())
     total_count = len(docs)

@@ -67,28 +67,27 @@ cd Face-Crypt-Cloud
 
 ```
 
-
 2. إنشاء بيئة افتراضية وتفعيلها:
 ```bash
 python -m venv venv
-# لنظام الويندوز:
-venv\Scripts\activate
-# لنظام ماك/لينكس:
-source venv/bin/activate
-
+source venv/bin/activate  # في الويندوز: venv\Scripts\activate
 ```
 
+### 3. تثبيت الاعتمادات وفحص الأمان (Install & Audit Dependencies)
 
-3. تثبيت المكتبات المطلوبة:
-*(ملاحظة: لتثبيت مكتبة `dlib` على بيئة ويندوز بسهولة، يمكنك استخدام ملف `.whl` المرفق في المجلد المحلى)*
 ```bash
 pip install -r requirements.txt
-
 ```
 
+**فحص الأمان المستمر (Security Auditing):**
+يُنصح بشدة بإجراء فحص دوري لاعتمادات بايثون للتأكد من خلوها من الثغرات الأمنية المكتشفة حديثاً (CVEs).
+```bash
+pip install pip-audit
+pip-audit -r requirements.txt
+```
+*(اقتراح للإطلاق في الإنتاج: إضافة سير عمل GitHub Actions لتشغيل `pip-audit` تلقائياً مع كل عملية Push).*
 
-
-### 3. إعداد المتغيرات البيئية (Environment Setup)
+### 4. إعداد المتغيرات البيئية (Environment Setup)
 
 قم بإنشاء ملف باسم `.env` في المسار الرئيسي للمشروع، وأضف بداخله القيم السرية التالية:
 

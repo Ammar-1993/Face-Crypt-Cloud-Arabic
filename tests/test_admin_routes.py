@@ -24,6 +24,9 @@ def test_admin_list_users_unauthenticated(client, mock_firebase):
 
 def test_admin_list_users(client, mock_firebase):
     """Test /admin/list_users GET request."""
+    mock_firebase['get_all_users'].return_value = [
+        {'name': 'John Doe', 'id': 'test_user_1'}
+    ]
     with client.session_transaction() as sess:
         sess['admin_logged_in'] = True
     response = client.get('/admin/list_users')
@@ -118,6 +121,7 @@ def test_admin_add_user_xss_prevention(client, mock_firebase):
 
     data['user_id'] = 'valid_id'
     data['name'] = '<img src=x onerror=alert(1)>'
+    data['image'] = (io.BytesIO(b"fake image data"), 'test.jpg')
     response = client.post('/admin/add_user', data=data, content_type='multipart/form-data')
     assert response.status_code == 400
     assert 'رموز غير مسموحة' in response.json['error']
