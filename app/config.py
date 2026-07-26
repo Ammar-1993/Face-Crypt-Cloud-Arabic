@@ -11,6 +11,7 @@ ADMIN_PASSWORD = os.environ.get('FACECRYPT_ADMIN_PASSWORD')
 SERVICE_ACCOUNT_PATH = os.environ.get('FACECRYPT_SERVICE_ACCOUNT_PATH')
 STORAGE_BUCKET = os.environ.get('FACECRYPT_STORAGE_BUCKET')
 SECRET_KEY = os.environ.get('FACECRYPT_SECRET_KEY')
+FLASK_SECRET_KEY = os.environ.get('FLASK_SECRET_KEY', 'default_flask_secret_key')
 
 print(f"✅ Loaded SECRET_KEY = {SECRET_KEY}")
 print(f"✅ Loaded ADMIN_PASSWORD: {ADMIN_PASSWORD}")

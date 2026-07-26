@@ -1,5 +1,31 @@
 const API_BASE = "http://127.0.0.1:8080";
 
+async function adminFetch(url, options = {}) {
+  options.credentials = "include";
+  const res = await fetch(url, options);
+  if (res.status === 401) {
+    Swal.fire({ text: 'انتهت الجلسة. يرجى تسجيل الدخول مجدداً.', icon: 'warning', confirmButtonText: 'حسناً' }).then(() => {
+      hide(document.getElementById("adminPanel"));
+      show(document.getElementById("loginSection"));
+    });
+    throw new Error('Unauthorized');
+  }
+  return res;
+}
+
+async function adminLogout() {
+  try {
+    await fetch(`${API_BASE}/admin/logout`, { method: "POST", credentials: "include" });
+  } catch (e) {
+    console.error(e);
+  }
+  hide(document.getElementById("adminPanel"));
+  show(document.getElementById("loginSection"));
+  document.getElementById("adminPassword").value = "";
+}
+
+
+
 // Translation Helpers
 function translateStatus(status) {
   if (!status) return "";
@@ -156,7 +182,7 @@ async function addUser() {
   formData.append("email", email);
   formData.append("image", image);
 
-  const res = await fetch(`${API_BASE}/admin/add_user`, {
+  const res = await adminFetch(`${API_BASE}/admin/add_user`, {
     method: "POST",
     body: formData,
   });
@@ -186,7 +212,7 @@ async function loadUsers() {
   defaultOption.selected = true;
   select.add(defaultOption);
 
-  const res = await fetch(`${API_BASE}/admin/list_users`);
+  const res = await adminFetch(`${API_BASE}/admin/list_users`);
   const data = await res.json();
 
   data.users.forEach((user) => {
@@ -218,7 +244,7 @@ async function deleteUser() {
     cancelButtonText: 'إلغاء'
   }).then(async (result) => {
     if (result.isConfirmed) {
-      const res = await fetch(`${API_BASE}/admin/delete_user`, {
+      const res = await adminFetch(`${API_BASE}/admin/delete_user`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ user_id: userId }),
@@ -242,7 +268,7 @@ async function deleteUser() {
 }
 
 async function fetchAuditLogs() {
-  const res = await fetch(`${API_BASE}/admin/audit_logs`);
+  const res = await adminFetch(`${API_BASE}/admin/audit_logs`);
   const data = await res.json();
 
   // 🟢 Sort descending by timestamp
@@ -349,7 +375,7 @@ function filterAuditLogs() {
 
 async function refreshStats() {
   try {
-    const res = await fetch(`${API_BASE}/admin/stats`);
+    const res = await adminFetch(`${API_BASE}/admin/stats`);
     const data = await res.json();
     if (res.ok) {
       document.getElementById("statTotal").textContent =
@@ -406,7 +432,7 @@ async function unblockUser(userId) {
   }).then(async (result) => {
     if (result.isConfirmed) {
       try {
-        const res = await fetch(`${API_BASE}/admin/unblock_user`, {
+        const res = await adminFetch(`${API_BASE}/admin/unblock_user`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ user_id: userId }),
@@ -441,7 +467,7 @@ async function clearAuditLogs() {
   }).then(async (result) => {
     if (result.isConfirmed) {
       try {
-        const res = await fetch(`${API_BASE}/admin/clear_audit_logs`, {
+        const res = await adminFetch(`${API_BASE}/admin/clear_audit_logs`, {
           method: "POST",
         });
 

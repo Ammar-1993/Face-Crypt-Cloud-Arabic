@@ -1,8 +1,16 @@
-from flask import Blueprint, request, jsonify, render_template
+from flask import Blueprint, request, jsonify, render_template, session
+from functools import wraps
 from app.config import ADMIN_PASSWORD, db
 from utils import face_utils, firebase_utils
 import app.config as config
 
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not session.get('admin_logged_in'):
+            return jsonify({"error": "Unauthorized"}), 401
+        return f(*args, **kwargs)
+    return decorated_function
 
 
 # ✅ إنشاء الـ Blueprint
@@ -27,6 +35,8 @@ def admin_login():
 
     password = data["password"]
     if password == ADMIN_PASSWORD:
+        session.permanent = True
+        session['admin_logged_in'] = True
         firebase_utils.log_audit_event(
             "admin", "Admin_Login", status="success", ip_address=request.remote_addr
         )
@@ -40,6 +50,7 @@ def admin_login():
 
 # ✅ /admin/add_user
 @admin_bp.route("/add_user", methods=["POST"])
+@login_required
 def admin_add_user():
     user_id = request.form.get("user_id")
     name = request.form.get("name")
@@ -83,6 +94,7 @@ def admin_add_user():
 
 # ✅ /admin/delete_user
 @admin_bp.route("/delete_user", methods=["POST"])
+@login_required
 def admin_delete_user():
     data = request.get_json()
     if not data or "user_id" not in data:
@@ -99,6 +111,7 @@ def admin_delete_user():
 
 # ✅ /admin/list_users
 @admin_bp.route("/list_users", methods=["GET"])
+@login_required
 def admin_list_users():
     try:
         users = firebase_utils.get_all_users()
@@ -122,6 +135,7 @@ def admin_list_users():
 
 # ✅ /admin/audit_logs
 @admin_bp.route("/audit_logs", methods=["GET"])
+@login_required
 def admin_audit_logs():
     try:
         logs_ref = db.collection("audit_logs")
@@ -139,6 +153,7 @@ def admin_audit_logs():
         return jsonify({"error": f"❌ خطأ داخلي في الخادم: {str(e)}"}), 500
 
 @admin_bp.route('/stats', methods=['GET'])
+@login_required
 def admin_stats():
     try:
         # 📌 قراءة سجلات الأحداث
@@ -194,6 +209,7 @@ def admin_stats():
         return jsonify({"error": f"❌ خطأ داخلي في الخادم: {str(e)}"}), 500
     
 @admin_bp.route('/unblock_user', methods=['POST'])
+@login_required
 def admin_unblock_user():
     data = request.get_json()
     if not data or 'user_id' not in data:
@@ -247,6 +263,7 @@ def admin_unblock_user():
 
 
 @admin_bp.route('/clear_audit_logs', methods=['POST'])
+@login_required
 def admin_clear_audit_logs():
     try:
         logs_ref = config.db.collection('audit_logs')
@@ -274,4 +291,7 @@ def admin_clear_audit_logs():
     except Exception as e:
         return jsonify({"error": f"❌ خطأ داخلي في الخادم: {str(e)}"}), 500
 
-
+@admin_bp.route('/logout', methods=['POST'])
+def admin_logout():
+    session.clear()
+    return jsonify({"message": "✅ تم تسجيل الخروج بنجاح"}), 200
