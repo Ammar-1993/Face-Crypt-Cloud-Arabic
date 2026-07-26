@@ -1,6 +1,6 @@
 # ☁️ Face Crypt Cloud (سحابة الملامح المشفرة)
 
-> **نظام مصادقة ذكي لتأمين المنصات الإلكترونية باستخدام تقنية التعرف على الوجوه والتشفير السحابي كبديل آمن لكلمات المرور التقليدية.**
+> **نظام مصادقة ذكي لتأمين المنصات الإلكترونية باستخدام تقنية التعرف على الوجوه والتشفير السحابي كبديل آمن لكلمات المرور التقليدية والمعتاد عليها.**
 
 [![Python Version](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
 [![Flask](https://img.shields.io/badge/Flask-3.1.1-green.svg)](https://flask.palletsprojects.com/)
