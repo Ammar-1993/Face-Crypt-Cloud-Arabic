@@ -44,7 +44,8 @@ Face-Crypt-Cloud/
 ├── firebase/               # مجلد الاعتمادات السحابية (serviceAccountKey.json)
 ├── test_images/            # صور تجريبية لعمليات الفحص والاختبار
 ├── .env                    # المتغيرات البيئية السرية (يجب عدم رفعه للعامة)
-├── app.py                  # نقطة انطلاق تشغيل الخادم
+├── app.py                  # نقطة انطلاق تشغيل الخادم (للتطوير)
+├── wsgi.py                 # نقطة انطلاق تشغيل الخادم (للإنتاج)
 └── requirements.txt        # الاعتمادات ومكتبات بايثون المطلوبة
 
 ```
@@ -102,15 +103,27 @@ FACECRYPT_ADMIN_PASSWORD=YourStrongAdminPassword
 SERVICE_ACCOUNT_PATH=firebase/serviceAccountKey.json
 STORAGE_BUCKET=your-firebase-project-id.appspot.com
 
+# إعدادات التشغيل (اختياري)
+FLASK_DEBUG=False
+PORT=8080
+
 ```
 
 ### 4. تشغيل النظام (Run the Application)
 
-لتشغيل خادم التطوير محلياً:
-
+**لبيئة التطوير (Development):**
 ```bash
 python app.py
+```
 
+**لبيئة الإنتاج (Production):**
+نوصي بشدة بتشغيل النظام باستخدام خادم `Waitress` WSGI المتوفر ضمن المشروع بدلاً من خادم Flask المدمج.
+```bash
+python wsgi.py
+```
+أو عبر الأمر:
+```bash
+waitress-serve --port=8080 wsgi:app
 ```
 
 * **بوابة وصول المستخدمين:** `http://127.0.0.1:8080/`
@@ -118,8 +131,6 @@ python app.py
 
 ## 🛡️ ملاحظات أمنية (Security Notes)
 
+* **⚠️ خطر وضع التطوير (FLASK_DEBUG):** يجب **ألا تقوم أبداً** بتعيين المتغير البيئي `FLASK_DEBUG=True` في أي بيئة إنتاج أو على خادم متصل بالإنترنت. تشغيل Flask في وضع التطوير يكشف واجهة مصحح الأخطاء (Werkzeug Debugger)، مما يعرض النظام لخطر تسريب البيانات الحساسة أو حتى تنفيذ الأوامر البرمجية عن بُعد (Remote Code Execution).
 * **حماية مفاتيح التشفير:** ملف `.env` يحتوي على مفتاح `Fernet` الذي يشفر بصمات الوجوه. إذا ضاع هذا المفتاح، فلن تتمكن من فك تشفير البيانات الموجودة في Firestore أبداً. تأكد من عدم رفع هذا الملف للعامة (تم إدراجه في `.gitignore`).
 * **استرداد حساب الإدارة (Recovery):** وصول المسؤول (Admin) معزول تماماً عن قاعدة البيانات. في حال نسيان كلمة المرور الإدارية، يمكن لمهندس النظام استعادتها فوراً بتحديث المتغير `FACECRYPT_ADMIN_PASSWORD` في بيئة الخادم.
-
-
-```
