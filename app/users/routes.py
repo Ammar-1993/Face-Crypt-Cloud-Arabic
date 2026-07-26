@@ -1,5 +1,8 @@
 import time
+import logging
 from flask import Blueprint, request, jsonify
+
+logger = logging.getLogger(__name__)
 from utils import face_utils, firebase_utils
 from app.limiter import limiter
 
@@ -42,7 +45,7 @@ def verify_login():
         new_encoding = face_utils.extract_face_encoding(image_array)
 
         users = firebase_utils.get_all_users()
-        print(f"✅ Retrieved {len(users)} users from Firestore")
+        logger.info("✅ Retrieved %d users from Firestore", len(users))
 
         matched_user = None
         # 1. First, find if the face matches ANY user (including blocked ones)
@@ -57,7 +60,7 @@ def verify_login():
                     matched_user = user
                     break
             except Exception as e:
-                print(f"❌ Error processing user {user.get('id')}: {e}")
+                logger.warning("❌ Error processing user %s: %s", user.get('id'), e)
                 continue
 
         # 2. If a match is found, check their status

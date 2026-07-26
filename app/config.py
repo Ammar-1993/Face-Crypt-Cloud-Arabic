@@ -2,6 +2,9 @@ import firebase_admin
 from firebase_admin import credentials, firestore, storage
 from dotenv import load_dotenv
 import os
+import logging
+
+logger = logging.getLogger(__name__)
 
 # ✅ تحميل متغيرات البيئة
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '..', '.env'))
@@ -13,10 +16,10 @@ STORAGE_BUCKET = os.environ.get('FACECRYPT_STORAGE_BUCKET')
 SECRET_KEY = os.environ.get('FACECRYPT_SECRET_KEY')
 FLASK_SECRET_KEY = os.environ.get('FLASK_SECRET_KEY', 'default_flask_secret_key')
 
-print(f"✅ Loaded SECRET_KEY = {SECRET_KEY}")
-print(f"✅ Loaded ADMIN_PASSWORD: {ADMIN_PASSWORD}")
-print(f"✅ Loaded SERVICE_ACCOUNT_PATH: {SERVICE_ACCOUNT_PATH}")
-print(f"✅ Loaded STORAGE_BUCKET: {STORAGE_BUCKET}")
+logger.info("✅ SECRET_KEY loaded: %s", bool(SECRET_KEY))
+logger.info("✅ ADMIN_PASSWORD loaded: %s", bool(ADMIN_PASSWORD))
+logger.info("✅ Loaded SERVICE_ACCOUNT_PATH: %s", SERVICE_ACCOUNT_PATH)
+logger.info("✅ Loaded STORAGE_BUCKET: %s", STORAGE_BUCKET)
 
 # ✅ إعداد Firebase
 firebase_app = None
@@ -31,7 +34,7 @@ def initialize_firebase():
         firebase_app = firebase_admin.initialize_app(cred, {
             'storageBucket': STORAGE_BUCKET
         })
-        print("✅ Firebase Admin SDK initialized in config.py")
+        logger.info("✅ Firebase Admin SDK initialized in config.py")
 
     db = firestore.client()
     bucket = storage.bucket()

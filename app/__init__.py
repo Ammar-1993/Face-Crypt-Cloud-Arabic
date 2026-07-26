@@ -1,5 +1,12 @@
 import os
+import logging
 from flask import Flask
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 from app import config
 from app.routes import bp as routes_bp
 from app.users.routes import users_bp
@@ -31,5 +38,5 @@ def create_app():
     app.register_blueprint(admin_bp)
 
 
-    print("✅ Flask App created and routes registered.")
+    logger.info("✅ Flask App created and routes registered.")
     return app

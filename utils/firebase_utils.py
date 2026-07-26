@@ -1,6 +1,9 @@
 from datetime import datetime
 from firebase_admin import firestore
 import pytz
+import logging
+
+logger = logging.getLogger(__name__)
 
 from app.config import db
 
@@ -14,7 +17,7 @@ def add_user_to_firestore(user_id, user_data):
     if doc_ref.get().exists:
         raise ValueError(f"المستخدم بالمعرف {user_id} موجود مسبقاً.")
     doc_ref.set(user_data)
-    print(f"✅ User {user_id} added to Firestore.")
+    logger.info("✅ User %s added to Firestore.", user_id)
 
 def delete_user_from_firestore(user_id):
     """
@@ -22,7 +25,7 @@ def delete_user_from_firestore(user_id):
     """
     doc_ref = db.collection('users').document(user_id)
     doc_ref.delete()
-    print(f"✅ User {user_id} deleted from Firestore.")
+    logger.info("✅ User %s deleted from Firestore.", user_id)
 
 def get_all_users():
     """
@@ -35,7 +38,7 @@ def get_all_users():
         user = doc.to_dict()
         user['id'] = doc.id
         users.append(user)
-    print(f"✅ Retrieved {len(users)} users.")
+    logger.info("✅ Retrieved %d users.", len(users))
     return users
 
 def log_audit_event(user_id, event, status=None, ip_address=None):
@@ -59,7 +62,7 @@ def log_audit_event(user_id, event, status=None, ip_address=None):
         event_data['ip_address'] = ip_address
 
     db.collection('audit_logs').document().set(event_data)
-    print(f"✅ Logged event: {event_data}")
+    logger.info("✅ Logged event '%s' for user '%s'", event, user_id)
 
 def update_user_fields(user_id, data):
     """
@@ -69,4 +72,4 @@ def update_user_fields(user_id, data):
     """
     doc_ref = db.collection('users').document(user_id)
     doc_ref.update(data)
-    print(f"✅ Updated user {user_id} with: {data}")
+    logger.info("✅ Updated user %s with keys: %s", user_id, list(data.keys()))
