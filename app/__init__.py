@@ -37,6 +37,18 @@ def create_app():
     app.register_blueprint(users_bp)
     app.register_blueprint(admin_bp)
 
+    import traceback
+    from flask import jsonify
+
+    @app.errorhandler(Exception)
+    def handle_exception(e):
+        logger.error("Unhandled Exception: %s\n%s", str(e), traceback.format_exc())
+        
+        if app.debug:
+            return jsonify({"error": f"❌ خطأ داخلي: {str(e)}"}), 500
+            
+        return jsonify({"error": "❌ خطأ داخلي في الخادم. يرجى المحاولة مرة أخرى لاحقاً."}), 500
+
 
     logger.info("✅ Flask App created and routes registered.")
     return app

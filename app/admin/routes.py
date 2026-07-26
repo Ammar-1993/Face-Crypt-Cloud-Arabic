@@ -96,8 +96,6 @@ def admin_add_user():
 
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
-    except Exception as e:
-        return jsonify({"error": f"خطأ داخلي في الخادم: {str(e)}"}), 500
 
 
 # ✅ /admin/delete_user
@@ -109,112 +107,93 @@ def admin_delete_user():
         return jsonify({"error": "❌ معرف المستخدم مطلوب"}), 400
 
     user_id = data["user_id"]
-
-    try:
-        firebase_utils.delete_user_from_firestore(user_id)
-        return jsonify({"message": "تم حذف المستخدم بنجاح"}), 200
-    except Exception as e:
-        return jsonify({"error": f"❌ خطأ داخلي في الخادم: {str(e)}"}), 500
+    firebase_utils.delete_user_from_firestore(user_id)
+    return jsonify({"message": "تم حذف المستخدم بنجاح"}), 200
 
 
 # ✅ /admin/list_users
 @admin_bp.route("/list_users", methods=["GET"])
 @login_required
-def admin_list_users():
-    try:
-        users = firebase_utils.get_all_users()
-        response = [
-            {
-                "id": user.get("id"),
-                "name": user.get("name"),
-                "email": user.get("email"),
-                "blocked": user.get("blocked", False),
-                "soft_block": user.get("soft_block", False),
-                "failed_attempts": user.get("failed_attempts", 0),
-            }
-            for user in users
-        ]
+    users = firebase_utils.get_all_users()
+    response = [
+        {
+            "id": user.get("id"),
+            "name": user.get("name"),
+            "email": user.get("email"),
+            "blocked": user.get("blocked", False),
+            "soft_block": user.get("soft_block", False),
+            "failed_attempts": user.get("failed_attempts", 0),
+        }
+        for user in users
+    ]
 
-        return jsonify({"users": response}), 200
-
-    except Exception as e:
-        return jsonify({"error": f"❌ خطأ داخلي في الخادم: {str(e)}"}), 500
+    return jsonify({"users": response}), 200
 
 
 # ✅ /admin/audit_logs
 @admin_bp.route("/audit_logs", methods=["GET"])
 @login_required
-def admin_audit_logs():
-    try:
-        logs_ref = db.collection("audit_logs")
-        docs = logs_ref.stream()
+    logs_ref = db.collection("audit_logs")
+    docs = logs_ref.stream()
 
-        logs = []
-        for doc in docs:
-            log = doc.to_dict()
-            log["id"] = doc.id
-            logs.append(log)
+    logs = []
+    for doc in docs:
+        log = doc.to_dict()
+        log["id"] = doc.id
+        logs.append(log)
 
-        return jsonify({"logs": logs}), 200
-
-    except Exception as e:
-        return jsonify({"error": f"❌ خطأ داخلي في الخادم: {str(e)}"}), 500
+    return jsonify({"logs": logs}), 200
 
 @admin_bp.route('/stats', methods=['GET'])
 @login_required
-def admin_stats():
-    try:
-        # 📌 قراءة سجلات الأحداث
-        logs_ref = config.db.collection('audit_logs').stream()
-        total = 0
-        success = 0
-        failure = 0
-        blocked_events = 0
-        soft_block_events = 0
+    # 📌 قراءة سجلات الأحداث
+    logs_ref = config.db.collection('audit_logs').stream()
+    total = 0
+    success = 0
+    failure = 0
+    blocked_events = 0
+    soft_block_events = 0
 
-        for doc in logs_ref:
-            data = doc.to_dict()
-            total += 1
-            status = data.get('status')
-            if status == 'success':
-                success += 1
-            elif status == 'failure':
-                failure += 1
-            elif status == 'blocked':
-                blocked_events += 1
-            elif status == 'soft_block':
-                soft_block_events += 1
+    for doc in logs_ref:
+        data = doc.to_dict()
+        total += 1
+        status = data.get('status')
+        if status == 'success':
+            success += 1
+        elif status == 'failure':
+            failure += 1
+        elif status == 'blocked':
+            blocked_events += 1
+        elif status == 'soft_block':
+            soft_block_events += 1
 
-        # 📌 قراءة حالات المستخدمين
-        users_ref = config.db.collection('users').stream()
-        blocked_users = 0
-        soft_blocked_users = 0
+    # 📌 قراءة حالات المستخدمين
+    users_ref = config.db.collection('users').stream()
+    blocked_users = 0
+    soft_blocked_users = 0
 
-        for doc in users_ref:
-            u = doc.to_dict()
-            if u.get('blocked', False):
-                blocked_users += 1
-            if u.get('soft_block', False):
-                soft_blocked_users += 1
+    for doc in users_ref:
+        u = doc.to_dict()
+        if u.get('blocked', False):
+            blocked_users += 1
+        if u.get('soft_block', False):
+            soft_blocked_users += 1
 
-        # In your /admin/stats endpoint
-        users = firebase_utils.get_all_users()
-        total_users = len(users)
+    # In your /admin/stats endpoint
+    users = firebase_utils.get_all_users()
+    total_users = len(users)
 
-        # 📌 إرجاع النتيجة
-        return jsonify({
-            "total_attempts": total,
-            "success_attempts": success,
-            "failed_attempts": failure,
-            "blocked_events": blocked_events,
-            "soft_block_events": soft_block_events,
-            "blocked_users_count": blocked_users,
-            "total_users": total_users,
-            "soft_blocked_users_count": soft_blocked_users
-        })
-
-    except Exception as e:
-        return jsonify({"error": f"❌ خطأ داخلي في الخادم: {str(e)}"}), 500
+    # 📌 إرجاع النتيجة
+    return jsonify({
+        "total_attempts": total,
+        "success_attempts": success,
+        "failed_attempts": failure,
+        "blocked_events": blocked_events,
+        "soft_block_events": soft_block_events,
+        "blocked_users_count": blocked_users,
+        "total_users": total_users,
+        "soft_blocked_users_count": soft_blocked_users
+    })
     
 @admin_bp.route('/unblock_user', methods=['POST'])
 @login_required
@@ -224,28 +203,23 @@ def admin_unblock_user():
         return jsonify({"error": "❌ معرف المستخدم مطلوب"}), 400
 
     user_id = data['user_id']
+    # تحديث حالة المستخدم في Firestore
+    firebase_utils.update_user_fields(user_id, {
+        "blocked": False,
+        "failed_attempts": 0,
+        "soft_block": False,
+        "soft_block_time": None
+    })
 
-    try:
-        # تحديث حالة المستخدم في Firestore
-        firebase_utils.update_user_fields(user_id, {
-            "blocked": False,
-            "failed_attempts": 0,
-            "soft_block": False,
-            "soft_block_time": None
-        })
+    # سجل في Audit Logs
+    firebase_utils.log_audit_event(
+        user_id,
+        "Admin_Unblock",
+        status="success",
+        ip_address=request.remote_addr
+    )
 
-        # سجل في Audit Logs
-        firebase_utils.log_audit_event(
-            user_id,
-            "Admin_Unblock",
-            status="success",
-            ip_address=request.remote_addr
-        )
-
-        return jsonify({"message": "✅ تم فك حظر المستخدم بنجاح"}), 200
-
-    except Exception as e:
-        return jsonify({"error": f"❌ خطأ داخلي في الخادم: {str(e)}"}), 500
+    return jsonify({"message": "✅ تم فك حظر المستخدم بنجاح"}), 200
 
 # @admin_bp.route('/clear_audit_logs', methods=['POST'])
 # def admin_clear_audit_logs():
@@ -272,32 +246,27 @@ def admin_unblock_user():
 
 @admin_bp.route('/clear_audit_logs', methods=['POST'])
 @login_required
-def admin_clear_audit_logs():
-    try:
-        logs_ref = config.db.collection('audit_logs')
-        docs = list(logs_ref.stream())
-        total_count = len(docs)
-        batch_size = 500
+    logs_ref = config.db.collection('audit_logs')
+    docs = list(logs_ref.stream())
+    total_count = len(docs)
+    batch_size = 500
 
-        # حذف على دفعات batch
-        for i in range(0, total_count, batch_size):
-            batch = config.db.batch()
-            batch_docs = docs[i:i + batch_size]
-            for doc in batch_docs:
-                batch.delete(doc.reference)
-            batch.commit()
+    # حذف على دفعات batch
+    for i in range(0, total_count, batch_size):
+        batch = config.db.batch()
+        batch_docs = docs[i:i + batch_size]
+        for doc in batch_docs:
+            batch.delete(doc.reference)
+        batch.commit()
 
-        # سجّل عملية المسح في السجل نفسه
-        firebase_utils.log_audit_event(
-            'admin',
-            'Clear_Audit_Logs',
-            status='success'
-        )
+    # سجّل عملية المسح في السجل نفسه
+    firebase_utils.log_audit_event(
+        'admin',
+        'Clear_Audit_Logs',
+        status='success'
+    )
 
-        return jsonify({"message": f"✅ تم مسح {total_count} من سجلات التدقيق."}), 200
-
-    except Exception as e:
-        return jsonify({"error": f"❌ خطأ داخلي في الخادم: {str(e)}"}), 500
+    return jsonify({"message": f"✅ تم مسح {total_count} من سجلات التدقيق."}), 200
 
 @admin_bp.route('/logout', methods=['POST'])
 def admin_logout():
