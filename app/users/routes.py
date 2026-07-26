@@ -9,6 +9,7 @@ from app.limiter import limiter
 
 users_bp = Blueprint('users', __name__, url_prefix='/users')
 
+GENERIC_ERROR_MSG = "❌ **فشل تسجيل الدخول**\nالرجاء المحاولة مرة أخرى، أو التواصل مع إدارة النظام إذا استمرت المشكلة."
 
 def is_soft_blocked(user):
     """
@@ -82,9 +83,7 @@ def verify_login():
             # Check for Permanent Ban
             if matched_user.get('blocked', False):
                 firebase_utils.log_audit_event(user_id, "User_Login", status='blocked', ip_address=request.remote_addr)
-                return jsonify({
-                    "message": "🚫 **تم حظر الحساب نهائياً**\nلقد تجاوزت الحد الأقصى للمحاولات الفاشلة (5 محاولات). يرجى مراجعة إدارة النظام لفك الحظر."
-                }), 403
+                return jsonify({"message": GENERIC_ERROR_MSG}), 403
             
             # Check for Soft Block
             if is_soft_blocked(matched_user):
@@ -95,14 +94,10 @@ def verify_login():
                 if failed_attempts >= 5:
                     update_data["blocked"] = True
                     status_to_log = 'blocked'
-                    msg = "🚫 **تم حظر الحساب نهائياً**\nلقد تم تجاوز عدد المحاولات الفاشلة. يرجى مراجعة إدارة النظام لفك الحظر."
-                else:
-                    msg = "⏳ **تنبيه أمني: حظر مؤقت**\nتم تجاوز عدد المحاولات الفاشلة. يرجى المحاولة مرة أخرى بعد 5 دقائق لحماية خصوصية بياناتك."
 
-                
                 firebase_utils.update_user_fields(user_id, update_data)
                 firebase_utils.log_audit_event(user_id, "User_Login", status=status_to_log, ip_address=request.remote_addr)
-                return jsonify({"message": msg}), 403
+                return jsonify({"message": GENERIC_ERROR_MSG}), 403
 
             # Success path
             firebase_utils.update_user_fields(user_id, {
@@ -131,9 +126,7 @@ def verify_login():
         # Log the unknown login attempt for auditing without associating it to a specific user
         firebase_utils.log_audit_event("unknown_user", "User_Login", status='failure', ip_address=request.remote_addr)
 
-        return jsonify({
-            "message": "❌ **فشل تسجيل الدخول**\nعذراً، ملامح الوجه لا تطابق سجلاتنا. يرجى المحاولة مرة أخرى في إضاءة جيدة.",
-        }), 403
+        return jsonify({"message": GENERIC_ERROR_MSG}), 403
 
 
     except ValueError as e:

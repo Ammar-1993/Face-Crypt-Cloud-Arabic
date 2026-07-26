@@ -99,7 +99,37 @@ def test_soft_block_trigger(mock_extract, mock_load, client, mock_firebase):
     response = client.post('/users/verify_login', data=data, content_type='multipart/form-data')
     assert response.status_code == 403
     assert 'message' in response.json
-    assert 'تم تجاوز عدد المحاولات الفاشلة' in response.json['message']
+    assert 'فشل تسجيل الدخول' in response.json['message']
+
+@patch('app.users.routes.face_utils.load_image_from_request')
+@patch('app.users.routes.face_utils.extract_face_encoding')
+@patch('app.users.routes.face_utils.decrypt_encoding')
+@patch('app.users.routes.face_utils.compare_encodings')
+def test_anti_enumeration(mock_compare, mock_decrypt, mock_extract, mock_load, client, mock_firebase):
+    """Test that NO-MATCH and MATCH-BLOCKED yield exactly the same public HTTP response."""
+    # 1. Test No Match
+    mock_compare.return_value = False
+    mock_decrypt.return_value = [0.1]
+    mock_extract.return_value = [0.9]
+    mock_load.return_value = MagicMock()
+    mock_firebase['get_all_users'].return_value = [
+        {'id': 'user1', 'face_encoding': 'dummy', 'blocked': False, 'soft_block': False}
+    ]
+    data_no_match = {'image': (io.BytesIO(b"fake image data"), 'test.jpg')}
+    res_no_match = client.post('/users/verify_login', data=data_no_match, content_type='multipart/form-data')
+
+    # 2. Test Match but Blocked
+    mock_compare.return_value = True
+    mock_firebase['get_all_users'].return_value = [
+        {'id': 'user1', 'face_encoding': 'dummy', 'blocked': True, 'soft_block': False}
+    ]
+    data_blocked = {'image': (io.BytesIO(b"fake image data"), 'test.jpg')}
+    res_blocked = client.post('/users/verify_login', data=data_blocked, content_type='multipart/form-data')
+
+    # Compare identical outputs
+    assert res_no_match.status_code == res_blocked.status_code == 403
+    assert res_no_match.json == res_blocked.json
+    assert 'فشل تسجيل الدخول' in res_no_match.json['message']
 
 @patch('app.users.routes.firebase_utils.update_user_fields')
 @patch('app.users.routes.face_utils.load_image_from_request')
