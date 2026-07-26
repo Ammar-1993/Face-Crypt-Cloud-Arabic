@@ -1,0 +1,20 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 🛡️ Safety Net Rules (قواعد حماية كشبكة أمان)
+    // 
+    // This backend exclusively uses the Firebase Admin SDK, which bypasses 
+    // all Firestore security rules. These rules strictly deny ALL direct 
+    // client-side (frontend) access. This ensures that even if a Firebase 
+    // client SDK is accidentally introduced into the frontend in the future, 
+    // the data remains fully protected and access must go through the Flask backend.
+    
+    match /users/{document=**} {
+      allow read, write: if false;
+    }
+    
+    match /audit_logs/{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
