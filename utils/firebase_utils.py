@@ -11,6 +11,8 @@ def add_user_to_firestore(user_id, user_data):
     user_data: A dictionary containing user information.
     """
     doc_ref = db.collection('users').document(user_id)
+    if doc_ref.get().exists:
+        raise ValueError(f"المستخدم بالمعرف {user_id} موجود مسبقاً.")
     doc_ref.set(user_data)
     print(f"✅ User {user_id} added to Firestore.")
 

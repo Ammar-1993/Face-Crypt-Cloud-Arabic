@@ -4,31 +4,6 @@ from utils import face_utils, firebase_utils
 
 users_bp = Blueprint('users', __name__, url_prefix='/users')
 
-@users_bp.route('/add', methods=['POST'])
-def add_user():
-    data = request.json
-    if not data or 'user_id' not in data or 'user_data' not in data:
-        return jsonify({"error": "طلب غير صالح"}), 400
-
-    user_id = data['user_id']
-    user_data = data['user_data']
-    firebase_utils.add_user_to_firestore(user_id, user_data)
-    return jsonify({"message": f"✅ تم إضافة المستخدم {user_id} بنجاح."})
-
-@users_bp.route('/delete', methods=['POST'])
-def delete_user():
-    data = request.json
-    if not data or 'user_id' not in data:
-        return jsonify({"error": "طلب غير صالح"}), 400
-
-    user_id = data['user_id']
-    firebase_utils.delete_user_from_firestore(user_id)
-    return jsonify({"message": f"✅ تم حذف المستخدم {user_id} بنجاح."})
-
-@users_bp.route('/list', methods=['GET'])
-def list_users():
-    users = firebase_utils.get_all_users()
-    return jsonify({"users": users})
 
 def is_soft_blocked(user):
     """
