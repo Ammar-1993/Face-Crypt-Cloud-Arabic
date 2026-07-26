@@ -4,6 +4,7 @@ from app.config import ADMIN_PASSWORD, db
 from utils import face_utils, firebase_utils
 import app.config as config
 import re
+import hmac
 
 def login_required(f):
     @wraps(f)
@@ -35,7 +36,7 @@ def admin_login():
         return jsonify({"error": "❌ كلمة المرور مطلوبة"}), 400
 
     password = data["password"]
-    if password == ADMIN_PASSWORD:
+    if hmac.compare_digest(password, ADMIN_PASSWORD):
         session.permanent = True
         session['admin_logged_in'] = True
         firebase_utils.log_audit_event(
