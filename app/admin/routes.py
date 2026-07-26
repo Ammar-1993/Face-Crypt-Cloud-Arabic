@@ -3,6 +3,7 @@ from functools import wraps
 from app.config import ADMIN_PASSWORD, db
 from utils import face_utils, firebase_utils
 import app.config as config
+import re
 
 def login_required(f):
     @wraps(f)
@@ -59,6 +60,12 @@ def admin_add_user():
 
     if not user_id or not name or not email or not image_file:
         return jsonify({"error": "❌ حقول مطلوبة مفقودة"}), 400
+
+    # Server-side validation against XSS / invalid characters
+    if len(user_id) > 50 or not re.match(r"^[\w\-]+$", user_id):
+        return jsonify({"error": "❌ معرف المستخدم غير صالح (أحرف، أرقام، شرطات فقط). ومحدود بـ 50 حرف."}), 400
+    if len(name) > 100 or re.search(r"[<>\'\"]", name):
+        return jsonify({"error": "❌ الاسم يحتوي على رموز غير مسموحة."}), 400
 
     try:
         image_array = face_utils.load_image_from_request(image_file)

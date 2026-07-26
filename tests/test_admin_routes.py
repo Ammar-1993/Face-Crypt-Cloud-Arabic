@@ -100,3 +100,24 @@ def test_admin_stats(mock_config_db, client, mock_firebase):
     
     for key in expected_keys:
         assert key in data
+
+def test_admin_add_user_xss_prevention(client, mock_firebase):
+    import io
+    with client.session_transaction() as sess:
+        sess['admin_logged_in'] = True
+        
+    data = {
+        'user_id': '<script>alert(1)</script>',
+        'name': 'Test Name',
+        'email': 'test@test.com',
+        'image': (io.BytesIO(b"fake image data"), 'test.jpg')
+    }
+    response = client.post('/admin/add_user', data=data, content_type='multipart/form-data')
+    assert response.status_code == 400
+    assert 'غير صالح' in response.json['error']
+
+    data['user_id'] = 'valid_id'
+    data['name'] = '<img src=x onerror=alert(1)>'
+    response = client.post('/admin/add_user', data=data, content_type='multipart/form-data')
+    assert response.status_code == 400
+    assert 'رموز غير مسموحة' in response.json['error']

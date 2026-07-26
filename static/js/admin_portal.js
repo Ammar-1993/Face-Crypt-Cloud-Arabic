@@ -313,18 +313,38 @@ function renderAuditLogs(logs) {
     const statusBadge = `<span class="badge ${badgeClass}">${translateStatus(status)}</span>`;
 
     // 🛠️ Dedicated Actions Column Logic
-    let actionCell = "";
+    const tdAction = document.createElement("td");
+    tdAction.className = "text-center";
     if (status === "blocked") {
-      actionCell = '<button class="btn btn-sm btn-outline-success rounded-pill px-3" onclick="unblockUser(\'' + log.user_id + '\')">فك الحظر</button>';
+      const btn = document.createElement("button");
+      btn.className = "btn btn-sm btn-outline-success rounded-pill px-3";
+      btn.textContent = "فك الحظر";
+      btn.onclick = () => unblockUser(log.user_id);
+      tdAction.appendChild(btn);
     }
 
-    row.innerHTML = `
-      <td>${translateEvent(log.event)}</td>
-      <td class="text-center">${statusBadge}</td>
-      <td>${log.user_id || ""}</td>
-      <td dir="ltr" class="text-center" style="unicode-bidi: plaintext;">${formatTimestamp(log.timestamp)}</td>
-      <td class="text-center">${actionCell}</td>
-    `;
+    const tdEvent = document.createElement("td");
+    tdEvent.textContent = translateEvent(log.event);
+
+    const tdStatus = document.createElement("td");
+    tdStatus.className = "text-center";
+    tdStatus.innerHTML = statusBadge;
+
+    const tdUserId = document.createElement("td");
+    tdUserId.textContent = log.user_id || "";
+
+    const tdTime = document.createElement("td");
+    tdTime.className = "text-center";
+    tdTime.dir = "ltr";
+    tdTime.style.unicodeBidi = "plaintext";
+    tdTime.textContent = formatTimestamp(log.timestamp);
+
+    row.appendChild(tdEvent);
+    row.appendChild(tdStatus);
+    row.appendChild(tdUserId);
+    row.appendChild(tdTime);
+    row.appendChild(tdAction);
+    
     table.appendChild(row);
   });
 }

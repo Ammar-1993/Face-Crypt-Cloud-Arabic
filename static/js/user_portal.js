@@ -145,7 +145,7 @@ sendButton.addEventListener("click", async () => {
     const data = await response.json();
 
     if (response.ok) {
-      showAlert(`✅ تم تسجيل الدخول بنجاح. أهلاً بك، <strong>${data.user.name}</strong>`, "success");
+      showAlert(`✅ تم تسجيل الدخول بنجاح. أهلاً بك، <strong>${escapeHTML(data.user.name)}</strong>`, "success");
     } else {
       // Check if it's a ban or soft block to show a more prominent message
       const message = data.message || data.error || "تم رفض الوصول. يرجى المحاولة مرة أخرى.";
@@ -186,6 +186,13 @@ function dataURLtoBlob(dataurl) {
         ia[i] = byteString.charCodeAt(i);
     }
     return new Blob([ab], {type: mimeString});
+}
+
+function escapeHTML(str) {
+  if (!str) return "";
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
 }
 
 // SweetAlert2 Toast Mixin
