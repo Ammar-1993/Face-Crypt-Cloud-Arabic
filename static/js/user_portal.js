@@ -41,14 +41,34 @@ btnOpenCamera.addEventListener("click", async () => {
 /**
  * State 2: Capture Photo
  */
-captureButton.addEventListener("click", () => {
-  const canvas = document.createElement("canvas");
-  canvas.width = cameraStream.videoWidth;
-  canvas.height = cameraStream.videoHeight;
-  const ctx = canvas.getContext("2d");
-  ctx.drawImage(cameraStream, 0, 0);
+captureButton.addEventListener("click", async () => {
+  const canvas1 = document.createElement("canvas");
+  canvas1.width = cameraStream.videoWidth;
+  canvas1.height = cameraStream.videoHeight;
+  const ctx1 = canvas1.getContext("2d");
+  ctx1.drawImage(cameraStream, 0, 0);
 
-  preview.src = canvas.toDataURL("image/jpeg");
+  // Active Challenge UI Hint
+  Swal.fire({
+    title: 'الرجاء تحريك رأسك قليلاً أو الرمش',
+    text: 'جاري التقاط الإطار الثاني للتأكد من الحيوية...',
+    icon: 'info',
+    timer: 1000,
+    showConfirmButton: false,
+    allowOutsideClick: false
+  });
+  
+  // Wait ~1 second for the user to make a micro-movement
+  await new Promise(r => setTimeout(r, 1000));
+  
+  const canvas2 = document.createElement("canvas");
+  canvas2.width = cameraStream.videoWidth;
+  canvas2.height = cameraStream.videoHeight;
+  const ctx2 = canvas2.getContext("2d");
+  ctx2.drawImage(cameraStream, 0, 0);
+
+  preview.src = canvas1.toDataURL("image/jpeg");
+  preview.dataset.frame2 = canvas2.toDataURL("image/jpeg");
   
   // UI Transitions
   preview.style.display = "block";
@@ -137,6 +157,12 @@ sendButton.addEventListener("click", async () => {
 
     const formData = new FormData();
     formData.append("image", blob, "capture.jpg");
+    
+    // Add second frame if available for Liveness challenge
+    if (preview.dataset.frame2) {
+      const blob2 = dataURLtoBlob(preview.dataset.frame2);
+      formData.append("image2", blob2, "capture2.jpg");
+    }
 
     const response = await fetch(`${API_BASE}/users/verify_login`, {
       method: "POST",

@@ -4,6 +4,7 @@ from flask import Blueprint, request, jsonify
 
 logger = logging.getLogger(__name__)
 from utils import face_utils, firebase_utils
+from app.config import ENABLE_LIVENESS_CHECK
 from app.limiter import limiter
 
 users_bp = Blueprint('users', __name__, url_prefix='/users')
@@ -40,8 +41,19 @@ def verify_login():
     if image_file.filename == '':
         return jsonify({"error": "❌ اسم الملف فارغ"}), 400
 
+    image2_file = request.files.get('image2')
+
     try:
         image_array = face_utils.load_image_from_request(image_file)
+        
+        # 🛡️ Liveness Check Flow
+        if ENABLE_LIVENESS_CHECK:
+            image_array_2 = face_utils.load_image_from_request(image2_file) if image2_file else None
+            is_live, reason = face_utils.check_liveness(image_array, image_array_2)
+            if not is_live:
+                firebase_utils.log_audit_event("unknown_user", "Spoofing_Attempt", status='blocked', ip_address=request.remote_addr)
+                return jsonify({"message": f"🚨 **فشل الأمان (مكافحة الانتحال):**\n{reason}"}), 403
+
         new_encoding = face_utils.extract_face_encoding(image_array)
 
         users = firebase_utils.get_all_users()

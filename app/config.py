@@ -21,6 +21,9 @@ logger.info("✅ ADMIN_PASSWORD loaded: %s", bool(ADMIN_PASSWORD))
 logger.info("✅ Loaded SERVICE_ACCOUNT_PATH: %s", SERVICE_ACCOUNT_PATH)
 logger.info("✅ Loaded STORAGE_BUCKET: %s", STORAGE_BUCKET)
 
+ENABLE_LIVENESS_CHECK = os.environ.get('FACECRYPT_ENABLE_LIVENESS_CHECK', 'False').lower() in ('true', '1', 't')
+logger.info("✅ ENABLE_LIVENESS_CHECK: %s", ENABLE_LIVENESS_CHECK)
+
 # ✅ إعداد Firebase
 firebase_app = None
 db = None

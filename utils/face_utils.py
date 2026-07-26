@@ -1,5 +1,7 @@
 import numpy as np
 import face_recognition
+import cv2
+import math
 import json
 from PIL import Image
 from io import BytesIO
@@ -68,4 +70,52 @@ def decrypt_encoding(encrypted_str):
     decrypted = fernet.decrypt(encrypted_str.encode())
     decoded = json.loads(decrypted.decode())
     return decoded
+
+def check_liveness(image_array_1, image_array_2=None):
+    """
+    Basic anti-spoofing liveness check.
+    If image_array_2 is provided, checks for natural head movement (landmark distance).
+    If only one image is provided, falls back to a texture heuristic (Laplacian variance) to reject extremely flat/blurry photos.
+    Returns: (is_live: bool, reason: str)
+    """
+    # 1. Texture heuristic (Single frame fallback)
+    # A printed photo or screen might be blurrier or have different edge characteristics
+    # compared to a live 3D face in focus.
+    gray1 = cv2.cvtColor(image_array_1, cv2.COLOR_RGB2GRAY)
+    laplacian_var = cv2.Laplacian(gray1, cv2.CV_64F).var()
+    
+    # Threshold for blur (very modest to allow regular webcams)
+    if laplacian_var < 30.0:
+        return False, "الصورة غير واضحة أو تبدو كصورة مطبوعة."
+
+    # 2. Active Challenge (Two frames)
+    if image_array_2 is not None:
+        try:
+            landmarks1 = face_recognition.face_landmarks(image_array_1)
+            landmarks2 = face_recognition.face_landmarks(image_array_2)
+            
+            if not landmarks1 or not landmarks2:
+                return False, "لم يتم اكتشاف الوجه في الإطارين."
+                
+            l1 = landmarks1[0]
+            l2 = landmarks2[0]
+            
+            def get_distance(pt1, pt2):
+                return math.sqrt((pt1[0] - pt2[0])**2 + (pt1[1] - pt2[1])**2)
+                
+            # Compare distance between nose tip and chin bottom
+            dist1 = get_distance(l1['nose_tip'][2], l1['chin'][8])
+            dist2 = get_distance(l2['nose_tip'][2], l2['chin'][8])
+            
+            diff = abs(dist1 - dist2)
+            
+            # If the difference is extremely small, it's a static printed photo or a screen
+            if diff < 0.5:
+                return False, "لم يتم اكتشاف أي حركة طبيعية للوجه (صورة ثابتة)."
+                
+        except Exception as e:
+            return False, f"خطأ أثناء الفحص: {str(e)}"
+            
+    return True, "نجاح"
+
 
