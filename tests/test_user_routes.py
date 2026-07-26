@@ -100,3 +100,40 @@ def test_soft_block_trigger(mock_extract, mock_load, client, mock_firebase):
     assert response.status_code == 403
     assert 'message' in response.json
     assert 'تم تجاوز عدد المحاولات الفاشلة' in response.json['message']
+
+@patch('app.users.routes.firebase_utils.update_user_fields')
+@patch('app.users.routes.face_utils.load_image_from_request')
+@patch('app.users.routes.face_utils.extract_face_encoding')
+@patch('app.users.routes.face_utils.decrypt_encoding')
+@patch('app.users.routes.face_utils.compare_encodings')
+def test_failed_login_does_not_penalize_all_users(mock_compare, mock_decrypt, mock_extract, mock_load, mock_update, client, mock_firebase):
+    """Test that a failed login doesn't penalize all users in the system."""
+    mock_compare.return_value = False
+    mock_decrypt.return_value = [0.1, 0.2, 0.3]
+    mock_extract.return_value = [0.9, 0.8, 0.7]
+    mock_load.return_value = MagicMock()
+
+    mock_firebase['get_all_users'].return_value = [
+        {
+            'id': 'user1',
+            'face_encoding': 'dummy1',
+            'blocked': False,
+            'soft_block': False
+        },
+        {
+            'id': 'user2',
+            'face_encoding': 'dummy2',
+            'blocked': False,
+            'soft_block': False
+        }
+    ]
+
+    data = {
+        'image': (io.BytesIO(b"fake image data"), 'test.jpg')
+    }
+
+    response = client.post('/users/verify_login', data=data, content_type='multipart/form-data')
+    assert response.status_code == 403
+    
+    # Assert that no users were updated/penalized
+    mock_update.assert_not_called()

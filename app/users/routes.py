@@ -1,6 +1,7 @@
 import time
 from flask import Blueprint, request, jsonify
 from utils import face_utils, firebase_utils
+from app.limiter import limiter
 
 users_bp = Blueprint('users', __name__, url_prefix='/users')
 
@@ -26,6 +27,8 @@ def is_soft_blocked(user):
 
 
 @users_bp.route('/verify_login', methods=['POST'])
+@limiter.limit("10 per minute")
+@limiter.limit("30 per hour")
 def verify_login():
     if 'image' not in request.files:
         return jsonify({"error": "❌ لم يتم تقديم أي صورة"}), 400
@@ -104,40 +107,14 @@ def verify_login():
             }), 200
 
         # 3. If NO match is found
-        # In a generic face login, we don't know who to penalize.
-        # However, to satisfy the requirement of "5 failed attempts -> ban", 
-        # we'll assume the system tracks it globally or for the 'intended' user.
-        # Given the existing structure, we will increment for all non-blocked users 
-        # but only if they are not already blocked.
-        # (This is suboptimal but preserves the original project's intent if it was a single-user system).
+        # PREVIOUS DESIGN FLAW: 
+        # The previous design incorrectly looped through all users and penalized them
+        # for a single failed login attempt. This was highly unsafe as it allowed
+        # one brute-force attack to lock out every single user in the system.
+        # We now use Flask-Limiter for IP-based rate limiting instead of global user penalization.
         
-        any_new_ban = False
-        for user in users:
-            if user.get('blocked', False):
-                continue
-
-            user_id = user['id']
-            failed_attempts = user.get('failed_attempts', 0) + 1
-            update_data = {"failed_attempts": failed_attempts}
-            
-            status = 'failure'
-
-            if failed_attempts == 3:
-                update_data["soft_block"] = True
-                update_data["soft_block_time"] = int(time.time())
-                status = 'soft_block'
-            if failed_attempts >= 5:
-                update_data["blocked"] = True
-                any_new_ban = True
-                status = 'blocked'
-
-            firebase_utils.update_user_fields(user_id, update_data)
-            firebase_utils.log_audit_event(user_id, "User_Login", status=status, ip_address=request.remote_addr)
-
-        if any_new_ban:
-            return jsonify({
-                "message": "🚫 **نظام الأمان: تم الإغلاق**\nلقد تم تجاوز عدد المحاولات المسموح بها (5 محاولات). تم حظر الوصول نهائياً لضمان سلامة البيانات."
-            }), 403
+        # Log the unknown login attempt for auditing without associating it to a specific user
+        firebase_utils.log_audit_event("unknown_user", "User_Login", status='failure', ip_address=request.remote_addr)
 
         return jsonify({
             "message": "❌ **فشل تسجيل الدخول**\nعذراً، ملامح الوجه لا تطابق سجلاتنا. يرجى المحاولة مرة أخرى في إضاءة جيدة.",

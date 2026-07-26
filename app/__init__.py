@@ -23,6 +23,9 @@ def create_app():
     config.initialize_firebase()
 
     # تسجيل الـ Blueprints
+    from app.limiter import limiter
+    limiter.init_app(app)
+    
     app.register_blueprint(routes_bp)
     app.register_blueprint(users_bp)
     app.register_blueprint(admin_bp)
