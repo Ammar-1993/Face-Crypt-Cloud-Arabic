@@ -25,6 +25,7 @@ def create_app():
     app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=30)
     app.config['SESSION_COOKIE_HTTPONLY'] = True
     app.config['SESSION_COOKIE_SECURE'] = True
+    app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024  # 5 MB limit
     
     # تهيئة Firebase
     config.initialize_firebase()
@@ -48,6 +49,11 @@ def create_app():
             return jsonify({"error": f"❌ خطأ داخلي: {str(e)}"}), 500
             
         return jsonify({"error": "❌ خطأ داخلي في الخادم. يرجى المحاولة مرة أخرى لاحقاً."}), 500
+    @app.errorhandler(413)
+    def request_entity_too_large(error):
+        logger.warning("Request Entity Too Large: %s", str(error))
+        return jsonify({"error": "❌ حجم الملف كبير جداً. الحد الأقصى المسموح به هو 5 ميغابايت."}), 413
+
 
 
     logger.info("✅ Flask App created and routes registered.")
