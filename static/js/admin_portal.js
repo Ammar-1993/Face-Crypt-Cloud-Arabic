@@ -1,7 +1,14 @@
 const API_BASE = "http://127.0.0.1:8080";
+let csrfToken = "";
 
 async function adminFetch(url, options = {}) {
   options.credentials = "include";
+  if (!options.headers) {
+    options.headers = {};
+  }
+  if (csrfToken) {
+    options.headers["X-CSRFToken"] = csrfToken;
+  }
   const res = await fetch(url, options);
   if (res.status === 401) {
     Swal.fire({ text: 'انتهت الجلسة. يرجى تسجيل الدخول مجدداً.', icon: 'warning', confirmButtonText: 'حسناً' }).then(() => {
@@ -22,6 +29,7 @@ async function adminLogout() {
   hide(document.getElementById("adminPanel"));
   show(document.getElementById("loginSection"));
   document.getElementById("adminPassword").value = "";
+  csrfToken = "";
 }
 
 
@@ -93,6 +101,9 @@ async function adminLogin() {
     });
     const data = await res.json();
     if (res.ok) {
+      if (data.csrf_token) {
+        csrfToken = data.csrf_token;
+      }
       // Professional & Distinctive Welcome Message
       Swal.fire({
         icon: 'success',

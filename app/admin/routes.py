@@ -13,10 +13,19 @@ def login_required(f):
             return jsonify({"error": "Unauthorized"}), 401
         return f(*args, **kwargs)
     return decorated_function
-
-
 # ✅ إنشاء الـ Blueprint
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
+
+@admin_bp.before_request
+def csrf_protect():
+    if request.method in ["POST", "PUT", "PATCH", "DELETE"]:
+        if request.path == "/admin/login":
+            return
+        token = session.get("csrf_token")
+        request_token = request.headers.get("X-CSRFToken")
+        if not token or not request_token or not hmac.compare_digest(token, request_token):
+            return jsonify({"error": "CSRF token missing or invalid."}), 403
+
 
 
 # ✅ صفحة Admin Portal
@@ -39,10 +48,13 @@ def admin_login():
     if hmac.compare_digest(password, ADMIN_PASSWORD):
         session.permanent = True
         session['admin_logged_in'] = True
+        import secrets
+        csrf_token = secrets.token_hex(32)
+        session['csrf_token'] = csrf_token
         firebase_utils.log_audit_event(
             "admin", "Admin_Login", status="success", ip_address=request.remote_addr
         )
-        return jsonify({"message": "✅ أهلاً بك أيها المسؤول"}), 200
+        return jsonify({"message": "✅ أهلاً بك أيها المسؤول", "csrf_token": csrf_token}), 200
     else:
         firebase_utils.log_audit_event(
             "admin", "Admin_Login", status="failure", ip_address=request.remote_addr

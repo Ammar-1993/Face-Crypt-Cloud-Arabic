@@ -40,13 +40,14 @@ def test_admin_list_users(client, mock_firebase):
 
 def test_admin_delete_user_unauthenticated(client, mock_firebase):
     response = client.post('/admin/delete_user', json={'user_id': 'test_user_123'})
-    assert response.status_code == 401
+    assert response.status_code == 403
 
 def test_admin_delete_user(client, mock_firebase):
     """Test /admin/delete_user POST request."""
     with client.session_transaction() as sess:
         sess['admin_logged_in'] = True
-    response = client.post('/admin/delete_user', json={'user_id': 'test_user_123'})
+        sess['csrf_token'] = 'test_token'
+    response = client.post('/admin/delete_user', json={'user_id': 'test_user_123'}, headers={'X-CSRFToken': 'test_token'})
     assert response.status_code == 200
     assert 'message' in response.json
     
@@ -108,20 +109,20 @@ def test_admin_add_user_xss_prevention(client, mock_firebase):
     import io
     with client.session_transaction() as sess:
         sess['admin_logged_in'] = True
-        
+        sess['csrf_token'] = 'test_token'
     data = {
         'user_id': '<script>alert(1)</script>',
         'name': 'Test Name',
         'email': 'test@test.com',
         'image': (io.BytesIO(b"fake image data"), 'test.jpg')
     }
-    response = client.post('/admin/add_user', data=data, content_type='multipart/form-data')
+    response = client.post('/admin/add_user', data=data, content_type='multipart/form-data', headers={'X-CSRFToken': 'test_token'})
     assert response.status_code == 400
     assert 'غير صالح' in response.json['error']
 
     data['user_id'] = 'valid_id'
     data['name'] = '<img src=x onerror=alert(1)>'
     data['image'] = (io.BytesIO(b"fake image data"), 'test.jpg')
-    response = client.post('/admin/add_user', data=data, content_type='multipart/form-data')
+    response = client.post('/admin/add_user', data=data, content_type='multipart/form-data', headers={'X-CSRFToken': 'test_token'})
     assert response.status_code == 400
     assert 'رموز غير مسموحة' in response.json['error']
