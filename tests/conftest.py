@@ -1,5 +1,6 @@
 import pytest
 import sys
+import os
 from unittest.mock import patch, MagicMock
 
 # Mock firebase_admin before importing the app to avoid real initialization
@@ -7,6 +8,13 @@ sys.modules['firebase_admin'] = MagicMock()
 sys.modules['firebase_admin.credentials'] = MagicMock()
 sys.modules['firebase_admin.firestore'] = MagicMock()
 sys.modules['firebase_admin.storage'] = MagicMock()
+
+# Set dummy environment variables to pass the configuration validation in app/config.py
+os.environ.setdefault('FACECRYPT_ADMIN_PASSWORD', 'test_admin_password')
+os.environ.setdefault('FACECRYPT_SERVICE_ACCOUNT_PATH', 'test_path.json')
+os.environ.setdefault('FACECRYPT_STORAGE_BUCKET', 'test.appspot.com')
+os.environ.setdefault('FACECRYPT_SECRET_KEY', 'R7kyQt7z69lzAyu1NQEFYvJYb0preezrytAENnh7src=')
+os.environ.setdefault('FACECRYPT_FLASK_SECRET_KEY', 'R7kyQt7z69lzAyu1NQEFYvJYb0preezrytAENnh7src=')
 
 from app import create_app
 
