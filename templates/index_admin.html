@@ -101,10 +101,8 @@
             </tr>
           </tbody>
         </table>
-        <div id="paginationControls" class="mt-2">
-          <button class="btn btn-secondary btn-sm me-2" onclick="prevPage()">⬅️ السابق</button>
-          <span id="pageIndicator">صفحة 1</span>
-          <button class="btn btn-secondary btn-sm ms-2" onclick="nextPage()">التالي ➡️</button>
+        <div id="paginationControls" class="mt-2 text-center">
+          <button id="loadMoreLogsBtn" class="btn btn-secondary btn-sm" style="display: none;" onclick="fetchAuditLogs(true)">تحميل المزيد ⬇️</button>
         </div>
       </div>
 

@@ -143,20 +143,38 @@ def admin_list_users():
     return jsonify({"users": response}), 200
 
 
-# ✅ /admin/audit_logs
 @admin_bp.route("/audit_logs", methods=["GET"])
 @login_required
 def admin_audit_logs():
-    logs_ref = db.collection("audit_logs")
-    docs = logs_ref.stream()
+    limit = request.args.get("limit", default=50, type=int)
+    if limit > 200:
+        limit = 200
 
+    start_after_id = request.args.get("start_after")
+    
+    logs_ref = db.collection("audit_logs").order_by("timestamp", direction="DESCENDING")
+    
+    if start_after_id:
+        doc = db.collection("audit_logs").document(start_after_id).get()
+        if doc.exists:
+            logs_ref = logs_ref.start_after(doc)
+            
+    # Fetch limit + 1 to know if there's a next page
+    docs = logs_ref.limit(limit + 1).stream()
+    
     logs = []
     for doc in docs:
         log = doc.to_dict()
         log["id"] = doc.id
         logs.append(log)
+        
+    has_more = len(logs) > limit
+    if has_more:
+        logs = logs[:limit]
+        
+    next_cursor = logs[-1]["id"] if logs else None
 
-    return jsonify({"logs": logs}), 200
+    return jsonify({"logs": logs, "has_more": has_more, "next_cursor": next_cursor}), 200
 
 @admin_bp.route('/stats', methods=['GET'])
 @login_required

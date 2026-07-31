@@ -68,8 +68,7 @@ function setText(id, msg) {
 }
 
 let allAuditLogs = [];
-let currentPage = 1;
-const rowsPerPage = 10;
+let auditCursor = null;
 
 async function adminLogin() {
   const passwordInput = document.getElementById("adminPassword");
@@ -279,38 +278,44 @@ async function deleteUser() {
   });
 }
 
-async function fetchAuditLogs() {
-  const res = await adminFetch(`${API_BASE}/admin/audit_logs`);
-  const data = await res.json();
-
-  // 🟢 Sort descending by timestamp
-  allAuditLogs = data.logs.sort((a, b) => {
-    return new Date(b.timestamp) - new Date(a.timestamp);
-  });
-
-  currentPage = 1;
-  renderAuditLogs(allAuditLogs);
-}
-
-function renderAuditLogs(logs) {
-  const table = document.getElementById("auditLogsTable");
-  const pageIndicator = document.getElementById("pageIndicator");
-  const totalPages = Math.ceil(logs.length / rowsPerPage);
-
-  const start = (currentPage - 1) * rowsPerPage;
-  const end = start + rowsPerPage;
-  const pageData = logs.slice(start, end);
-
-  pageIndicator.textContent = `صفحة ${currentPage} من ${totalPages || 1}`;
-
-  if (!pageData || pageData.length === 0) {
-    table.innerHTML =
-      '<tr><td colspan="5" class="text-center">لم يتم العثور على سجلات.</td></tr>';
-    return;
+async function fetchAuditLogs(loadMore = false) {
+  if (!loadMore) {
+    auditCursor = null;
+    allAuditLogs = [];
+    document.getElementById("auditLogsTable").innerHTML = '<tr><td colspan="5" class="text-center">جاري التحميل...</td></tr>';
   }
 
-  table.innerHTML = "";
-  pageData.forEach((log) => {
+  let url = `${API_BASE}/admin/audit_logs?limit=50`;
+  if (auditCursor) {
+    url += `&start_after=${encodeURIComponent(auditCursor)}`;
+  }
+
+  const res = await adminFetch(url);
+  const data = await res.json();
+
+  allAuditLogs.push(...data.logs);
+  auditCursor = data.next_cursor;
+
+  renderAuditLogs(data.logs, loadMore);
+
+  const btn = document.getElementById("loadMoreLogsBtn");
+  if (btn) {
+    btn.style.display = data.has_more ? "inline-block" : "none";
+  }
+}
+
+function renderAuditLogs(logs, append = false) {
+  const table = document.getElementById("auditLogsTable");
+
+  if (!append) {
+    table.innerHTML = "";
+    if (!logs || logs.length === 0) {
+      table.innerHTML = '<tr><td colspan="5" class="text-center">لم يتم العثور على سجلات.</td></tr>';
+      return;
+    }
+  }
+
+  logs.forEach((log) => {
     const row = document.createElement("tr");
 
     // 🏷️ Status Badges Logic
@@ -377,20 +382,7 @@ function formatTimestamp(ts) {
 }
 
 
-function nextPage() {
-  const totalPages = Math.ceil(allAuditLogs.length / rowsPerPage);
-  if (currentPage < totalPages) {
-    currentPage++;
-    renderAuditLogs(allAuditLogs);
-  }
-}
 
-function prevPage() {
-  if (currentPage > 1) {
-    currentPage--;
-    renderAuditLogs(allAuditLogs);
-  }
-}
 
 function filterAuditLogs() {
   const query = document.getElementById("auditSearch").value.toLowerCase();
@@ -401,8 +393,7 @@ function filterAuditLogs() {
       (log.user_id || "").toLowerCase().includes(query) ||
       (log.timestamp || "").toLowerCase().includes(query)
   );
-  currentPage = 1;
-  renderAuditLogs(filtered);
+  renderAuditLogs(filtered, false);
 }
 
 async function refreshStats() {
