@@ -212,7 +212,21 @@ async function addUser() {
   }
 }
 
+let loadedUsersList = [];
+
 async function loadUsers() {
+  const res = await adminFetch(`${API_BASE}/admin/list_users`);
+  const data = await res.json();
+
+  loadedUsersList = data.users;
+  renderDeleteUserOptions(loadedUsersList);
+  
+  // Clear any existing search query when reloading users
+  const searchInput = document.getElementById("deleteUserSearch");
+  if (searchInput) searchInput.value = "";
+}
+
+function renderDeleteUserOptions(users) {
   const select = document.getElementById("deleteUserId");
   select.innerHTML = "";
   
@@ -223,15 +237,20 @@ async function loadUsers() {
   defaultOption.selected = true;
   select.add(defaultOption);
 
-  const res = await adminFetch(`${API_BASE}/admin/list_users`);
-  const data = await res.json();
-
-  data.users.forEach((user) => {
+  users.forEach((user) => {
     const option = document.createElement("option");
     option.value = user.id;
     option.text = `${user.name} (${user.id})`;
     select.add(option);
   });
+}
+
+function filterDeleteUserSelect() {
+  const query = document.getElementById("deleteUserSearch").value.toLowerCase();
+  const filtered = loadedUsersList.filter(user => 
+    user.name.toLowerCase().includes(query) || user.id.toLowerCase().includes(query)
+  );
+  renderDeleteUserOptions(filtered);
 }
 
 async function deleteUser() {
