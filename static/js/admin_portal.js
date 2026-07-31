@@ -30,6 +30,9 @@ async function adminLogout() {
   show(document.getElementById("loginSection"));
   document.getElementById("adminPassword").value = "";
   csrfToken = "";
+  // Hide nav logout button
+  const navLogout = document.getElementById("navLogoutBtn");
+  if (navLogout) hide(navLogout);
 }
 
 
@@ -118,6 +121,9 @@ async function adminLogin() {
         willClose: () => {
           hide(document.getElementById("loginSection"));
           show(document.getElementById("adminPanel"));
+          // Show nav logout button
+          const navLogout = document.getElementById("navLogoutBtn");
+          if (navLogout) show(navLogout);
         }
       });
 

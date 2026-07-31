@@ -1,12 +1,12 @@
-body {
-  font-family: 'Cairo', sans-serif;
-  background-color: #f8f9fa;
-  text-align: center;
-  padding: 20px;
-}
+/*
+ * NOTE: Body base styles (background, font, padding) are intentionally
+ * NOT set here — they are fully handled by landing.css which is loaded
+ * before this file. Duplicating them here would override the dark theme.
+ */
 
+/* Neutralise browser defaults that conflict with landing.css layout */
 h1 {
-  margin-top: 20px;
+  margin-top: 0;
 }
 
 /* Modern Action Button */

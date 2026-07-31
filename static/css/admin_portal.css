@@ -3,8 +3,29 @@
    Theme: Dark Cyberpunk / Glassmorphism
    ============================================================ */
 
-body {
-  /* landing.css sets base body styles, including navy background */
+/* Body background/font: handled by landing.css (loaded before this file) */
+
+/* ── Nav Logout Button ── */
+.btn-nav-logout {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 16px;
+  background: transparent;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  border-radius: 20px;
+  color: #FCA5A5;
+  font-family: var(--font-arabic);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+.btn-nav-logout:hover {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.7);
+  color: #FCA5A5;
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.15);
 }
 
 /* Base Headings */
@@ -207,4 +228,145 @@ h1 {
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(-5px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================================
+   ADMIN UX IMPROVEMENTS
+   ============================================================ */
+
+/* -- Sticky Audit Table Header -- */
+.table-responsive {
+  max-height: 520px;
+  overflow-y: auto;
+  border-radius: var(--border-radius-md);
+  /* Custom scrollbar */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0,212,255,0.3) transparent;
+}
+.table-responsive::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+.table-responsive::-webkit-scrollbar-track { background: transparent; }
+.table-responsive::-webkit-scrollbar-thumb {
+  background: rgba(0,212,255,0.3);
+  border-radius: 10px;
+}
+
+.table thead.table-dark th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background-color: var(--navy-700) !important;
+}
+
+/* Minimum column widths to prevent squeezing */
+.table th:nth-child(1), .table td:nth-child(1) { min-width: 110px; } /* الحدث */
+.table th:nth-child(2), .table td:nth-child(2) { min-width: 80px;  } /* الحالة */
+.table th:nth-child(3), .table td:nth-child(3) { min-width: 110px; } /* معرف المستخدم */
+.table th:nth-child(4), .table td:nth-child(4) { min-width: 140px; } /* الوقت */
+.table th:nth-child(5), .table td:nth-child(5) { min-width: 90px;  } /* الإجراءات */
+
+/* -- Stat Cards — clearer number/label hierarchy -- */
+.stat-card-hover {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 8px !important;
+  min-height: 88px;
+  gap: 4px;
+}
+
+.stat-card-hover .fs-3 {
+  font-size: 2rem !important;
+  line-height: 1.1;
+  font-weight: 800 !important;
+}
+
+.stat-card-hover .fs-6 {
+  font-size: 0.72rem !important;
+  letter-spacing: 0.3px;
+  line-height: 1.3;
+}
+
+/* -- Section card headers (Add/Delete user, Audit, Stats) -- */
+.card h4 {
+  font-size: 1rem;
+  padding-bottom: 12px;
+  margin-bottom: 16px !important;
+  border-bottom: 1px solid var(--white-10);
+  text-align: right;
+}
+
+/* -- Section title top-border accent line -- */
+.card h4::before {
+  content: '';
+  display: inline-block;
+  width: 3px;
+  height: 1em;
+  background: var(--cyan-400);
+  border-radius: 2px;
+  margin-inline-start: 10px;
+  vertical-align: middle;
+  box-shadow: 0 0 8px var(--cyan-glow);
+}
+
+/* -- Admin logout action bar -- */
+#adminPanel > div:first-child {
+  border-bottom: 1px solid var(--white-10);
+  padding-bottom: 16px;
+  margin-bottom: 20px !important;
+}
+
+/* -- Login page security info strip -- */
+.admin-security-strip {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: rgba(255,193,7,0.05);
+  border: 1px solid rgba(255,193,7,0.18);
+  border-radius: var(--border-radius-md);
+  padding: 14px 18px;
+  margin-top: 20px;
+  font-size: 0.82rem;
+  color: var(--white-70);
+  line-height: 1.7;
+  text-align: right;
+}
+
+.admin-security-strip .strip-icon {
+  font-size: 1.4rem;
+  flex-shrink: 0;
+  line-height: 1;
+  margin-top: 2px;
+}
+
+/* -- "فك الحظر" unblock button consistent style -- */
+.btn-outline-success {
+  border-color: var(--cyan-400) !important;
+  color: var(--cyan-400) !important;
+  border-radius: var(--border-radius-sm) !important;
+  font-size: 0.78rem !important;
+  padding: 4px 12px !important;
+  transition: var(--transition-fast) !important;
+}
+.btn-outline-success:hover {
+  background-color: rgba(0,212,255,0.12) !important;
+  box-shadow: 0 0 12px rgba(0,212,255,0.2) !important;
+}
+
+/* -- Audit log search input spacing -- */
+#auditSearch {
+  margin-bottom: 4px;
+}
+
+/* -- Responsive: narrower viewports hide h1 subtitle on admin -- */
+@media (max-width: 520px) {
+  #loginSection, #adminPanel {
+    max-width: 100%;
+  }
+  .stat-card-hover .fs-3 {
+    font-size: 1.5rem !important;
+  }
 }
