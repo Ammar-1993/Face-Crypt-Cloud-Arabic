@@ -41,6 +41,21 @@ def get_all_users():
     logger.info("✅ Retrieved %d users.", len(users))
     return users
 
+def get_all_users_summary():
+    """
+    Retrieves a summary of all user documents, fetching only the required fields
+    for the admin list to save bandwidth and memory (skipping face_encoding).
+    """
+    users = []
+    # Fetching only specific fields
+    docs = db.collection('users').select(['name', 'email', 'blocked', 'soft_block', 'failed_attempts']).stream()
+    for doc in docs:
+        user = doc.to_dict()
+        user['id'] = doc.id
+        users.append(user)
+    logger.info("✅ Retrieved %d user summaries.", len(users))
+    return users
+
 def log_audit_event(user_id, event, status=None, ip_address=None):
     """
     Logs an audit event to the Firestore 'audit_logs' collection.

@@ -127,7 +127,7 @@ def admin_delete_user():
 @admin_bp.route("/list_users", methods=["GET"])
 @login_required
 def admin_list_users():
-    users = firebase_utils.get_all_users()
+    users = firebase_utils.get_all_users_summary()
     response = [
         {
             "id": user.get("id"),

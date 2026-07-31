@@ -24,7 +24,7 @@ def test_admin_list_users_unauthenticated(client, mock_firebase):
 
 def test_admin_list_users(client, mock_firebase):
     """Test /admin/list_users GET request."""
-    mock_firebase['get_all_users'].return_value = [
+    mock_firebase['get_all_users_summary'].return_value = [
         {'name': 'John Doe', 'id': 'test_user_1'}
     ]
     with client.session_transaction() as sess:

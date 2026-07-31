@@ -30,16 +30,19 @@ def mock_firebase():
     with patch('utils.firebase_utils.add_user_to_firestore') as mock_add_user, \
          patch('utils.firebase_utils.delete_user_from_firestore') as mock_delete_user, \
          patch('utils.firebase_utils.get_all_users') as mock_get_all, \
+         patch('utils.firebase_utils.get_all_users_summary') as mock_get_all_summary, \
          patch('utils.firebase_utils.update_user_fields') as mock_update_user, \
          patch('utils.firebase_utils.log_audit_event') as mock_log_audit:
         
         # Configure default return values
         mock_get_all.return_value = []
+        mock_get_all_summary.return_value = []
 
         yield {
             'add_user_to_firestore': mock_add_user,
             'delete_user_from_firestore': mock_delete_user,
             'get_all_users': mock_get_all,
+            'get_all_users_summary': mock_get_all_summary,
             'update_user_fields': mock_update_user,
             'log_audit_event': mock_log_audit
         }
