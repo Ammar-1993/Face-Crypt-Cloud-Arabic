@@ -1019,6 +1019,35 @@ body {
 /* ============================================================
    RESPONSIVE ADJUSTMENTS
    ============================================================ */
+@media (max-width: 900px) {
+  .top-nav {
+    padding: 16px 24px;
+  }
+
+  .hero-section {
+    padding: 50px 20px 35px;
+  }
+
+  .hero-graphic-container {
+    width: min(320px, 85vw);
+    margin-bottom: 40px;
+  }
+
+  .features-row {
+    gap: 10px;
+    margin-bottom: 40px;
+  }
+
+  .feature-pill {
+    padding: 8px 14px;
+    font-size: 0.8rem;
+  }
+
+  .auth-card {
+    width: min(440px, 94vw);
+    padding: 30px 22px;
+  }
+}
 @media (max-width: 520px) {
   .top-nav {
     padding: 14px 20px;
