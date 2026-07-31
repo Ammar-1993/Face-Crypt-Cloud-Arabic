@@ -18,7 +18,7 @@ let stream = null;
  */
 btnOpenCamera.addEventListener("click", async () => {
   try {
-    stream = await navigator.mediaDevices.getUserMedia({ video: true });
+    stream = await navigator.mediaDevices.getUserMedia({ video: { width: { ideal: 640 }, height: { ideal: 480 } } });
     cameraStream.srcObject = stream;
     
     // UI Transitions
@@ -67,8 +67,8 @@ captureButton.addEventListener("click", async () => {
   const ctx2 = canvas2.getContext("2d");
   ctx2.drawImage(cameraStream, 0, 0);
 
-  preview.src = canvas1.toDataURL("image/jpeg");
-  preview.dataset.frame2 = canvas2.toDataURL("image/jpeg");
+  preview.src = canvas1.toDataURL("image/jpeg", 0.85);
+  preview.dataset.frame2 = canvas2.toDataURL("image/jpeg", 0.85);
   
   // UI Transitions
   preview.style.display = "block";
