@@ -115,3 +115,20 @@ img#preview {
   color: #dc3545 !important;
 }
 
+/* Custom self-contained spinner animation */
+.fc-spinner {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  vertical-align: text-bottom;
+  border: 0.15em solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: fc-spinner-border .75s linear infinite;
+  margin-inline-end: 0.5rem;
+}
+
+@keyframes fc-spinner-border {
+  to { transform: rotate(360deg); }
+}
+

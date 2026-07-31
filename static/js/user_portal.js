@@ -146,7 +146,7 @@ sendButton.addEventListener("click", async () => {
   sendButton.disabled = true;
   retakeButton.disabled = true;
   const originalBtnContent = sendButton.innerHTML;
-  sendButton.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> جاري التحقق...`;
+  sendButton.innerHTML = `<span class="fc-spinner" role="status" aria-hidden="true"></span> جاري التحقق...`;
 
   try {
     const blob = dataURLtoBlob(imageData);
