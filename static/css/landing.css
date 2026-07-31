@@ -1058,3 +1058,46 @@ body {
 .mt-1 { margin-top: 8px; }
 .mt-2 { margin-top: 16px; }
 .mt-3 { margin-top: 24px; }
+
+/* ============================================================
+   ACCESSIBILITY: PREFERS REDUCED MOTION
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  /* Shorten large entry animations */
+  .project-badge,
+  .hero-title,
+  .hero-subtitle,
+  .hero-desc,
+  .hero-graphic-container,
+  .features-row,
+  .auth-card {
+    animation-duration: 0.01ms !important;
+  }
+
+  /* Stop continuous/looping animations */
+  .bg-layer::before,
+  .bg-layer::after,
+  .grid-overlay,
+  .particle,
+  .scan-line,
+  .graphic-ring,
+  .graphic-ring-2,
+  .project-badge svg,
+  .nav-badge .status-dot,
+  .hero-chip .dot,
+  .btn-cta-primary-wrapper::before,
+  .scanning-active {
+    animation: none !important;
+  }
+
+  /* Hide elements that are purely decorative and rely on motion */
+  .particle,
+  .scan-line {
+    display: none !important;
+  }
+
+  /* Disable smooth scrolling */
+  html {
+    scroll-behavior: auto !important;
+  }
+}
