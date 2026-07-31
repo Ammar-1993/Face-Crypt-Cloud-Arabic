@@ -1,99 +1,203 @@
+/* ============================================================
+   Face-Crypt-Cloud | Admin Portal Stylesheet
+   Theme: Dark Cyberpunk / Glassmorphism
+   ============================================================ */
+
 body {
-  font-family: 'Cairo', sans-serif;
-  background-color: #f8f9fa;
-  padding: 20px;
+  /* landing.css sets base body styles, including navy background */
 }
 
-h1,
-h3,
-h4 {
+/* Base Headings */
+h1, h3, h4 {
   text-align: center;
+  color: var(--white);
+  font-family: var(--font-arabic);
 }
 
+h1 {
+  background: linear-gradient(135deg, var(--white) 0%, var(--cyan-300) 50%, var(--blue-400) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: none;
+  filter: drop-shadow(0 0 10px rgba(0, 212, 255, 0.3));
+}
+
+/* Glassmorphism Cards */
 .card {
-  margin-bottom: 20px;
+  background: var(--glass-bg) !important;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: var(--border-radius-xl) !important;
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  box-shadow:
+    0 10px 30px rgba(0,0,0,0.4),
+    inset 0 1px 0 rgba(255,255,255,0.06),
+    0 0 0 1px rgba(0,212,255,0.06) !important;
+  color: var(--white) !important;
+  margin-bottom: 24px;
 }
 
 #loginSection,
 #adminPanel {
-  max-width: 800px;
+  max-width: 900px;
   margin: auto;
+  position: relative;
+  z-index: 10;
 }
 
 .hidden {
-  display: none;
+  display: none !important;
 }
 
-.alert {
-  margin-top: 10px;
+/* Labels and Inputs */
+.form-label {
+  color: var(--white-90);
 }
 
-.stat-box {
-  padding: 12px;
-  border-radius: 8px;
-  margin: 6px;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+.form-control, .form-select {
+  background-color: var(--white-05) !important;
+  border: 1px solid var(--glass-border) !important;
+  color: var(--white) !important;
+  border-radius: var(--border-radius-md) !important;
 }
 
-.bg-stat-success {
-  background-color: #28a745;
-  color: white;
+.form-control::placeholder {
+  color: var(--white-50);
 }
 
-.bg-stat-failure {
-  background-color: #dc3545;
-  color: white;
+.form-control:focus, .form-select:focus {
+  background-color: var(--white-10) !important;
+  border-color: var(--cyan-400) !important;
+  box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.25) !important;
 }
 
-.bg-stat-blocked {
-  background-color: #ffc107;
-  color: #212529;
+/* Primary Buttons */
+.btn-primary, .btn-success {
+  background: linear-gradient(135deg, var(--blue-500) 0%, #005ACC 40%, var(--cyan-400) 100%) !important;
+  color: var(--white) !important;
+  border: none !important;
+  border-radius: var(--border-radius-lg) !important;
+  font-weight: 700 !important;
+  transition: var(--transition-smooth) !important;
+  box-shadow: 0 4px 16px rgba(0,128,255,0.3) !important;
 }
 
-.bg-stat-soft {
-  background-color: #6c757d;
-  color: white;
+.btn-primary:hover, .btn-success:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,128,255,0.5), 0 0 20px rgba(0,212,255,0.2) !important;
 }
 
-#refreshButton {
-  font-size: 0.9rem;
-  padding: 4px 8px;
+.btn-danger {
+  background: linear-gradient(135deg, #B91C1C 0%, #EF4444 100%) !important;
+  border: none !important;
+  border-radius: var(--border-radius-lg) !important;
 }
 
-.table-striped tbody tr:nth-of-type(odd) {
-  background-color: #f8f9fa;
+.btn-outline-danger {
+  border-color: #EF4444 !important;
+  color: #EF4444 !important;
+}
+.btn-outline-danger:hover {
+  background: #EF4444 !important;
+  color: var(--white) !important;
 }
 
-.table-striped tbody tr:hover {
-  background-color: #e2e6ea;
+.btn-outline-secondary {
+  border-color: var(--glass-border) !important;
+  color: var(--cyan-300) !important;
+}
+.btn-outline-secondary:hover {
+  background-color: var(--white-10) !important;
+  color: var(--cyan-400) !important;
 }
 
 /* Password Visibility Toggle */
 .input-group .btn-outline-secondary {
-  border-color: #dee2e6;
-  color: #6c757d;
-  background-color: #fff;
-  transition: all 0.3s ease;
+  background-color: var(--white-05) !important;
 }
-
 .input-group .btn-outline-secondary:hover {
-  background-color: #f8f9fa;
-  color: #0d6efd;
-  border-color: #0d6efd;
+  background-color: var(--white-10) !important;
+  color: var(--cyan-400) !important;
+  border-color: var(--cyan-400) !important;
 }
-
 .input-group .btn-outline-secondary:focus {
-  box-shadow: none;
+  box-shadow: none !important;
 }
 
-#toggleIcon {
-  font-size: 1.1rem;
+/* Statistics Cards */
+.stat-card-hover {
+  background: var(--navy-800) !important;
+  border: 1px solid var(--white-05) !important;
+  transition: var(--transition-smooth) !important;
+  border-radius: var(--border-radius-md) !important;
 }
 
+.stat-card-hover:hover {
+  background: var(--navy-700) !important;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0,212,255,0.15) !important;
+}
+
+/* Mapping bootstrap border colors to our palette for stats */
+.border-primary { border-color: var(--blue-400) !important; }
+.border-success { border-color: var(--cyan-400) !important; }
+.border-danger { border-color: #EF4444 !important; }
+.border-secondary { border-color: #9CA3AF !important; }
+.border-warning { border-color: var(--gold-400) !important; }
+.border-dark { border-color: #374151 !important; }
+.border-info { border-color: var(--cyan-300) !important; }
+
+/* Text colors mapping for stats */
+.text-primary { color: var(--blue-400) !important; }
+.text-success { color: var(--cyan-400) !important; }
+.text-danger { color: #EF4444 !important; }
+.text-secondary { color: #9CA3AF !important; }
+.text-warning { color: var(--gold-400) !important; }
+.text-dark { color: var(--white) !important; }
+.text-info { color: var(--cyan-300) !important; }
+.text-muted { color: var(--white-50) !important; }
+
+/* Audit Logs Table */
+.table {
+  color: var(--white-90) !important;
+  background-color: transparent !important;
+  border-color: var(--white-10) !important;
+}
+
+.table-striped > tbody > tr:nth-of-type(odd) > * {
+  background-color: rgba(255, 255, 255, 0.02) !important;
+  color: var(--white-90) !important;
+}
+
+.table-hover > tbody > tr:hover > * {
+  background-color: rgba(0, 212, 255, 0.05) !important;
+  color: var(--white) !important;
+}
+
+.table-dark {
+  background-color: var(--navy-800) !important;
+}
+.table-dark th {
+  background-color: var(--navy-700) !important;
+  border-color: var(--glass-border) !important;
+  color: var(--cyan-300) !important;
+  font-weight: 600;
+}
+
+.table td, .table th {
+  border-color: var(--white-10) !important;
+  vertical-align: middle;
+}
+
+/* Badges for Audit Logs */
+.badge {
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 20px;
+}
+
+/* Animations */
 #arabicWarning {
   display: block;
   font-weight: 600;
