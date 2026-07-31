@@ -115,20 +115,34 @@ img#preview {
   color: #dc3545 !important;
 }
 
-/* Custom self-contained spinner animation */
+/* ============================================================
+   LOADING SPINNER — #2 fix: fc-spinner (replaces Bootstrap's
+   spinner-border which is unavailable on this page)
+   Color: --cyan-400 (#00D4FF) matching the design system
+   ============================================================ */
 .fc-spinner {
   display: inline-block;
-  width: 1rem;
-  height: 1rem;
-  vertical-align: text-bottom;
-  border: 0.15em solid currentColor;
-  border-right-color: transparent;
+  width: 16px;
+  height: 16px;
+  border: 2.5px solid rgba(0, 212, 255, 0.25);
+  border-top-color: #00D4FF;
   border-radius: 50%;
-  animation: fc-spinner-border .75s linear infinite;
-  margin-inline-end: 0.5rem;
+  animation: fc-spin 0.65s linear infinite;
+  vertical-align: middle;
+  margin-inline-end: 6px;
+  flex-shrink: 0;
 }
 
-@keyframes fc-spinner-border {
+@keyframes fc-spin {
   to { transform: rotate(360deg); }
+}
+
+/* Reduced-motion: keep the spinner visible but stop rotating */
+@media (prefers-reduced-motion: reduce) {
+  .fc-spinner {
+    animation: none;
+    border-top-color: #00D4FF;
+    opacity: 0.7;
+  }
 }
 

@@ -20,14 +20,28 @@
 </head>
 
 <body>
-  <div class="bg-layer"></div>
-  <div class="grid-overlay"></div>
+  <div class="bg-layer" aria-hidden="true"></div>
+  <div class="grid-overlay" aria-hidden="true"></div>
   <div class="page-wrapper">
-  <div style="text-align:center; margin: 30px 0;">
-    <img src="{{ url_for('static', filename='images/face_crypt_cloud_logo.png') }}" alt="FaceCrypt Logo" width="180">
-  </div>
-  <main role="main" class="container">
-    <h1 class="mb-4">سحابة الملامح المشفرة - بوابة المسؤول</h1>
+
+    <!-- ── TOP NAVIGATION ── -->
+    <nav class="top-nav" role="navigation" aria-label="شريط التنقل — بوابة المسؤول">
+      <!-- Logo -->
+      <a href="/admin/" class="nav-logo" aria-label="Face-Crypt-Cloud — بوابة المسؤول">
+        <img src="{{ url_for('static', filename='images/face_crypt_cloud_logo.png') }}"
+             alt="شعار Face-Crypt-Cloud" width="42" height="42">
+        <span class="nav-logo-text">Face‑Crypt‑Cloud</span>
+      </a>
+
+      <!-- Admin Badge -->
+      <div class="nav-badge" role="note" aria-label="وضع لوحة المسؤول">
+        <span class="status-dot" aria-hidden="true"></span>
+        <span>بوابة المسؤول</span>
+      </div>
+    </nav>
+
+    <main role="main" class="container" style="padding-top: 32px; padding-bottom: 32px;">
+      <h1 class="mb-4">بوابة المسؤول — Face‑Crypt‑Cloud</h1>
 
     <!-- Login Section -->
     <div id="loginSection" class="card p-4 shadow">
@@ -192,10 +206,19 @@
       </div>
     </main>
 
-    <!-- ملفات الجافاسكريبت -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{{ url_for('static', filename='js/admin_portal.js') }}"></script>
-  </div>
+    <!-- ── SITE FOOTER ── -->
+    <footer class="site-footer" role="contentinfo">
+      <p>
+        &copy; 2024–2026 <strong>Face‑Crypt‑Cloud</strong> —
+        بوابة الإدارة الآمنة. جميع العمليات مُسجَّلة في سجلات التدقيق.
+      </p>
+    </footer>
+
+  </div><!-- /page-wrapper -->
+
+  <!-- ملفات الجافاسكريبت -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="{{ url_for('static', filename='js/admin_portal.js') }}"></script>
 </body>
 
 </html>
