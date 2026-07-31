@@ -28,8 +28,11 @@ def csrf_protect():
 
 
 
+from app.limiter import limiter
+
 # ✅ صفحة Admin Portal
 @admin_bp.route("/", methods=["GET"])
+@limiter.exempt
 def admin_portal():
     return render_template("index_admin.html")
 

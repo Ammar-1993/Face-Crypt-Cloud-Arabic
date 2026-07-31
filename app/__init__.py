@@ -59,6 +59,11 @@ def create_app():
         logger.warning("Request Entity Too Large: %s", str(error))
         return jsonify({"error": "❌ حجم الملف كبير جداً. الحد الأقصى المسموح به هو 5 ميغابايت."}), 413
 
+    @app.errorhandler(429)
+    def ratelimit_handler(error):
+        logger.warning("Rate limit exceeded: %s", str(error))
+        return jsonify({"error": f"❌ عذراً، تم تجاوز الحد المسموح من الطلبات: {error.description}"}), 429
+
 
 
     logger.info("✅ Flask App created and routes registered.")
