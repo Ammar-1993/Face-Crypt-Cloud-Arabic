@@ -3,81 +3,331 @@
 
 <head>
   <meta charset="UTF-8" />
-  <title>سحابة الملامح المشفرة</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-  <!-- رابط ملف CSS المخصص -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/user_portal.css') }}">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Face-Crypt-Cloud – نظام المصادقة البيومترية السحابي المشفر. تسجيل دخول آمن بتقنية التعرف على الوجه والتشفير المتقدم." />
+  <meta name="theme-color" content="#050A18" />
+  <title>Face-Crypt-Cloud | نظام المصادقة بالوجه السحابي المشفر</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- SweetAlert2 -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <!-- Landing Page Stylesheet -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}">
+  <!-- User Portal Functional Styles (kept for JS compatibility) -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/user_portal.css') }}">
 </head>
 
 <body>
-  <div style="text-align:center; margin: 15px 0;">
-    <img src="{{ url_for('static', filename='images/face_crypt_cloud_logo.png') }}" alt="FaceCrypt Logo" width="150">
-  </div>
-  <div class="container mt-2">
-    <h1 class="mb-1">سحابة الملامح المشفرة - بوابة المستخدم</h1>
-    <p class="mb-3">تسجيل الدخول الآمن ببصمة الوجه</p>
 
-    <!-- Main Action: Open Camera -->
-    <div id="openCameraWrapper" class="d-grid gap-2 col-10 col-md-8 mx-auto mt-4">
-      <button id="btnOpenCamera" class="btn btn-modern-primary py-3 shadow-lg">
-        <div class="d-flex align-items-center justify-content-center">
-          <i class="bi bi-camera-fill fs-3 me-3"></i>
-          <div class="text-start">
-            <span class="d-block fw-bold fs-4">بدء التحقق من الوجه</span>
-            <small class="d-block opacity-75" style="font-size: 0.85rem;">افتح الكاميرا لتسجيل دخول آمن</small>
+  <!-- ============================================================
+       BACKGROUND LAYERS
+       ============================================================ -->
+  <div class="bg-layer" aria-hidden="true"></div>
+  <div class="grid-overlay" aria-hidden="true"></div>
+
+  <!-- Floating Particles -->
+  <div class="particles-layer" aria-hidden="true" id="particlesLayer"></div>
+
+  <!-- ============================================================
+       PAGE WRAPPER
+       ============================================================ -->
+  <div class="page-wrapper">
+
+    <!-- ── TOP NAVIGATION ── -->
+    <nav class="top-nav" role="navigation" aria-label="شريط التنقل الرئيسي">
+      <!-- Logo (RTL: logo on right) -->
+      <a href="/" class="nav-logo" aria-label="Face-Crypt-Cloud الصفحة الرئيسية">
+        <img src="{{ url_for('static', filename='images/face_crypt_cloud_logo.png') }}"
+             alt="شعار Face-Crypt-Cloud"
+             width="42" height="42">
+        <span class="nav-logo-text">Face‑Crypt‑Cloud</span>
+      </a>
+
+      <!-- Status Badge (LTR: badge on left) -->
+      <div class="nav-badge" role="status" aria-label="حالة النظام">
+        <span class="status-dot" aria-hidden="true"></span>
+        <span>النظام متاح</span>
+      </div>
+    </nav>
+
+    <!-- ── HERO SECTION ── -->
+    <main class="hero-section" id="main-content">
+
+      <!-- Project Badge -->
+      <div class="project-badge" role="note">
+        <!-- Gear icon -->
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm8.94-3.34a7.72 7.72 0 0 0 .06-.66 7.72 7.72 0 0 0-.06-.66l1.42-1.11a.34.34 0 0 0 .08-.43l-1.35-2.34a.34.34 0 0 0-.41-.15l-1.67.67a6.93 6.93 0 0 0-1.14-.66l-.25-1.78A.33.33 0 0 0 17.28 4h-2.7a.33.33 0 0 0-.33.28l-.25 1.78a6.93 6.93 0 0 0-1.14.66l-1.67-.67a.33.33 0 0 0-.41.15L9.43 8.54a.33.33 0 0 0 .08.43l1.42 1.11A7.15 7.15 0 0 0 10.87 12a7.15 7.15 0 0 0 .06.92L9.51 14.03a.33.33 0 0 0-.08.43l1.35 2.34c.08.14.25.2.41.15l1.67-.67c.36.25.74.47 1.14.66l.25 1.78c.04.18.2.28.33.28h2.7c.17 0 .31-.11.33-.28l.25-1.78a6.93 6.93 0 0 0 1.14-.66l1.67.67c.16.06.33 0 .41-.15l1.35-2.34a.33.33 0 0 0-.08-.43l-1.41-1.09z"/>
+        </svg>
+        <span>مصادقة بيومترية سحابية مشفرة</span>
+      </div>
+
+      <!-- Main Title -->
+      <h1 class="hero-title">
+        <span class="brand-name">Face‑Crypt‑Cloud</span>
+      </h1>
+
+      <!-- Subtitle -->
+      <p class="hero-subtitle">نظام المصادقة بالوجه السحابي المشفر</p>
+
+      <!-- Description -->
+      <p class="hero-desc">
+        منصة أمنية متقدمة تجمع بين تقنية التعرف على الوجه والتشفير السحابي
+        لضمان هوية المستخدم بدقة عالية وحماية بلا مساومة.
+      </p>
+
+      <!-- ── HERO BIOMETRIC GRAPHIC ── -->
+      <div class="hero-graphic-container" aria-hidden="true">
+        <!-- Outer pulse rings -->
+        <div class="graphic-ring"></div>
+        <div class="graphic-ring graphic-ring-2"></div>
+
+        <div class="hero-graphic-wrap">
+          <!-- Scan line animation -->
+          <div class="scan-line"></div>
+
+          <!-- Corner biometric brackets -->
+          <div class="bracket bracket-tl"></div>
+          <div class="bracket bracket-tr"></div>
+          <div class="bracket bracket-bl"></div>
+          <div class="bracket bracket-br"></div>
+
+          <!-- Hero Image -->
+          <img src="{{ url_for('static', filename='images/hero_graphic.png') }}"
+               alt="رسم بياني للتعرف على الوجه ببيانات بيومترية مشفرة"
+               width="360" height="360"
+               loading="eager">
+        </div>
+
+        <!-- Status Chip -->
+        <div class="hero-chip" role="status">
+          <span class="dot" aria-hidden="true"></span>
+          <span>جاهز للمسح البيومتري</span>
+        </div>
+      </div>
+
+      <!-- ── FEATURE PILLS ── -->
+      <div class="features-row" role="list" aria-label="مميزات النظام">
+        <div class="feature-pill" role="listitem">
+          <span class="pill-icon" aria-hidden="true">🔐</span>
+          <span>تشفير AES-256</span>
+        </div>
+        <div class="feature-pill" role="listitem">
+          <span class="pill-icon" aria-hidden="true">☁️</span>
+          <span>سحابة Firebase</span>
+        </div>
+        <div class="feature-pill" role="listitem">
+          <span class="pill-icon" aria-hidden="true">🤖</span>
+          <span>ذكاء اصطناعي</span>
+        </div>
+        <div class="feature-pill" role="listitem">
+          <span class="pill-icon" aria-hidden="true">⚡</span>
+          <span>استجابة فورية</span>
+        </div>
+      </div>
+
+      <!-- ── AUTHENTICATION CARD ── -->
+      <section class="auth-card" aria-labelledby="auth-card-title">
+
+        <!-- Card Header -->
+        <div class="auth-card-header">
+          <div class="auth-card-icon" aria-hidden="true">🪪</div>
+          <div>
+            <h2 class="auth-card-title" id="auth-card-title">بوابة التحقق البيومتري</h2>
+            <p class="auth-card-sub">ضع وجهك أمام الكاميرا لإتمام عملية التحقق</p>
           </div>
         </div>
-      </button>
-    </div>
 
-    <!-- Camera and Preview Container -->
-    <div id="cameraContainer" class="text-center mt-3">
-      <video id="cameraStream" autoplay playsinline style="display:none;"></video>
-      <img id="preview" src="#" alt="معاينة" style="display:none;">
+        <!-- ── CTA: Open Camera ── -->
+        <div id="openCameraWrapper" class="btn-cta-primary-wrapper">
+          <button id="btnOpenCamera"
+                  class="btn-cta-primary"
+                  aria-label="بدء عملية التحقق من الوجه – فتح الكاميرا">
+            <div class="btn-cta-icon" aria-hidden="true">📷</div>
+            <div class="btn-cta-text">
+              <span class="main-text">بدء التحقق من الوجه</span>
+              <span class="sub-text">افتح الكاميرا لتسجيل دخول آمن</span>
+            </div>
+          </button>
+        </div>
 
-      <div class="mt-3 d-flex justify-content-center gap-3">
-        <button id="captureButton" class="btn btn-warning btn-lg px-4 py-2 fw-bold shadow-sm" style="display:none;">
-          <i class="bi bi-camera-fill me-2"></i> التقاط الصورة
+        <!-- ── Camera Stream & Preview ── -->
+        <div id="cameraContainer">
+          <video id="cameraStream"
+                 autoplay playsinline
+                 aria-label="بث الكاميرا للتحقق من الوجه"
+                 style="display:none;"></video>
+          <img id="preview" src="#" alt="معاينة الصورة الملتقطة" style="display:none;">
+
+          <!-- Camera Controls -->
+          <div class="camera-controls">
+            <button id="captureButton"
+                    class="btn-cam btn-cam-capture"
+                    style="display:none;"
+                    aria-label="التقاط صورة من الكاميرا">
+              <span aria-hidden="true">📸</span>
+              <span>التقاط الصورة</span>
+            </button>
+            <button id="stopCameraButton"
+                    class="btn-cam btn-cam-stop"
+                    style="display:none;"
+                    aria-label="إغلاق الكاميرا">
+              <span aria-hidden="true">✕</span>
+              <span>إغلاق الكاميرا</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- ── Submit / Retake Row ── -->
+        <div class="submit-row">
+          <button id="sendButton"
+                  class="btn-submit"
+                  style="display:none;"
+                  aria-label="إرسال الصورة للتحقق">
+            <span aria-hidden="true">✅</span>
+            <span>إرسال للتحقق</span>
+          </button>
+          <button id="retakeButton"
+                  class="btn-retake"
+                  style="display:none;"
+                  aria-label="إعادة التقاط الصورة">
+            <span aria-hidden="true">🔄</span>
+            <span>إعادة التقاط</span>
+          </button>
+        </div>
+
+        <button type="button"
+                class="btn-cancel"
+                id="btnCancelCamera"
+                style="display:none;"
+                aria-label="إلغاء عملية التحقق">
+          إلغاء العملية ✖
         </button>
-        <button id="stopCameraButton" class="btn btn-outline-secondary btn-lg px-4 py-2 fw-bold shadow-sm" style="display:none;">
-          <i class="bi bi-x-circle-fill me-2"></i> إغلاق الكاميرا
-        </button>
-      </div>
-    </div>
 
-    <!-- Final Submission and Retake Actions -->
-    <div class="d-flex justify-content-center gap-3 mt-3">
-      <button id="sendButton" class="btn btn-success btn-lg" style="display:none;">✅ إرسال للتحقق</button>
-      <button id="retakeButton" class="btn btn-outline-danger btn-lg" style="display:none;">🔄 إعادة التقاط</button>
-      <button type="button" class="btn btn-outline-secondary btn-lg" id="btnCancelCamera" style="display: none;">إلغاء ✖️</button>
-    </div>
+        <!-- ── Result Area ── -->
+        <div id="result" role="alert" aria-live="polite"></div>
 
-    <!-- Result -->
-    <div id="result" class="mt-2"></div>
+        <!-- ── Security Policy ── -->
+        <div class="security-card" id="securityDisclaimer" role="complementary" aria-label="سياسة حماية الحساب">
+          <div class="security-card-title">
+            <!-- Shield icon -->
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+            <span>سياسة حماية الحساب</span>
+          </div>
+          <ul class="security-list" aria-label="قواعد الحماية">
+            <li>
+              <span class="sec-badge sec-badge-warn" aria-label="تحذير">٣ محاولات فاشلة</span>
+              <span>حظر مؤقت تلقائي لمدة ٥ دقائق.</span>
+            </li>
+            <li>
+              <span class="sec-badge sec-badge-danger" aria-label="خطر">٥ محاولات فاشلة</span>
+              <span>حظر دائم — يتطلب مراجعة مسؤول النظام.</span>
+            </li>
+          </ul>
+        </div>
 
-    <!-- Security Disclaimer -->
-    <div id="securityDisclaimer" class="mt-4 p-3 border rounded shadow-sm bg-light text-start">
-      <h6 class="fw-bold text-dark mb-2">
-        <i class="bi bi-shield-lock-fill me-1"></i> سياسة حماية الحساب:
-      </h6>
-      <ul class="list-unstyled mb-0" style="font-size: 1rem; line-height: 1.6;">
-        <li class="text-secondary">
-          <span class="badge bg-warning text-dark me-1">٣ محاولات فاشلة</span>
-          <span>حظر مؤقت لمدة ٥ دقائق.</span>
-        </li>
-        <li class="text-secondary mt-1">
-          <span class="badge bg-danger me-1">٥ محاولات فاشلة</span>
-          <span>حظر دائم (يتطلب مراجعة مسؤول النظام).</span>
-        </li>
-      </ul>
-    </div>
+      </section>
+      <!-- /auth-card -->
+
+    </main>
+    <!-- /hero-section -->
+
+    <!-- ── SITE FOOTER ── -->
+    <footer class="site-footer" role="contentinfo">
+      <p>
+        &copy; 2024–2026 <strong>Face‑Crypt‑Cloud</strong> —
+        جميع الحقوق محفوظة.
+        مبني بتقنية
+        <a href="https://flask.palletsprojects.com/" target="_blank" rel="noopener noreferrer">Flask</a>،
+        <a href="https://firebase.google.com/" target="_blank" rel="noopener noreferrer">Firebase</a>
+        &amp;
+        <a href="https://github.com/ageitgey/face_recognition" target="_blank" rel="noopener noreferrer">Face Recognition</a>.
+      </p>
+    </footer>
+
   </div>
+  <!-- /page-wrapper -->
 
-  <!-- رابط ملف JS المخصص -->
+  <!-- ============================================================
+       JAVASCRIPT
+       ============================================================ -->
+  <!-- Particle system & UI enhancements -->
+  <script>
+    (function() {
+      'use strict';
+
+      /* ---- Particle Generator ---- */
+      const layer = document.getElementById('particlesLayer');
+      const PARTICLE_COUNT = 28;
+      const COLORS = ['rgba(0,212,255,', 'rgba(0,128,255,', 'rgba(255,215,0,'];
+
+      for (let i = 0; i < PARTICLE_COUNT; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        const size = (Math.random() * 3 + 1.5).toFixed(1);
+        const colorBase = COLORS[Math.floor(Math.random() * COLORS.length)];
+        p.style.cssText = [
+          `width:${size}px`,
+          `height:${size}px`,
+          `left:${(Math.random() * 100).toFixed(1)}%`,
+          `background:${colorBase}${(Math.random() * 0.5 + 0.3).toFixed(2)})`,
+          `--dur:${(Math.random() * 10 + 8).toFixed(1)}s`,
+          `--delay:${(Math.random() * 8).toFixed(1)}s`,
+          `box-shadow:0 0 ${Math.round(size * 3)}px ${colorBase}0.6)`
+        ].join(';');
+        layer.appendChild(p);
+      }
+
+      /* ---- Camera Button UX Enhancements ---- */
+      const btnOpen = document.getElementById('btnOpenCamera');
+      const videoEl = document.getElementById('cameraStream');
+
+      if (btnOpen) {
+        // Add ripple effect on click
+        btnOpen.addEventListener('click', function(e) {
+          // Scanning pulse on video when camera opens
+          if (videoEl) {
+            setTimeout(() => {
+              if (videoEl.style.display !== 'none') {
+                videoEl.classList.add('scanning-active');
+              }
+            }, 800);
+          }
+        });
+      }
+
+      // Remove scanning pulse when camera closes
+      const btnStop = document.getElementById('stopCameraButton');
+      const btnCancel = document.getElementById('btnCancelCamera');
+
+      [btnStop, btnCancel].forEach(btn => {
+        if (btn) {
+          btn.addEventListener('click', () => {
+            if (videoEl) videoEl.classList.remove('scanning-active');
+          });
+        }
+      });
+
+      // Remove scanning pulse when photo is captured
+      const btnCapture = document.getElementById('captureButton');
+      if (btnCapture) {
+        btnCapture.addEventListener('click', () => {
+          if (videoEl) videoEl.classList.remove('scanning-active');
+        });
+      }
+
+    })();
+  </script>
+
+  <!-- User Portal Logic (unchanged) -->
   <script src="{{ url_for('static', filename='js/user_portal.js') }}"></script>
-</body>
 
+</body>
 </html>
