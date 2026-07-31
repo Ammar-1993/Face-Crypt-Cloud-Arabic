@@ -48,20 +48,34 @@ def verify_login():
         image_array = face_utils.load_image_from_request(image_file)
         
         # 🛡️ Liveness Check Flow
+        face_locations_1 = None
         if ENABLE_LIVENESS_CHECK:
+            import face_recognition
+            face_locations_1 = face_recognition.face_locations(image_array)
             image_array_2 = face_utils.load_image_from_request(image2_file) if image2_file else None
-            is_live, reason = face_utils.check_liveness(image_array, image_array_2)
+            
+            face_locations_2 = None
+            if image_array_2 is not None:
+                face_locations_2 = face_recognition.face_locations(image_array_2)
+                
+            is_live, reason = face_utils.check_liveness(
+                image_array, image_array_2,
+                face_locations_1=face_locations_1,
+                face_locations_2=face_locations_2
+            )
             if not is_live:
                 firebase_utils.log_audit_event("unknown_user", "Spoofing_Attempt", status='blocked', ip_address=request.remote_addr)
                 return jsonify({"message": f"🚨 **فشل الأمان (مكافحة الانتحال):**\n{reason}"}), 403
 
-        new_encoding = face_utils.extract_face_encoding(image_array)
+        new_encoding = face_utils.extract_face_encoding(image_array, face_locations=face_locations_1)
 
         users = firebase_utils.get_all_users()
         logger.info("✅ Retrieved %d users from Firestore", len(users))
 
         matched_user = None
         # 1. First, find if the face matches ANY user (including blocked ones)
+        decrypted_encodings = []
+        valid_users = []
         for user in users:
             stored_encoding_encrypted = user.get('face_encoding')
             if not stored_encoding_encrypted or not isinstance(stored_encoding_encrypted, str):
@@ -69,12 +83,16 @@ def verify_login():
 
             try:
                 stored_encoding = face_utils.decrypt_encoding(stored_encoding_encrypted)
-                if face_utils.compare_encodings(stored_encoding, new_encoding):
-                    matched_user = user
-                    break
+                decrypted_encodings.append(stored_encoding)
+                valid_users.append(user)
             except Exception as e:
                 logger.warning("❌ Error processing user %s: %s", user.get('id'), e)
                 continue
+                
+        if valid_users:
+            best_match_idx = face_utils.find_best_match(decrypted_encodings, new_encoding)
+            if best_match_idx is not None:
+                matched_user = valid_users[best_match_idx]
 
         # 2. If a match is found, check their status
         if matched_user:

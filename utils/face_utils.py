@@ -26,7 +26,7 @@ def load_image_from_request(file):
     image_array = np.ascontiguousarray(image_array)
     return image_array
 
-def extract_face_encoding(image_array):
+def extract_face_encoding(image_array, face_locations=None):
     """
     Safely extracts the face encoding from a given image (NumPy array).
     Returns the first encoding found or raises ValueError.
@@ -36,7 +36,8 @@ def extract_face_encoding(image_array):
             raise ValueError(f"نوع البيانات غير مدعوم: {image_array.dtype}")
         if len(image_array.shape) != 3 or image_array.shape[2] != 3:
             raise ValueError(f"شكل غير مدعوم: {image_array.shape}")
-        encodings = face_recognition.face_encodings(image_array)
+        
+        encodings = face_recognition.face_encodings(image_array, known_face_locations=face_locations)
         if len(encodings) == 0:
             raise ValueError("لم يتم اكتشاف أي وجه. يرجى المحاولة مرة أخرى بصورة واضحة.")
         return encodings[0]
@@ -53,6 +54,22 @@ def compare_encodings(known_encoding, unknown_encoding, tolerance=0.6):
         raise ValueError("❌ أحد التشفيرات أو كلاهما غير صالح.")
     results = face_recognition.compare_faces([known_encoding], unknown_encoding, tolerance=tolerance)
     return results[0]
+
+def find_best_match(known_encodings_list, unknown_encoding, tolerance=0.6):
+    """
+    Finds the best match for an unknown encoding against a list of known encodings.
+    Returns the index of the best match within the tolerance, or None if no match is found.
+    """
+    if not known_encodings_list:
+        return None
+    
+    known_encodings_array = np.array(known_encodings_list)
+    distances = face_recognition.face_distance(known_encodings_array, unknown_encoding)
+    best_match_idx = np.argmin(distances)
+    
+    if distances[best_match_idx] <= tolerance:
+        return best_match_idx
+    return None
 
 def encrypt_encoding(encoding):
     """
@@ -71,7 +88,7 @@ def decrypt_encoding(encrypted_str):
     decoded = json.loads(decrypted.decode())
     return decoded
 
-def check_liveness(image_array_1, image_array_2=None):
+def check_liveness(image_array_1, image_array_2=None, face_locations_1=None, face_locations_2=None):
     """
     Basic anti-spoofing liveness check.
     If image_array_2 is provided, checks for natural head movement (landmark distance).
@@ -91,8 +108,8 @@ def check_liveness(image_array_1, image_array_2=None):
     # 2. Active Challenge (Two frames)
     if image_array_2 is not None:
         try:
-            landmarks1 = face_recognition.face_landmarks(image_array_1)
-            landmarks2 = face_recognition.face_landmarks(image_array_2)
+            landmarks1 = face_recognition.face_landmarks(image_array_1, face_locations=face_locations_1)
+            landmarks2 = face_recognition.face_landmarks(image_array_2, face_locations=face_locations_2)
             
             if not landmarks1 or not landmarks2:
                 return False, "لم يتم اكتشاف الوجه في الإطارين."
