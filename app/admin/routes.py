@@ -161,42 +161,31 @@ def admin_audit_logs():
 @admin_bp.route('/stats', methods=['GET'])
 @login_required
 def admin_stats():
-    # 📌 قراءة سجلات الأحداث
-    logs_ref = config.db.collection('audit_logs').stream()
-    total = 0
-    success = 0
-    failure = 0
-    blocked_events = 0
-    soft_block_events = 0
+    # 📌 قراءة سجلات الأحداث باستخدام استعلامات التجميع (Aggregation Queries)
+    logs_ref = config.db.collection('audit_logs')
+    
+    def get_count(query):
+        return query.count().get()[0][0].value
 
-    for doc in logs_ref:
-        data = doc.to_dict()
-        total += 1
-        status = data.get('status')
-        if status == 'success':
-            success += 1
-        elif status == 'failure':
-            failure += 1
-        elif status == 'blocked':
-            blocked_events += 1
-        elif status == 'soft_block':
-            soft_block_events += 1
+    total = get_count(logs_ref)
+    success = get_count(logs_ref.where('status', '==', 'success'))
+    failure = get_count(logs_ref.where('status', '==', 'failure'))
+    blocked_events = get_count(logs_ref.where('status', '==', 'blocked'))
+    soft_block_events = get_count(logs_ref.where('status', '==', 'soft_block'))
 
-    # 📌 قراءة حالات المستخدمين
+    # 📌 قراءة حالات المستخدمين بمسار واحد
     users_ref = config.db.collection('users').stream()
     blocked_users = 0
     soft_blocked_users = 0
+    total_users = 0
 
     for doc in users_ref:
         u = doc.to_dict()
+        total_users += 1
         if u.get('blocked', False):
             blocked_users += 1
         if u.get('soft_block', False):
             soft_blocked_users += 1
-
-    # In your /admin/stats endpoint
-    users = firebase_utils.get_all_users()
-    total_users = len(users)
 
     # 📌 إرجاع النتيجة
     return jsonify({

@@ -82,13 +82,19 @@ def test_admin_stats_unauthenticated(client, mock_firebase):
 @patch('app.admin.routes.config.db')
 def test_admin_stats(mock_config_db, client, mock_firebase):
     """Test /admin/stats GET request."""
-    # Setup mock to return an empty list when stream() is called for logs and users
-    mock_stream = MagicMock()
-    mock_stream.stream.return_value = []
-    mock_config_db.collection.return_value = mock_stream
+    mock_collection = MagicMock()
+    mock_config_db.collection.return_value = mock_collection
     
-    # Setup mock_firebase get_all_users to return empty for total_users calculation
-    mock_firebase['get_all_users'].return_value = []
+    mock_count = MagicMock()
+    mock_get = MagicMock()
+    mock_agg_result = MagicMock()
+    mock_agg_result.value = 0
+    mock_get.return_value = [[mock_agg_result]]
+    mock_count.get = mock_get
+    
+    mock_collection.count.return_value = mock_count
+    mock_collection.where.return_value.count.return_value = mock_count
+    mock_collection.stream.return_value = []
     
     with client.session_transaction() as sess:
         sess['admin_logged_in'] = True
