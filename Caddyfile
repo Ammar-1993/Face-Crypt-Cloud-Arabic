@@ -1,0 +1,15 @@
+# Optional: local HTTPS reverse proxy for testing the admin panel's
+# session-cookie-dependent login flow (SESSION_COOKIE_SECURE=True
+# requires HTTPS even in local development).
+#
+# Caddy auto-generates and trusts a local certificate for you — no
+# manual cert setup needed. Uncomment the `caddy` service in
+# docker-compose.yml, then run: docker compose up
+#
+# Visit https://localhost:8443 afterwards (accept the local cert
+# prompt once, or run `caddy trust` if your browser still warns).
+
+localhost:8443 {
+    tls internal
+    reverse_proxy app:8080
+}

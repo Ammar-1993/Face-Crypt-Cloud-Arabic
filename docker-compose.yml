@@ -1,0 +1,50 @@
+services:
+  app:
+    build: .
+    image: face-crypt-cloud:dev
+    container_name: face-crypt-cloud-app
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    volumes:
+      # Live-reload: your WSL2 source files are mirrored straight into the
+      # container, so code edits take effect without rebuilding the image.
+      - .:/app
+      # Anonymous volume so the container's own __pycache__ doesn't get
+      # polluted by/into your host filesystem.
+      - /app/__pycache__
+    environment:
+      - PYTHONUNBUFFERED=1
+      # FLASK_DEBUG should be set to true/false via your .env file, NOT
+      # hardcoded here — keep .env as the single source of truth (see
+      # README.md's env var table).
+    # DEV override: run Flask's own auto-reloading dev server instead of
+    # the Dockerfile's default `python wsgi.py` (waitress), so file changes
+    # under the bind-mounted volume above are picked up automatically.
+    # Remove this `command:` line (or change it back to the Dockerfile's
+    # default) when you want to test the production-like waitress path
+    # locally before deploying.
+    command: ["python", "app.py"]
+    restart: unless-stopped
+
+  # ------------------------------------------------------------------
+  # OPTIONAL: local HTTPS reverse proxy.
+  #
+  # app/__init__.py sets SESSION_COOKIE_SECURE = True, so the admin
+  # panel's login session cookie will NOT be stored by the browser over
+  # plain http://localhost:8080 — only the public /verify_login flow will
+  # work correctly without this. Uncomment this service (and see the
+  # accompanying Caddyfile in the setup guide) if you need to test the
+  # admin panel's full login/session/CSRF flow locally, not just the
+  # public-facing face-login page.
+  # ------------------------------------------------------------------
+  # caddy:
+  #   image: caddy:2-alpine
+  #   container_name: face-crypt-cloud-proxy
+  #   ports:
+  #     - "8443:8443"
+  #   volumes:
+  #     - ./Caddyfile:/etc/caddy/Caddyfile
+  #   depends_on:
+  #     - app

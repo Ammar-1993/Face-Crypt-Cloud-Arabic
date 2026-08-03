@@ -1,0 +1,50 @@
+# Version control
+.git
+.github
+.gitignore
+
+# Secrets — NEVER let these into the image; they're injected at
+# runtime via docker-compose's env_file + volume mount instead
+.env
+.env.*
+!.env.example
+firebase/serviceAccountKey.json
+
+# Python runtime/cache artifacts
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+*.egg-info/
+
+# Local virtual environments (in case one was carried over from Windows —
+# it would contain Windows-only binaries and must not be copied in)
+venv/
+env/
+.venv/
+
+# Editor/IDE
+.vscode/
+.idea/
+
+# Test fixtures and one-off debug/scratch scripts — not needed at runtime.
+# NOTE: cleaning these out of the repo itself (not just the image) is the
+# real fix; see the setup guide's "repo hygiene" step. This is a defensive
+# second layer so they never end up inside a shipped image either way.
+test_images/
+check_logs.py
+generate_favicon.py
+mock_face_recognition.py
+test_empty_count.py
+test_firestore.py
+test_firestore_insert.py
+test_get_count.py
+test_stats.py
+test_stats_direct.py
+test_stats_route.py
+test_stream_count.py
+
+# Docker files themselves (no need to copy them into their own image)
+Dockerfile
+docker-compose.yml
+.dockerignore
