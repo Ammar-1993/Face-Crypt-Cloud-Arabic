@@ -41,7 +41,7 @@ Jinja2==3.1.6
 MarkupSafe==3.0.2
 msgpack==1.2.1
 numpy==2.2.6
-opencv-python==5.0.0.93
+opencv-python-headless==5.0.0.93
 Pillow==12.3.0
 proto-plus==1.26.1
 protobuf==6.33.5

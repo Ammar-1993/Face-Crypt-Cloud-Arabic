@@ -47,27 +47,7 @@ def verify_login():
     try:
         image_array = face_utils.load_image_from_request(image_file)
         
-        # 🛡️ Liveness Check Flow
-        face_locations_1 = None
-        if ENABLE_LIVENESS_CHECK:
-            import face_recognition
-            face_locations_1 = face_recognition.face_locations(image_array)
-            image_array_2 = face_utils.load_image_from_request(image2_file) if image2_file else None
-            
-            face_locations_2 = None
-            if image_array_2 is not None:
-                face_locations_2 = face_recognition.face_locations(image_array_2)
-                
-            is_live, reason = face_utils.check_liveness(
-                image_array, image_array_2,
-                face_locations_1=face_locations_1,
-                face_locations_2=face_locations_2
-            )
-            if not is_live:
-                firebase_utils.log_audit_event("unknown_user", "Spoofing_Attempt", status='blocked', ip_address=request.remote_addr)
-                return jsonify({"message": f"🚨 **فشل الأمان (مكافحة الانتحال):**\n{reason}"}), 403
-
-        new_encoding = face_utils.extract_face_encoding(image_array, face_locations=face_locations_1)
+        new_encoding = face_utils.extract_face_encoding(image_array)
 
         users = firebase_utils.get_all_users()
         logger.info("✅ Retrieved %d users from Firestore", len(users))
@@ -105,7 +85,6 @@ def verify_login():
             
             # Check for Soft Block
             if is_soft_blocked(matched_user):
-                # Increment attempts even during soft block as a penalty
                 failed_attempts = matched_user.get('failed_attempts', 0) + 1
                 update_data = {"failed_attempts": failed_attempts}
                 status_to_log = 'soft_block'
@@ -116,6 +95,35 @@ def verify_login():
                 firebase_utils.update_user_fields(user_id, update_data)
                 firebase_utils.log_audit_event(user_id, "User_Login", status=status_to_log, ip_address=request.remote_addr)
                 return jsonify({"message": GENERIC_ERROR_MSG}), 403
+
+            # 🛡️ Liveness Check Flow
+            if ENABLE_LIVENESS_CHECK:
+                import face_recognition
+                face_locations_1 = face_recognition.face_locations(image_array)
+                image_array_2 = face_utils.load_image_from_request(image2_file) if image2_file else None
+                face_locations_2 = face_recognition.face_locations(image_array_2) if image_array_2 is not None else None
+                is_live, reason = face_utils.check_liveness(
+                    image_array, image_array_2,
+                    face_locations_1=face_locations_1,
+                    face_locations_2=face_locations_2
+                )
+                if not is_live:
+                    # Penalize targeted user for spoofing attempt
+                    failed_attempts = matched_user.get('failed_attempts', 0) + 1
+                    update_data = {"failed_attempts": failed_attempts}
+                    status_to_log = 'failure'
+                    
+                    if failed_attempts >= 5:
+                        update_data["blocked"] = True
+                        status_to_log = 'blocked'
+                    elif failed_attempts >= 3:
+                        update_data["soft_block"] = True
+                        update_data["soft_block_time"] = int(time.time())
+                        status_to_log = 'soft_block'
+                        
+                    firebase_utils.update_user_fields(user_id, update_data)
+                    firebase_utils.log_audit_event(user_id, "Spoofing_Attempt", status=status_to_log, ip_address=request.remote_addr)
+                    return jsonify({"message": f"🚨 **فشل الأمان (مكافحة الانتحال):**\n{reason}"}), 403
 
             # Success path
             firebase_utils.update_user_fields(user_id, {

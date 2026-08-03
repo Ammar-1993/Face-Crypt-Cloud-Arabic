@@ -186,7 +186,7 @@ def admin_stats():
     logs_ref = config.db.collection('audit_logs')
     
     def get_count(query):
-        return query.count().get()[0][0].value
+        return len(list(query.stream()))
 
     total = get_count(logs_ref)
     success = get_count(logs_ref.where('status', '==', 'success'))
