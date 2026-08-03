@@ -863,24 +863,39 @@ body {
   margin-top: 18px;
 }
 
-#result .alert {
-  border-radius: var(--border-radius-md);
-  font-family: var(--font-arabic);
-  font-size: 0.95rem;
+/* ============================================================
+   CUSTOM ALERTS (Global)
+   ============================================================ */
+.custom-alert {
+  background-color: #1E2029;
+  color: #F3F4F6;
+  border-radius: 8px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+  direction: rtl;
+  text-align: right;
   padding: 14px 18px;
   border: none;
+  font-family: var(--font-arabic);
+  font-size: 0.95rem;
+  margin-top: 10px;
+  margin-bottom: 15px;
+  display: block;
 }
 
-#result .alert-success {
-  background: rgba(34,197,94,0.12);
-  color: #86EFAC;
-  border: 1px solid rgba(34,197,94,0.3);
+.custom-alert-danger {
+  border-right: 4px solid #EF4444;
 }
 
-#result .alert-danger {
-  background: rgba(239,68,68,0.12);
-  color: #FCA5A5;
-  border: 1px solid rgba(239,68,68,0.3);
+.custom-alert-success {
+  border-right: 4px solid #10B981;
+}
+
+.custom-alert-warning {
+  border-right: 4px solid #F59E0B;
+}
+
+.custom-alert-info {
+  border-right: 4px solid #3B82F6;
 }
 
 /* ============================================================

@@ -105,15 +105,7 @@ img#preview {
   font-weight: 600;
 }
 
-/* Modern SweetAlert Popup */
-.modern-alert-popup {
-  border-radius: 20px !important;
-  font-family: 'Cairo', sans-serif !important;
-}
-
-.modern-alert-popup .swal2-title {
-  color: #dc3545 !important;
-}
+/* Removed old modern-alert-popup to use swal-dark-popup instead */
 
 /* ============================================================
    LOADING SPINNER — #2 fix: fc-spinner (replaces Bootstrap's

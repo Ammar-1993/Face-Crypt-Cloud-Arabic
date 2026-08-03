@@ -11,7 +11,7 @@ async function adminFetch(url, options = {}) {
   }
   const res = await fetch(url, options);
   if (res.status === 401) {
-    Swal.fire({ text: 'انتهت الجلسة. يرجى تسجيل الدخول مجدداً.', icon: 'warning', confirmButtonText: 'حسناً' }).then(() => {
+    Swal.fire({ text: 'انتهت الجلسة. يرجى تسجيل الدخول مجدداً.', icon: 'warning', confirmButtonText: 'حسناً', customClass: { popup: 'swal-dark-popup' } }).then(() => {
       hide(document.getElementById("adminPanel"));
       show(document.getElementById("loginSection"));
     });
@@ -80,7 +80,7 @@ async function adminLogin() {
   if (!password) {
     setText(
       "loginMessage",
-      `<span class="text-danger">❌ الرجاء إدخال كلمة المرور أولاً.</span>`
+      `<div class="custom-alert custom-alert-danger">الرجاء إدخال كلمة المرور أولاً.</div>`
     );
     setTimeout(() => {
       setText("loginMessage", "");
@@ -115,6 +115,7 @@ async function adminLogin() {
         timerProgressBar: true,
         showConfirmButton: false,
         allowOutsideClick: false,
+        customClass: { popup: 'swal-dark-popup' },
         showClass: {
           popup: 'animate__animated animate__fadeInDown'
         },
@@ -133,14 +134,14 @@ async function adminLogin() {
     } else {
       setText(
         "loginMessage",
-        `<span class="text-danger">❌ ${data.error}</span>`
+        `<div class="custom-alert custom-alert-danger">${data.error}</div>`
       );
     }
   } catch (error) {
     console.error(error);
     setText(
       "loginMessage",
-      `<span class="text-danger">❌ خطأ في الشبكة أو خادم الويب غير متصل.</span>`
+      `<div class="custom-alert custom-alert-danger">خطأ في الشبكة أو خادم الويب غير متصل.</div>`
     );
   } finally {
     loginBtn.disabled = false;
@@ -153,7 +154,7 @@ async function addUser() {
   if (!userId) {
     setText(
       "addUserMessage",
-      `<span class="text-danger">❌ يرجى إدخال معرف المستخدم.</span>`
+      `<div class="custom-alert custom-alert-danger">يرجى إدخال معرف المستخدم.</div>`
     );
     return;
   }
@@ -162,7 +163,7 @@ async function addUser() {
   if (!name) {
     setText(
       "addUserMessage",
-      `<span class="text-danger">❌ يرجى إدخال الاسم.</span>`
+      `<div class="custom-alert custom-alert-danger">يرجى إدخال الاسم.</div>`
     );
     return;
   }
@@ -172,14 +173,14 @@ async function addUser() {
   if (!email) {
     setText(
       "addUserMessage",
-      `<span class="text-danger">❌ يرجى إدخال البريد الإلكتروني.</span>`
+      `<div class="custom-alert custom-alert-danger">يرجى إدخال البريد الإلكتروني.</div>`
     );
     return;
   }
   if (!emailPattern.test(email)) {
     setText(
       "addUserMessage",
-      `<span class="text-danger">❌ يرجى إدخال بريد إلكتروني صالح.</span>`
+      `<div class="custom-alert custom-alert-danger">يرجى إدخال بريد إلكتروني صالح.</div>`
     );
     return;
   }
@@ -188,7 +189,7 @@ async function addUser() {
   if (!image) {
     setText(
       "addUserMessage",
-      `<span class="text-danger">❌ يرجى اختيار صورة.</span>`
+      `<div class="custom-alert custom-alert-danger">يرجى اختيار صورة.</div>`
     );
     return;
   }
@@ -207,13 +208,13 @@ async function addUser() {
   if (res.ok) {
     setText(
       "addUserMessage",
-      `<span class="text-success">✅ ${data.message}</span>`
+      `<div class="custom-alert custom-alert-success">${data.message}</div>`
     );
     await loadUsers();
   } else {
     setText(
       "addUserMessage",
-      `<span class="text-danger">❌ ${data.error}</span>`
+      `<div class="custom-alert custom-alert-danger">${data.error}</div>`
     );
   }
 }
@@ -264,7 +265,7 @@ async function deleteUser() {
   if (!userId) {
     setText(
       "deleteUserMessage",
-      `<span class="text-danger">❌ يرجى تحديد مستخدم لحذفه.</span>`
+      `<div class="custom-alert custom-alert-danger">يرجى تحديد مستخدم لحذفه.</div>`
     );
     return;
   }
@@ -277,7 +278,8 @@ async function deleteUser() {
     confirmButtonColor: '#d33',
     cancelButtonColor: '#3085d6',
     confirmButtonText: 'نعم، متأكد',
-    cancelButtonText: 'إلغاء'
+    cancelButtonText: 'إلغاء',
+    customClass: { popup: 'swal-dark-popup' }
   }).then(async (result) => {
     if (result.isConfirmed) {
       const res = await adminFetch(`${API_BASE}/admin/delete_user`, {
@@ -290,13 +292,13 @@ async function deleteUser() {
       if (res.ok) {
         setText(
           "deleteUserMessage",
-          `<span class="text-success">✅ ${data.message}</span>`
+          `<div class="custom-alert custom-alert-success">${data.message}</div>`
         );
         await loadUsers();
       } else {
         setText(
           "deleteUserMessage",
-          `<span class="text-danger">❌ ${data.error}</span>`
+          `<div class="custom-alert custom-alert-danger">${data.error}</div>`
         );
       }
     }
@@ -443,11 +445,11 @@ async function refreshStats() {
       document.getElementById("statTotalUsers").textContent =
         data.total_users ?? 0; // Added for total users
     } else {
-      Swal.fire({ text: "❌ فشل في جلب الإحصائيات", icon: 'error', confirmButtonText: 'حسناً' });
+      Swal.fire({ text: "فشل في جلب الإحصائيات", icon: 'error', confirmButtonText: 'حسناً', customClass: { popup: 'swal-dark-popup' } });
     }
   } catch (e) {
     console.error(e);
-    Swal.fire({ text: "❌ خطأ في جلب الإحصائيات", icon: 'error', confirmButtonText: 'حسناً' });
+    Swal.fire({ text: "خطأ في جلب الإحصائيات", icon: 'error', confirmButtonText: 'حسناً', customClass: { popup: 'swal-dark-popup' } });
   }
 }
 
@@ -476,7 +478,8 @@ async function unblockUser(userId) {
     confirmButtonColor: '#d33',
     cancelButtonColor: '#3085d6',
     confirmButtonText: 'نعم، متأكد',
-    cancelButtonText: 'إلغاء'
+    cancelButtonText: 'إلغاء',
+    customClass: { popup: 'swal-dark-popup' }
   }).then(async (result) => {
     if (result.isConfirmed) {
       try {
@@ -488,15 +491,15 @@ async function unblockUser(userId) {
 
         const data = await res.json();
         if (res.ok) {
-          Swal.fire({ text: data.message, icon: 'success', confirmButtonText: 'حسناً' });
+          Swal.fire({ text: data.message, icon: 'success', confirmButtonText: 'حسناً', customClass: { popup: 'swal-dark-popup' } });
           await fetchAuditLogs();
           await refreshStats();
         } else {
-          Swal.fire({ text: `❌ خطأ: ${data.error}`, icon: 'error', confirmButtonText: 'حسناً' });
+          Swal.fire({ text: `خطأ: ${data.error}`, icon: 'error', confirmButtonText: 'حسناً', customClass: { popup: 'swal-dark-popup' } });
         }
       } catch (e) {
         console.error(e);
-        Swal.fire({ text: "❌ خطأ في فك حظر المستخدم", icon: 'error', confirmButtonText: 'حسناً' });
+        Swal.fire({ text: "خطأ في فك حظر المستخدم", icon: 'error', confirmButtonText: 'حسناً', customClass: { popup: 'swal-dark-popup' } });
       }
     }
   });
@@ -511,7 +514,8 @@ async function clearAuditLogs() {
     confirmButtonColor: '#d33',
     cancelButtonColor: '#3085d6',
     confirmButtonText: 'نعم، متأكد',
-    cancelButtonText: 'إلغاء'
+    cancelButtonText: 'إلغاء',
+    customClass: { popup: 'swal-dark-popup' }
   }).then(async (result) => {
     if (result.isConfirmed) {
       try {
@@ -521,15 +525,15 @@ async function clearAuditLogs() {
 
         const data = await res.json();
         if (res.ok) {
-          Swal.fire({ text: data.message, icon: 'success', confirmButtonText: 'حسناً' });
+          Swal.fire({ text: data.message, icon: 'success', confirmButtonText: 'حسناً', customClass: { popup: 'swal-dark-popup' } });
           await fetchAuditLogs();
           await refreshStats();
         } else {
-          Swal.fire({ text: `❌ خطأ: ${data.error}`, icon: 'error', confirmButtonText: 'حسناً' });
+          Swal.fire({ text: `خطأ: ${data.error}`, icon: 'error', confirmButtonText: 'حسناً', customClass: { popup: 'swal-dark-popup' } });
         }
       } catch (e) {
         console.error(e);
-        Swal.fire({ text: "❌ خطأ في مسح سجلات التدقيق.", icon: 'error', confirmButtonText: 'حسناً' });
+        Swal.fire({ text: "خطأ في مسح سجلات التدقيق.", icon: 'error', confirmButtonText: 'حسناً', customClass: { popup: 'swal-dark-popup' } });
       }
     }
   });

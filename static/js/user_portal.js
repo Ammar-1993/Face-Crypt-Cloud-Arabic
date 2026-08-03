@@ -34,7 +34,7 @@ btnOpenCamera.addEventListener("click", async () => {
     retakeButton.style.display = "none";
     btnCancelCamera.style.display = "none";
   } catch (error) {
-    showAlert("❌ فشل في الوصول إلى الكاميرا. يرجى التأكد من منح الأذونات.", "danger");
+    showAlert("فشل في الوصول إلى الكاميرا. يرجى التأكد من منح الأذونات.", "danger");
   }
 });
 
@@ -138,7 +138,7 @@ stopCameraButton.addEventListener("click", () => {
 sendButton.addEventListener("click", async () => {
   const imageData = preview.src;
   if (!imageData || imageData === "#") {
-    showAlert("❌ يرجى التقاط صورة أولاً.", "danger");
+    showAlert("يرجى التقاط صورة أولاً.", "danger");
     return;
   }
 
@@ -171,7 +171,7 @@ sendButton.addEventListener("click", async () => {
     const data = await response.json();
 
     if (response.ok) {
-      showAlert(`✅ تم تسجيل الدخول بنجاح. أهلاً بك، <strong>${escapeHTML(data.user.name)}</strong>`, "success");
+      showAlert(`تم تسجيل الدخول بنجاح. أهلاً بك، <strong>${escapeHTML(data.user.name)}</strong>`, "success");
     } else {
       // Check if it's a ban or soft block to show a more prominent message
       const message = data.message || data.error || "تم رفض الوصول. يرجى المحاولة مرة أخرى.";
@@ -183,15 +183,15 @@ sendButton.addEventListener("click", async () => {
           confirmButtonText: 'موافق',
           confirmButtonColor: '#d33',
           customClass: {
-            popup: 'modern-alert-popup'
+            popup: 'swal-dark-popup'
           }
         });
       } else {
-        showAlert(`❌ ${message}`, "danger");
+        showAlert(message, "danger");
       }
     }
   } catch (error) {
-    showAlert("❌ خطأ في الشبكة. يرجى المحاولة مرة أخرى.", "danger");
+    showAlert("خطأ في الشبكة. يرجى المحاولة مرة أخرى.", "danger");
   } finally {
     // 2. Safe Restoration
     sendButton.disabled = false;
@@ -221,23 +221,13 @@ function escapeHTML(str) {
   return div.innerHTML;
 }
 
-// SweetAlert2 Toast Mixin
-const Toast = Swal.mixin({
-  toast: true,
-  position: 'bottom-end',
-  showConfirmButton: false,
-  timer: 3000,
-  timerProgressBar: true,
-  didOpen: (toast) => {
-    toast.addEventListener('mouseenter', Swal.stopTimer)
-    toast.addEventListener('mouseleave', Swal.resumeTimer)
-  }
-});
-
 function showAlert(message, type) {
-  let iconType = type === 'danger' ? 'error' : (type === 'success' ? 'success' : 'info');
-  Toast.fire({
-    icon: iconType,
-    html: message
-  });
+  const resultDiv = document.getElementById("result");
+  if (resultDiv) {
+    resultDiv.innerHTML = `<div class="custom-alert custom-alert-${type}">${message}</div>`;
+    // Auto-hide alert after 4 seconds for a clean UX
+    setTimeout(() => {
+      resultDiv.innerHTML = "";
+    }, 4000);
+  }
 }
