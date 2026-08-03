@@ -15,5 +15,10 @@ def index():
 def health():
     return "✅ Server is healthy!", 200
 
+@bp.route('/verify')
+@limiter.exempt
+def verify():
+    return render_template('verification.html')
+
 
 

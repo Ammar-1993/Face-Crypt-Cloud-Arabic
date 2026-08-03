@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Face-Crypt-Cloud – بوابة التحقق البيومتري." />
+  <meta name="theme-color" content="#050A18" />
+  <title>Face-Crypt-Cloud | بوابة التحقق البيومتري</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='images/favicon-32x32.png') }}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='images/favicon-16x16.png') }}">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <!-- Landing Page Stylesheet -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}">
+  <!-- User Portal Functional Styles -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/user_portal.css') }}">
+</head>
+
+<body>
+
+  <!-- ============================================================
+       BACKGROUND LAYERS
+       ============================================================ -->
+  <div class="bg-layer" aria-hidden="true"></div>
+  <div class="grid-overlay" aria-hidden="true"></div>
+  <div class="particles-layer" aria-hidden="true" id="particlesLayer"></div>
+
+  <!-- ============================================================
+       PAGE WRAPPER
+       ============================================================ -->
+  <div class="page-wrapper">
+
+    <!-- ── TOP NAVIGATION ── -->
+    <nav class="top-nav" role="navigation" aria-label="شريط التنقل الرئيسي">
+      <a href="/" class="nav-logo" aria-label="Face-Crypt-Cloud الصفحة الرئيسية">
+        <img src="{{ url_for('static', filename='images/face_crypt_cloud_logo.png') }}"
+             alt="شعار Face-Crypt-Cloud"
+             width="42" height="42">
+        <span class="nav-logo-text">Face‑Crypt‑Cloud</span>
+      </a>
+      <div class="nav-badge" role="status" aria-label="حالة النظام">
+        <span class="status-dot" aria-hidden="true"></span>
+        <span>النظام متاح</span>
+      </div>
+    </nav>
+
+    <!-- ── VERIFICATION SECTION ── -->
+    <main class="hero-section" id="main-content" style="min-height: 80vh; display: flex; align-items: center; justify-content: center; padding-top: 0;">
+
+      <!-- ── AUTHENTICATION CARD ── -->
+      <section class="auth-card" aria-labelledby="auth-card-title">
+        <!-- Card Header -->
+        <div class="auth-card-header">
+          <div class="auth-card-icon" aria-hidden="true">🪪</div>
+          <div>
+            <h2 class="auth-card-title" id="auth-card-title">بوابة التحقق البيومتري</h2>
+            <p class="auth-card-sub">ضع وجهك أمام الكاميرا لإتمام عملية التحقق</p>
+          </div>
+        </div>
+
+        <!-- ── CTA: Open Camera ── -->
+        <div id="openCameraWrapper" class="btn-cta-primary-wrapper">
+          <button id="btnOpenCamera"
+                  class="btn-cta-primary"
+                  aria-label="بدء عملية التحقق من الوجه – فتح الكاميرا">
+            <div class="btn-cta-icon" aria-hidden="true">📷</div>
+            <div class="btn-cta-text">
+              <span class="main-text">بدء التحقق من الوجه</span>
+              <span class="sub-text">افتح الكاميرا لتسجيل دخول آمن</span>
+            </div>
+          </button>
+        </div>
+
+        <!-- ── Camera Stream & Preview ── -->
+        <div id="cameraContainer">
+          <video id="cameraStream"
+                 autoplay playsinline
+                 aria-label="بث الكاميرا للتحقق من الوجه"
+                 style="display:none;"></video>
+          <img id="preview" src="#" alt="معاينة الصورة الملتقطة" style="display:none;">
+
+          <!-- Camera Controls -->
+          <div class="camera-controls">
+            <button id="captureButton"
+                    class="btn-cam btn-cam-capture"
+                    style="display:none;"
+                    aria-label="التقاط صورة من الكاميرا">
+              <span aria-hidden="true">📸</span>
+              <span>التقاط الصورة</span>
+            </button>
+            <button id="stopCameraButton"
+                    class="btn-cam btn-cam-stop"
+                    style="display:none;"
+                    aria-label="إغلاق الكاميرا">
+              <span aria-hidden="true">✕</span>
+              <span>إغلاق الكاميرا</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- ── Submit / Retake Row ── -->
+        <div class="submit-row">
+          <button id="sendButton"
+                  class="btn-submit"
+                  style="display:none;"
+                  aria-label="إرسال الصورة للتحقق">
+            <span aria-hidden="true">✅</span>
+            <span>إرسال للتحقق</span>
+          </button>
+          <button id="retakeButton"
+                  class="btn-retake"
+                  style="display:none;"
+                  aria-label="إعادة التقاط الصورة">
+            <span aria-hidden="true">🔄</span>
+            <span>إعادة التقاط</span>
+          </button>
+        </div>
+
+        <button type="button"
+                class="btn-cancel"
+                id="btnCancelCamera"
+                style="display:none;"
+                aria-label="إلغاء عملية التحقق">
+          إلغاء العملية ✖
+        </button>
+
+        <!-- ── Result Area ── -->
+        <div id="result" role="alert" aria-live="polite"></div>
+
+        <!-- ── Security Policy ── -->
+        <div class="security-card" id="securityDisclaimer" role="complementary" aria-label="سياسة حماية الحساب">
+          <div class="security-card-title">
+            <!-- Shield icon -->
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+            <span>سياسة حماية الحساب</span>
+          </div>
+          <ul class="security-list" aria-label="قواعد الحماية">
+            <li>
+              <span class="sec-badge sec-badge-warn" aria-label="تحذير">٣ محاولات فاشلة</span>
+              <span>حظر مؤقت تلقائي لمدة ٥ دقائق.</span>
+            </li>
+            <li>
+              <span class="sec-badge sec-badge-danger" aria-label="خطر">٥ محاولات فاشلة</span>
+              <span>حظر دائم — يتطلب مراجعة مسؤول النظام.</span>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- ── SITE FOOTER ── -->
+    <footer class="site-footer" role="contentinfo">
+      <p>
+        &copy; 2024–2026 <strong>Face‑Crypt‑Cloud</strong> —
+        جميع الحقوق محفوظة.
+        مبني بتقنية
+        <a href="https://flask.palletsprojects.com/" target="_blank" rel="noopener noreferrer">Flask</a>،
+        <a href="https://firebase.google.com/" target="_blank" rel="noopener noreferrer">Firebase</a>
+        &amp;
+        <a href="https://github.com/ageitgey/face_recognition" target="_blank" rel="noopener noreferrer">Face Recognition</a>.
+      </p>
+    </footer>
+
+  </div>
+  <!-- /page-wrapper -->
+
+  <!-- ============================================================
+       JAVASCRIPT
+       ============================================================ -->
+  <!-- Particle system & UI enhancements -->
+  <script>
+    (function() {
+      'use strict';
+
+      /* ---- Particle Generator ---- */
+      const layer = document.getElementById('particlesLayer');
+      if (layer) {
+        const PARTICLE_COUNT = 28;
+        const COLORS = ['rgba(0,212,255,', 'rgba(0,128,255,', 'rgba(255,215,0,'];
+
+        for (let i = 0; i < PARTICLE_COUNT; i++) {
+          const p = document.createElement('div');
+          p.className = 'particle';
+          const size = (Math.random() * 3 + 1.5).toFixed(1);
+          const colorBase = COLORS[Math.floor(Math.random() * COLORS.length)];
+          p.style.cssText = [
+            `width:${size}px`,
+            `height:${size}px`,
+            `left:${(Math.random() * 100).toFixed(1)}%`,
+            `background:${colorBase}${(Math.random() * 0.5 + 0.3).toFixed(2)})`,
+            `--dur:${(Math.random() * 10 + 8).toFixed(1)}s`,
+            `--delay:${(Math.random() * 8).toFixed(1)}s`,
+            `box-shadow:0 0 ${Math.round(size * 3)}px ${colorBase}0.6)`
+          ].join(';');
+          layer.appendChild(p);
+        }
+      }
+
+      /* ---- Camera Button UX Enhancements ---- */
+      const btnOpen = document.getElementById('btnOpenCamera');
+      const videoEl = document.getElementById('cameraStream');
+
+      if (btnOpen) {
+        btnOpen.addEventListener('click', function(e) {
+          if (videoEl) {
+            setTimeout(() => {
+              if (videoEl.style.display !== 'none') {
+                videoEl.classList.add('scanning-active');
+              }
+            }, 800);
+          }
+        });
+      }
+
+      const btnStop = document.getElementById('stopCameraButton');
+      const btnCancel = document.getElementById('btnCancelCamera');
+      [btnStop, btnCancel].forEach(btn => {
+        if (btn) {
+          btn.addEventListener('click', () => {
+            if (videoEl) videoEl.classList.remove('scanning-active');
+          });
+        }
+      });
+
+      const btnCapture = document.getElementById('captureButton');
+      if (btnCapture) {
+        btnCapture.addEventListener('click', () => {
+          if (videoEl) videoEl.classList.remove('scanning-active');
+        });
+      }
+    })();
+  </script>
+
+  <!-- User Portal Logic -->
+  <script src="{{ url_for('static', filename='js/user_portal.js') }}"></script>
+
+</body>
+</html>

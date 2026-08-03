@@ -106,11 +106,14 @@
                loading="eager">
         </div>
 
-        <!-- Status Chip -->
-        <div class="hero-chip" role="status">
-          <span class="dot" aria-hidden="true"></span>
-          <span>جاهز للمسح البيومتري</span>
-        </div>
+        <!-- CTA: Go to Verification Page -->
+        <a href="/verify" class="btn-cta-primary" style="text-decoration: none; width: auto; max-width: max-content; margin-top: 1.5rem; display: inline-flex;" aria-label="جاهز للمسح البيومتري - انتقل إلى بوابة التحقق">
+          <div class="btn-cta-icon" aria-hidden="true">🪪</div>
+          <div class="btn-cta-text">
+            <span class="main-text">جاهز للمسح البيومتري</span>
+            <span class="sub-text">انتقل إلى بوابة التحقق</span>
+          </div>
+        </a>
       </div>
 
       <!-- ── FEATURE PILLS ── -->
@@ -133,110 +136,7 @@
         </div>
       </div>
 
-      <!-- ── AUTHENTICATION CARD ── -->
-      <section class="auth-card" aria-labelledby="auth-card-title">
-
-        <!-- Card Header -->
-        <div class="auth-card-header">
-          <div class="auth-card-icon" aria-hidden="true">🪪</div>
-          <div>
-            <h2 class="auth-card-title" id="auth-card-title">بوابة التحقق البيومتري</h2>
-            <p class="auth-card-sub">ضع وجهك أمام الكاميرا لإتمام عملية التحقق</p>
-          </div>
-        </div>
-
-        <!-- ── CTA: Open Camera ── -->
-        <div id="openCameraWrapper" class="btn-cta-primary-wrapper">
-          <button id="btnOpenCamera"
-                  class="btn-cta-primary"
-                  aria-label="بدء عملية التحقق من الوجه – فتح الكاميرا">
-            <div class="btn-cta-icon" aria-hidden="true">📷</div>
-            <div class="btn-cta-text">
-              <span class="main-text">بدء التحقق من الوجه</span>
-              <span class="sub-text">افتح الكاميرا لتسجيل دخول آمن</span>
-            </div>
-          </button>
-        </div>
-
-        <!-- ── Camera Stream & Preview ── -->
-        <div id="cameraContainer">
-          <video id="cameraStream"
-                 autoplay playsinline
-                 aria-label="بث الكاميرا للتحقق من الوجه"
-                 style="display:none;"></video>
-          <img id="preview" src="#" alt="معاينة الصورة الملتقطة" style="display:none;">
-
-          <!-- Camera Controls -->
-          <div class="camera-controls">
-            <button id="captureButton"
-                    class="btn-cam btn-cam-capture"
-                    style="display:none;"
-                    aria-label="التقاط صورة من الكاميرا">
-              <span aria-hidden="true">📸</span>
-              <span>التقاط الصورة</span>
-            </button>
-            <button id="stopCameraButton"
-                    class="btn-cam btn-cam-stop"
-                    style="display:none;"
-                    aria-label="إغلاق الكاميرا">
-              <span aria-hidden="true">✕</span>
-              <span>إغلاق الكاميرا</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- ── Submit / Retake Row ── -->
-        <div class="submit-row">
-          <button id="sendButton"
-                  class="btn-submit"
-                  style="display:none;"
-                  aria-label="إرسال الصورة للتحقق">
-            <span aria-hidden="true">✅</span>
-            <span>إرسال للتحقق</span>
-          </button>
-          <button id="retakeButton"
-                  class="btn-retake"
-                  style="display:none;"
-                  aria-label="إعادة التقاط الصورة">
-            <span aria-hidden="true">🔄</span>
-            <span>إعادة التقاط</span>
-          </button>
-        </div>
-
-        <button type="button"
-                class="btn-cancel"
-                id="btnCancelCamera"
-                style="display:none;"
-                aria-label="إلغاء عملية التحقق">
-          إلغاء العملية ✖
-        </button>
-
-        <!-- ── Result Area ── -->
-        <div id="result" role="alert" aria-live="polite"></div>
-
-        <!-- ── Security Policy ── -->
-        <div class="security-card" id="securityDisclaimer" role="complementary" aria-label="سياسة حماية الحساب">
-          <div class="security-card-title">
-            <!-- Shield icon -->
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-            </svg>
-            <span>سياسة حماية الحساب</span>
-          </div>
-          <ul class="security-list" aria-label="قواعد الحماية">
-            <li>
-              <span class="sec-badge sec-badge-warn" aria-label="تحذير">٣ محاولات فاشلة</span>
-              <span>حظر مؤقت تلقائي لمدة ٥ دقائق.</span>
-            </li>
-            <li>
-              <span class="sec-badge sec-badge-danger" aria-label="خطر">٥ محاولات فاشلة</span>
-              <span>حظر دائم — يتطلب مراجعة مسؤول النظام.</span>
-            </li>
-          </ul>
-        </div>
-
-      </section>
-      <!-- /auth-card -->
+      <!-- Authentication card moved to /verify -->
 
     </main>
     <!-- /hero-section -->
@@ -328,8 +228,7 @@
     })();
   </script>
 
-  <!-- User Portal Logic (unchanged) -->
-  <script src="{{ url_for('static', filename='js/user_portal.js') }}"></script>
+  <!-- user_portal.js moved to verification page -->
 
 </body>
 </html>
