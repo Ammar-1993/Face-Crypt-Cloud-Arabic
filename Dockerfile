@@ -34,6 +34,15 @@ RUN pip install --no-cache-dir --upgrade pip && \
 FROM python:3.10-slim
 
 # libgomp1: OpenMP runtime used by numpy/dlib's compiled extensions.
+# libopenblas0 + liblapack3: RUNTIME counterparts of the libopenblas-dev /
+# liblapack-dev packages installed in the builder stage above. dlib links
+# against libopenblas.so.0 at build time, but a multi-stage build only
+# carries over the /wheels directory from the builder — not its apt
+# packages. Without these two runtime packages here, `import dlib` fails
+# at container startup with:
+#   ImportError: libopenblas.so.0: cannot open shared object file
+# (confirmed via a real deployment log — this is not a hypothetical risk).
+#
 # NOTE: this image assumes requirements.txt uses opencv-python-headless
 # (not opencv-python). The regular opencv-python package additionally
 # needs libgl1/libglib2.0-0/libsm6 etc. for GUI features this server-side
@@ -41,6 +50,8 @@ FROM python:3.10-slim
 # keep opencv-python instead, add those packages to the apt-get line below.
 RUN apt-get update && apt-get install -y --no-install-recommends \
         libgomp1 \
+        libopenblas0 \
+        liblapack3 \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
