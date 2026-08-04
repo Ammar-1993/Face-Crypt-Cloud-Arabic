@@ -43,8 +43,22 @@ test_stats.py
 test_stats_direct.py
 test_stats_route.py
 test_stream_count.py
+.pytest_cache/
 
 # Docker files themselves (no need to copy them into their own image)
 Dockerfile
 docker-compose.yml
 .dockerignore
+
+
+
+
+
+
+# Documentation & Images
+docs/
+README.md
+LICENSE
+WSL2_DOCKER_SETUP.md
+
+

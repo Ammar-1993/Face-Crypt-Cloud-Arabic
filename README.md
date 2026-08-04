@@ -10,7 +10,7 @@
 [![Firebase](https://img.shields.io/badge/Firebase-Firestore%20%7C%20Storage-orange.svg)](https://firebase.google.com/)
 [![Academic](https://img.shields.io/badge/University_of_Bisha-Cybersecurity-1a4659.svg)]()
 
-**🔗 جرّب النظام مباشرة:** [face-crypt-cloud-184918603595.us-central1.run.app](https://face-crypt-cloud-184918603595.us-central1.run.app/)
+**🔗 جرّب النظام مباشرة:** [face-crypt-cloud-184918603595.us-central1.run.app](https://face-crypt-cloud-184918603595.us-central1.run.app/)[cite: 1]
 
 ---
 
@@ -38,6 +38,38 @@
 
 ---
 
+## 📸 جولة في واجهات النظام (System Interfaces)
+
+### 1. بوابة النظام الرئيسية (Main System Portal)
+واجهة ترحيبية بتصميم عصري داكن، تستعرض التقنيات الأساسية المشغلة للنظام (تشفير AES-128، الذكاء الاصطناعي، والسحابة). تتضمن مؤشراً حياً لحالة الخادم وزراً واضحاً للانتقال السلس إلى بوابة التحقق الأمني.
+![بوابة النظام الرئيسية](docs/01_main_portal.webp)
+
+### 2. بوابة التحقق والأمان (Security & Verification Gateway)
+واجهة مخصصة لبدء عملية المصادقة البيومترية. تعرض بوضوح "سياسة حماية الحساب" (الحظر المؤقت والدائم) لردع محاولات الدخول غير المصرح بها، مما يعكس الصرامة الأمنية للنظام قبل تشغيل الكاميرا.
+![بوابة التحقق والأمان](docs/02_verify_start.webp)
+
+### 3. نافذة التقاط الوجه الحي (Live Face Capture Window)
+بيئة تفاعلية تدمج بث الكاميرا المباشر مع واجهة الويب بسلاسة. تتيح للمستخدم التقاط إطار بيومتري دقيق مع توفير أدوات تحكم واضحة لضمان جودة الصورة ووضوح المعالم قبل بدء المعالجة.
+![نافذة التقاط الوجه الحي](docs/03_live_capture.webp)
+
+### 4. نافذة تقييم الإطار وإرسال البيانات (Frame Evaluation & Data Submission Window)
+مرحلة التأكيد البصري التي تمنح المستخدم تحكماً كاملاً بمدخلاته. توفر خيارات مرنة لإعادة الالتقاط في حال ضعف الإضاءة، أو إرسال البيانات فوراً للخادم السحابي لبدء خوارزميات المطابقة الآمنة.
+![نافذة تقييم الإطار وإرسال البيانات](docs/04_submit_capture.webp)
+
+### 5. شاشة اجتياز التحقق الأمني (Security Clearance & Welcome Screen)
+لحظة تتويج العملية بنجاح؛ حيث يظهر إشعار منبثق يؤكد تطابق الوجه بيومترياً ويرحب بالمستخدم باسمه. يعكس هذا الظهور الفوري كفاءة وسرعة خوارزميات الذكاء الاصطناعي في الاستجابة.
+![شاشة اجتياز التحقق الأمني](docs/05_login_success.webp)
+
+### 6. بوابة الوصول الإداري المراقبة (Monitored Administrative Access Gateway)
+الجدار الأمني الفاصل للوحة التحكم الخلفية. تتطلب كلمة مرور معقدة وتعرض إشعاراً صريحاً بأن جميع العمليات الإدارية مُسجلة ومُراقبة تلقائياً في سجل التدقيق السحابي (Cloud Audit Log) لضمان المساءلة.
+![بوابة الوصول الإداري المراقبة](docs/06_admin_login.webp)
+
+### 7. نافذة اجتياز البوابة الإدارية (Admin Gateway Clearance Modal)
+نافذة تأكيد نجاح تسجيل دخول المسؤول. توفر تجربة انتقال سلسة وموثوقة من خلال عرض عداد تنازلي شفاف قبل التحويل التلقائي والآمن إلى لوحة التحكم الإدارية ذات الصلاحيات الكاملة.
+![نافذة اجتياز البوابة الإدارية](docs/07_admin_success.webp)
+
+---
+
 ## 🛠️ التقنيات المستخدمة
 
 | الفئة | التقنيات |
@@ -45,10 +77,10 @@
 | **الخلفية (Backend)** | Python 3.10+, Flask 3.1, Waitress (WSGI للإنتاج) |
 | **الذكاء الاصطناعي ومعالجة الصور** | `face_recognition`, `dlib`, `opencv-python-headless`, `Pillow`, `NumPy` |
 | **قاعدة البيانات والسحابة** | Google Firebase (Cloud Firestore & Cloud Storage) |
-| **الأمان** | `cryptography` (Fernet), `Flask-Limiter`, HMAC (مقارنة بوقت ثابت) |
-| **الحاويات والنشر** | Docker, Docker Compose, Google Cloud Run |
-| **الواجهة الأمامية** | HTML5, Vanilla CSS3 (نظام تصميم مخصص), Vanilla JS, SweetAlert2 |
-| **الاختبارات** | pytest (18 اختبار: مصادقة، صلاحيات، منع تعداد الحسابات، حماية XSS) |
+| **الأمان** | `cryptography` (Fernet), `Flask-Limiter`, HMAC (مقارنة بوقت ثابت)[cite: 1] |
+| **الحاويات والنشر**[cite: 1] | Docker, Docker Compose, Google Cloud Run[cite: 1] |
+| **الواجهة الأمامية**[cite: 1] | HTML5, Vanilla CSS3 (نظام تصميم مخصص), Vanilla JS, SweetAlert2[cite: 1] |
+| **الاختبارات**[cite: 1] | pytest (18 اختبار: مصادقة، صلاحيات، منع تعداد الحسابات، حماية XSS)[cite: 1] |
 
 ---
 
@@ -56,10 +88,10 @@
 
 ### الطريقة الموصى بها: Docker (الأسرع والأضمن)
 
-لا حاجة لتثبيت `cmake` أو أي أدوات بناء يدويًا — كل شيء داخل الحاوية.
+لا حاجة لتثبيت `cmake` أو أي أدوات بناء يدويًا — كل شيء داخل الحاوية.[cite: 1]
 
 ```bash
-git clone https://github.com/Ammar-1993/Face-Crypt-Cloud-Arabic.git
+git clone [https://github.com/Ammar-1993/Face-Crypt-Cloud-Arabic.git](https://github.com/Ammar-1993/Face-Crypt-Cloud-Arabic.git)
 cd Face-Crypt-Cloud-Arabic
 
 cp .env.example .env
