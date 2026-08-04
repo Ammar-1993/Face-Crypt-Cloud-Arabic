@@ -1,119 +1,99 @@
 # ☁️ Face Crypt Cloud (سحابة الملامح المشفرة)
 
-> **نظام مصادقة ذكي لتأمين المنصات الإلكترونية باستخدام تقنية التعرف على الوجوه والتشفير السحابي كبديل آمن لكلمات المرور التقليدية والمعتاد عليها.**
+> **نظام مصادقة سحابي متطور يعتمد على القياسات الحيوية للوجه (Biometrics) والتشفير المتقدم (Zero-Knowledge Architecture)، لتقديم بديل آمن وسلس لكلمات المرور التقليدية.**
 
 [![Python Version](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
-[![Flask](https://img.shields.io/badge/Flask-3.1.1-green.svg)](https://flask.palletsprojects.com/)
+[![Flask](https://img.shields.io/badge/Flask-3.1.x-green.svg)](https://flask.palletsprojects.com/)
 [![Firebase](https://img.shields.io/badge/Firebase-Firestore%20%7C%20Storage-orange.svg)](https://firebase.google.com/)
-[![Security](https://img.shields.io/badge/Security-Zero--Knowledge%20Proof-red.svg)]()
+[![Security](https://img.shields.io/badge/Security-Advanced-red.svg)]()
+[![Design](https://img.shields.io/badge/UI%2FUX-Glassmorphism-00D4FF.svg)]()
 [![Academic](https://img.shields.io/badge/University_of_Bisha-Cybersecurity-1a4659.svg)]()
 
+---
+
 ## 📖 عن المشروع (About The Project)
-**Face Crypt Cloud** هو مشروع تخرج هندسي يهدف إلى معالجة ثغرات المصادقة التقليدية (مثل التصيد الاحتيالي وهجمات القوة الغاشمة). يقوم النظام بالتقاط صورة وجه المستخدم حياً، واستخراج المعالم الحيوية (Face Encodings)، ثم **تشفيرها** قبل تخزينها في السحابة (Google Firebase). عند محاولة تسجيل الدخول، يتم التحقق من الوجه ومطابقته برمجياً في الذاكرة المؤقتة دون الحاجة لكتابة أي كلمة مرور، مما يوفر بيئة وصول آمنة، موثوقة، وسهلة الاستخدام.
+**Face Crypt Cloud** هو مشروع تخرج هندسي متقدم يهدف إلى القضاء على الث الثغرات الأمنية المرتبطة بكلمات المرور (مثل التصيد الاحتيالي، هجمات القوة الغاشمة، وإعادة استخدام الكلمات السريّة). 
+
+يعمل النظام عبر التقاط صورة حية للمستخدم، واستخراج المعالم الحيوية للوجه (Face Encodings) بدقة، ثم **تشفير هذه المعالم** قبل إرسالها وتخزينها في السحابة (Google Firebase). عند محاولة تسجيل الدخول، يتم فك التشفير والمطابقة برمجياً في الذاكرة المؤقتة للخادم فقط، مما يضمن بيئة وصول سلسة (Passwordless) ومحصنة بالكامل.
+
+---
 
 ## ✨ الميزات الرئيسية (Key Features)
-* **🔐 مصادقة حيوية بدون كلمات مرور (Passwordless Auth):** الدخول للنظام بمجرد التحقق الآمن والسريع من ملامح الوجه باستخدام الذكاء الاصطناعي.
-* **🛡️ تشفير البيانات الحيوية (Biometric Encryption):** لا يتم حفظ بصمات الوجوه كنصوص واضحة في قاعدة البيانات، بل يتم تشفيرها بخوارزمية `Fernet` لضمان الخصوصية القصوى.
-* **🚦 نظام حظر ذكي (Smart Rate Limiting):** حظر مؤقت آلي للمستخدم بعد 3 محاولات فاشلة، وحظر دائم بعد 5 محاولات لمنع هجمات التخمين والاختراق.
-* **📊 لوحة تحكم مركزية (Admin Dashboard):** واجهة مخصصة للإدارة لإضافة/حذف المستخدمين، فك الحظر، ومراقبة إحصائيات النظام في الوقت الفعلي.
-* **📝 سجلات تدقيق دقيقة (Audit Logs):** توثيق شامل لكل عملية دخول (ناجحة/فاشلة/حظر) مع تسجيل الوقت ومعرف المستخدم، مما يضمن الشفافية والمساءلة الإدارية.
+
+* **🔐 مصادقة حيوية بدون كلمات مرور (Passwordless Auth):** دخول آمن وسريع بمجرد التعرف على ملامح الوجه باستخدام خوارزميات الذكاء الاصطناعي.
+* **🛡️ تشفير البيانات الحيوية (Biometric Encryption):** لا يتم حفظ بصمات الوجوه كنصوص واضحة أبداً. يتم تشفيرها بخوارزمية التشفير المتماثل `Fernet` (AES-128) لضمان الخصوصية التامة.
+* **🚦 نظام حماية ومكافحة التخمين (Anti-Enumeration & Rate Limiting):**
+  * حظر مؤقت آلي (5 دقائق) بعد 3 محاولات فاشلة.
+  * حظر دائم يتطلب تدخلاً إدارياً بعد 5 محاولات.
+  * رسائل خطأ موحدة (Generic Responses) لمنع المهاجمين من استنتاج حالة الحساب.
+* **🛡️ حماية متقدمة ضد الهجمات (Advanced Hardening):** 
+  * مقارنة كلمات المرور بوقت ثابت (Constant-Time Comparison) لمنع هجمات التوقيت.
+  * حماية مدمجة ضد هجمات تزوير الطلبات عبر المواقع (CSRF) للوحة الإدارة.
+  * منع الوصول المباشر لقاعدة البيانات عبر قواعد Firestore الصارمة (Defense-in-Depth).
+* **🎨 واجهة مستخدم حديثة (Modern UI/UX):** تصميم مبتكر يعتمد على "Glassmorphism" والألوان الداكنة (Dark Cyberpunk Theme) مع تجربة مستخدم سلسة ومتجاوبة عبر جميع الأجهزة.
+* **📊 لوحة تحكم مركزية (Admin Dashboard):** واجهة مخصصة وآمنة لإدارة المستخدمين، ومراقبة إحصائيات النظام في الوقت الفعلي.
+* **📝 سجلات تدقيق غير قابلة للتلاعب (Audit Logs):** توثيق شامل لكل العمليات (ناجحة/فاشلة/حظر) مع تسجيل دقيق للوقت ومعرف المستخدم لضمان المساءلة.
+
+---
 
 ## 🛠️ التقنيات المستخدمة (Tech Stack)
-* **الواجهة الخلفية (Backend):** Python, Flask Framework.
+
+* **الواجهة الخلفية (Backend):** Python 3.10+, Flask Framework.
 * **الذكاء الاصطناعي ومعالجة الصور:** `face_recognition`, `dlib`, `OpenCV`, `Pillow`, `NumPy`.
-* **قاعدة البيانات والسحابة:** Google Firebase (Cloud Firestore for NoSQL Data, Cloud Storage for Images).
-* **الواجهة الأمامية (Frontend):** HTML5, CSS3, Vanilla JavaScript, Bootstrap, SweetAlert2.
-* **الأمان والتشفير:** `cryptography` (Fernet Symmetric Encryption).
+* **قاعدة البيانات والسحابة:** Google Firebase (Cloud Firestore & Cloud Storage).
+* **الواجهة الأمامية (Frontend):** HTML5, Vanilla CSS3 (Custom Design System), Vanilla JS, Bootstrap Grid, SweetAlert2.
+* **الأمان والتشفير:** `cryptography` (Fernet), HMAC (Constant-time comparison).
 
-## 📂 هيكل المشروع المعماري (Project Structure)
-```text
-Face-Crypt-Cloud/
-│
-├── app/                    # مجلد التطبيق الرئيسي (App Factory Pattern)
-│   ├── admin/              # مسارات وخدمات لوحة تحكم الإدارة
-│   ├── users/              # مسارات وخدمات المستخدم العادي
-│   ├── services/           # دوال الاتصال بقواعد البيانات السحابية
-│   └── config.py           # إعدادات النظام وربط المتغيرات البيئية
-│
-├── utils/                  # الأدوات البرمجية المساعدة (Utilities)
-│   ├── face_utils.py       # دوال معالجة، تشفير، ومقارنة الوجوه
-│   └── firebase_utils.py   # دوال الاتصال المباشر مع Firestore و Storage
-│
-├── static/                 # الملفات الثابتة (CSS, JavaScript, Images)
-├── templates/              # قوالب واجهات المستخدم ولوحة التحكم (HTML)
-├── firebase/               # مجلد الاعتمادات السحابية (serviceAccountKey.json)
-├── test_images/            # صور تجريبية لعمليات الفحص والاختبار
-├── .env                    # المتغيرات البيئية السرية (يجب عدم رفعه للعامة)
-├── app.py                  # نقطة انطلاق تشغيل الخادم (للتطوير)
-├── wsgi.py                 # نقطة انطلاق تشغيل الخادم (للإنتاج)
-└── requirements.txt        # الاعتمادات ومكتبات بايثون المطلوبة
-
-```
+---
 
 ## 🚀 البدء والتشغيل (Getting Started)
 
 ### 1. المتطلبات الأساسية (Prerequisites)
-
-* تثبيت `Python 3.10`
+* تثبيت `Python 3.10` أو أحدث.
 * إنشاء مشروع على منصة **Google Firebase** وتفعيل خدمتي (Firestore Database) و (Storage).
 * تنزيل مفتاح الخدمة `serviceAccountKey.json` من إعدادات Firebase ووضعه داخل مجلد `firebase/`.
 
 ### 2. التثبيت (Installation)
-
-1. قم باستنساخ المستودع:
 ```bash
-git clone [https://github.com/YourUsername/Face-Crypt-Cloud.git](https://github.com/YourUsername/Face-Crypt-Cloud.git)
+# 1. استنساخ المستودع
+git clone https://github.com/YourUsername/Face-Crypt-Cloud.git
 cd Face-Crypt-Cloud
 
-```
-
-2. إنشاء بيئة افتراضية وتفعيلها:
-```bash
+# 2. إنشاء بيئة افتراضية وتفعيلها
 python -m venv venv
-source venv/bin/activate  # في الويندوز: venv\Scripts\activate
-```
+source venv/bin/activate  # Windows: venv\Scripts\activate
 
-### 3. تثبيت الاعتمادات وفحص الأمان (Install & Audit Dependencies)
-
-```bash
+# 3. تثبيت الاعتمادات
 pip install -r requirements.txt
 ```
 
-**فحص الأمان المستمر (Security Auditing):**
-يُنصح بشدة بإجراء فحص دوري لاعتمادات بايثون للتأكد من خلوها من الثغرات الأمنية المكتشفة حديثاً (CVEs).
-```bash
-pip install pip-audit
-pip-audit -r requirements.txt
-```
-*(اقتراح للإطلاق في الإنتاج: إضافة سير عمل GitHub Actions لتشغيل `pip-audit` تلقائياً مع كل عملية Push).*
-
-### 4. إعداد المتغيرات البيئية (Environment Setup)
-
-قم بإنشاء ملف باسم `.env` في المسار الرئيسي للمشروع، وأضف بداخله القيم السرية التالية (تأكد من مطابقة أسماء المتغيرات تماماً):
+### 3. إعداد المتغيرات البيئية (Environment Setup)
+قم بإنشاء ملف باسم `.env` في المسار الرئيسي للمشروع. **يجب ألا يتم رفع هذا الملف إطلاقاً لأي مستودع عام**.
 
 ```env
-# مفتاح تشفير البيانات الحيوية (يتم توليده عبر مكتبة cryptography - Fernet)
+# مفتاح تشفير البيانات الحيوية (مطلوب - يولد عبر مكتبة cryptography - Fernet)
 FACECRYPT_SECRET_KEY=your_generated_fernet_key_here
 
-# مفتاح تشفير الجلسات وحماية CSRF (يجب أن يكون قيمة عشوائية طويلة، ومختلفاً عن مفتاح Fernet)
-# يمكنك توليده عبر الأمر: python -c "import secrets; print(secrets.token_hex(32))"
+# مفتاح تشفير جلسات Flask (مطلوب - استخدم قيمة عشوائية طويلة مثل 32-byte hex)
 FACECRYPT_FLASK_SECRET_KEY=your_generated_flask_secret_key_here
 
-# كلمة مرور الدخول للوحة تحكم المسؤول (يتم التحقق منها من الذاكرة مباشرة)
+# كلمة مرور الدخول للوحة تحكم المسؤول (مطلوب)
 FACECRYPT_ADMIN_PASSWORD=YourStrongAdminPassword
 
-# مسار مفتاح فايربيس ورابط التخزين الخاص بمشروعك السحابي
+# مسار مفتاح فايربيس (مطلوب)
 FACECRYPT_SERVICE_ACCOUNT_PATH=firebase/serviceAccountKey.json
+
+# رابط التخزين الخاص بمشروعك السحابي (مطلوب)
 FACECRYPT_STORAGE_BUCKET=your-firebase-project-id.appspot.com
 
 # إعدادات التشغيل (اختياري)
 FLASK_DEBUG=False
 PORT=8080
-FACECRYPT_WSGI_THREADS=4 # (افتراضي: عدد أنوية المعالج). يجب ضبطه بناءً على الأنوية المتاحة وتجربة الحمل، نظراً لأن معالجة الوجوه تتطلب جهداً من المعالج (CPU-bound).
-
+FACECRYPT_WSGI_THREADS=4
 ```
+*(ملاحظة: النظام مزود بآلية "Fail-Fast"، ولن يعمل إذا كانت أي من المتغيرات السرية مفقودة).*
 
-### 4. تشغيل النظام (Run the Application)
+### 4. التشغيل (Run the Application)
 
 **لبيئة التطوير (Development):**
 ```bash
@@ -121,75 +101,60 @@ python app.py
 ```
 
 **لبيئة الإنتاج (Production):**
-نوصي بشدة بتشغيل النظام باستخدام خادم `Waitress` WSGI المتوفر ضمن المشروع بدلاً من خادم Flask المدمج.
-```bash
-python wsgi.py
-```
-أو عبر الأمر:
+يُمنع استخدام خادم التطوير. استخدم `Waitress`:
 ```bash
 waitress-serve --port=8080 wsgi:app
 ```
+* بوابة المستخدمين: `http://127.0.0.1:8080/`
+* بوابة المسؤول: `http://127.0.0.1:8080/admin/`
 
-* **بوابة وصول المستخدمين:** `http://127.0.0.1:8080/`
-* **بوابة وصول الإدارة (لوحة التحكم):** `http://127.0.0.1:8080/admin/`
+---
 
-## 🛡️ ملاحظات أمنية (Security Notes)
+## 🛡️ هندسة الأمان والملاحظات (Security Architecture)
 
-* **فحص الحيوية الأساسي (Liveness Detection):** تم تنفيذ فحص أساسي لمكافحة الانتحال (Anti-spoofing) لردع محاولات استخدام صور مطبوعة أو شاشات ثابتة. يستخدم الفحص تحليل تباين الصور (Laplacian Variance) بالإضافة إلى اكتشاف الحركة الدقيقة بين إطارين (Micro-movement باستخدام Facial Landmarks). **ملاحظة:** هذا الفحص مصمم لأغراض مشروع التخرج كطبقة أمان إضافية، ولكنه ليس بديلاً معتمداً تجارياً لتقنيات Liveness 3D المتقدمة. يمكن تفعيله عبر المتغير `FACECRYPT_ENABLE_LIVENESS_CHECK=True`.
-* **⚠️ خطر وضع التطوير (FLASK_DEBUG):** يجب **ألا تقوم أبداً** بتعيين المتغير البيئي `FLASK_DEBUG=True` في أي بيئة إنتاج أو على خادم متصل بالإنترنت. تشغيل Flask في وضع التطوير يكشف واجهة مصحح الأخطاء (Werkzeug Debugger)، مما يعرض النظام لخطر تسريب البيانات الحساسة أو حتى تنفيذ الأوامر البرمجية عن بُعد (Remote Code Execution).
-* **حماية مفاتيح التشفير:** ملف `.env` يحتوي على مفتاح `Fernet` الذي يشفر بصمات الوجوه. إذا ضاع هذا المفتاح، فلن تتمكن من فك تشفير البيانات الموجودة في Firestore أبداً. تأكد من عدم رفع هذا الملف للعامة (تم إدراجه في `.gitignore`).
-* **حدود حجم الملفات (Upload Limits):** لتقليل هجمات حرمان الخدمة (DoS) الناتجة عن الإرهاق الحسابي لمعالجة الصور، تم تقييد حجم الطلبات المرفوعة إلى 5 ميغابايت كحد أقصى.
-* **استرداد حساب الإدارة (Recovery):** وصول المسؤول (Admin) معزول تماماً عن قاعدة البيانات. في حال نسيان كلمة المرور الإدارية، يمكن لمهندس النظام استعادتها فوراً بتحديث المتغير `FACECRYPT_ADMIN_PASSWORD` في بيئة الخادم.
-* **قواعد أمان قاعدة البيانات (Firestore Security Rules):** تم إضافة ملف `firestore.rules` لرفض كافة اتصالات العميل المباشرة (Client-Side). النظام يعتمد كلياً على بيئة (Admin SDK) داخل الواجهة الخلفية (Flask)، مما يضمن عدم إمكانية الوصول إلى البيانات الحيوية من المتصفح مباشرة كطبقة حماية إضافية (Defense-in-Depth).
+تم بناء **Face Crypt Cloud** مع مراعاة أعلى معايير الأمان:
 
-## 🌍 النشر في بيئة الإنتاج (Production Deployment)
+1. **مكافحة الهجمات الجانبية والتخمين:** 
+   * يتم استخدام `hmac.compare_digest` لمقارنة كلمات المرور ورموز CSRF لمنع استنتاج البيانات عبر هجمات التوقيت (Timing Attacks).
+   * استجابات الواجهة البرمجية API موحدة تماماً عند فشل تسجيل الدخول، مما يمنع المهاجم من معرفة ما إذا كان الحساب غير موجود، أو محظوراً، أو غير مطابق (User Enumeration Prevention).
+2. **الحد من حجم الحمولات (DoS Prevention):** تم تقييد حجم الصور المرفوعة بـ 5 ميجابايت (`MAX_CONTENT_LENGTH`) لمنع هجمات حرمان الخدمة (DoS) التي تستهدف إرهاق المعالج أثناء استخراج ملامح الوجه.
+3. **الدفاع المتعدد الطبقات (Defense in Depth):** 
+   * ملف `firestore.rules` يغلق تماماً إمكانية القراءة/الكتابة من جانب العميل. التطبيق يتواصل حصرياً وموثوقاً عبر `Firebase Admin SDK` في الواجهة الخلفية.
+   * إدارة أخطاء شاملة تمنع تسريب تفاصيل الأكواد أو البنية التحتية (Traceback Leaks) للمستخدم النهائي، مع الاكتفاء بتسجيلها في النظام.
+4. **تدقيق الاعتمادات (CI/CD Auditing):** المشروع مزود بمسار عمل GitHub Actions لتشغيل `pip-audit` آلياً لاكتشاف أي ثغرات (CVEs) في مكتبات الطرف الثالث.
 
-لضمان أمان البيانات الحيوية (مثل صور الوجوه وكلمات المرور) عند النشر على خوادم حقيقية، يجب **تأمين الاتصال باستخدام HTTPS/TLS**. إرسال البيانات الحساسة عبر HTTP غير المشفر يعرضها لخطر الاعتراض (Man-in-the-Middle Attacks).
+---
 
-**ملاحظة هامة جداً:** التطبيق مهيأ لإنشاء ملفات تعريف ارتباط (Cookies) آمنة فقط (`SESSION_COOKIE_SECURE = True`). إذا قمت بتشغيل التطبيق عبر اتصال `HTTP` غير مشفر في بيئة الإنتاج، فلن يقوم المتصفح بحفظ جلسة الإدارة، مما سيؤدي إلى فشل تسجيل الدخول بصمت (لن تتمكن من الدخول للوحة التحكم إطلاقاً). لذلك فإن HTTPS هو **متطلب تشغيلي إلزامي** وليس مجرد توصية.
+## 🌍 النشر في الإنتاج (Production Deployment)
 
-### 1. الخادم الوكيل العكسي وتشفير الاتصال (Reverse Proxy & TLS)
-يجب وضع التطبيق خلف خادم وكيل عكسي (Reverse Proxy) مثل Nginx أو Caddy ليتولى مهمة تشفير الاتصال (TLS Termination).
+لضمان أمان البيانات والجلسات، **يُعتبر استخدام بروتوكول HTTPS شرطاً إلزامياً** في الإنتاج. 
 
-**مثال لإعداد Nginx (Nginx Configuration Example):**
+التطبيق مُعد لإنشاء جلسات مؤمنة (`SESSION_COOKIE_SECURE = True`). عبر اتصال HTTP غير مشفر، لن تحتفظ المتصفحات بجلسة المشرف، وسيفشل تسجيل الدخول.
+
+### إعداد الخادم الوكيل العكسي (Nginx Reverse Proxy)
+
+يجب وضع خادم `Waitress` خلف خادم وكيل يعالج التشفير (TLS Termination). مثال التكوين:
+
 ```nginx
-server {
-    listen 80;
-    server_name yourdomain.com;
-    return 301 https://$host$request_uri;
-}
-
 server {
     listen 443 ssl;
     server_name yourdomain.com;
 
-    ssl_certificate /etc/letsencrypt/live/yourdomain.com/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/yourdomain.com/privkey.pem;
+    ssl_certificate /path/to/fullchain.pem;
+    ssl_certificate_key /path/to/privkey.pem;
 
     location / {
-        proxy_pass http://127.0.0.1:8080; # توجيه الطلبات إلى خادم Waitress
+        proxy_pass http://127.0.0.1:8080;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
+        
+        # السماح برفع صور تصل إلى 5MB (مطابق لإعدادات التطبيق)
+        client_max_body_size 5M;
     }
 }
 ```
 
-### 2. تشغيل التطبيق (Application Server)
-* ⚠️ **تحذير:** لا تستخدم خادم Flask المدمج (`python app.py`) في بيئة الإنتاج.
-* استخدم دائماً خادم إنتاج مخصص مثل `Waitress` (المتضمن بالفعل في الاعتمادات).
-* تأكد من أن التطبيق يعمل ومقيد بالشبكة المحلية (`localhost` أو `127.0.0.1`) وأنه غير متاح للوصول الخارجي المباشر، بل فقط من خلال الخادم الوكيل (Reverse Proxy).
-* **تحسين الأداء لمعالجة الوجوه (CPU-bound):** لأن عملية مطابقة الوجوه تستهلك قدراً كبيراً من المعالج، يُنصح بضبط متغير `FACECRYPT_WSGI_THREADS` ليتناسب مع عدد أنوية المعالج (Cores) المتوفرة في الخادم. زيادة عدد الخيوط (Threads) أكثر من عدد الأنوية الفعلية لن يساعد بل قد يضر بالأداء، لذا يجب الاعتماد على اختبار الحمل (Load testing).
-* **ملاحظة حول تقييد الطلبات (Rate Limiting):** يستخدم `Flask-Limiter` حالياً الذاكرة الداخلية (In-memory storage) مما يعني أن الحدود تُطبق على مستوى العملية الواحدة (Per-process). إذا تم التوسع أفقياً (Horizontal Scaling) بتشغيل عمليات (Processes) أو خوادم متعددة، فيجب إعداد وسيط تخزين مشترك مثل Redis لـ Flask-Limiter للحفاظ على دقة الحدود، وإلا ستتضاعف الحدود فعلياً بعدد العمليات.
-
-```bash
-# التشغيل الصحيح في الإنتاج
-waitress-serve --listen=127.0.0.1:8080 wsgi:app
-```
-
-### 3. قائمة التحقق قبل النشر (Pre-Deployment Checklist)
-قبل إطلاق النظام، تأكد من الآتي:
-- [ ] **تعطيل وضع التطوير:** التأكد تماماً من تعيين `FLASK_DEBUG=False`.
-- [ ] **إدارة الأسرار السرية:** عدم رفع ملف `.env` لمستودعات الكود. يجب إعداد جميع المتغيرات السرية (مثل `FACECRYPT_SECRET_KEY`, `FACECRYPT_FLASK_SECRET_KEY`, `FACECRYPT_ADMIN_PASSWORD`) عبر "مدير الأسرار" الخاص بمنصة الاستضافة (Secret Manager) أو كمتغيرات بيئية على الخادم بشكل آمن، مع التأكد من تعيين قيمة فريدة وقوية لـ `FACECRYPT_FLASK_SECRET_KEY`.
-- [ ] **شهادات SSL/TLS صالحة ومفعلة:** لضمان تشفير البيانات المرسلة بين المستخدم والخادم.
+---
+*© 2024–2026 Face-Crypt-Cloud — جميع الحقوق محفوظة.*
