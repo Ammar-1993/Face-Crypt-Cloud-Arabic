@@ -1,7 +1,7 @@
 # ☁️ Face Crypt Cloud
-
+![بوابة النظام الرئيسية](docs/01_main_portal.webp)
 > **نظام مصادقة سحابي متطور يعتمد على القياسات الحيوية للوجه (Biometrics) والتشفير المتقدم، لتقديم بديل آمن وسلس لكلمات المرور التقليدية — بدون كلمة مرور واحدة.**
-
+![بوابة النظام الرئيسية](docs/01_main_portal.webp)
 [![Live Demo](https://img.shields.io/badge/🌐_Live_Demo-Cloud_Run-4285F4.svg)](https://face-crypt-cloud-184918603595.us-central1.run.app/)
 [![Python Version](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
 [![Flask](https://img.shields.io/badge/Flask-3.1.x-green.svg)](https://flask.palletsprojects.com/)
