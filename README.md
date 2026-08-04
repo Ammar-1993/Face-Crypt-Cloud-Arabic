@@ -1,139 +1,165 @@
-# ☁️ Face Crypt Cloud (سحابة الملامح المشفرة)
+# ☁️ Face Crypt Cloud
 
-> **نظام مصادقة سحابي متطور يعتمد على القياسات الحيوية للوجه (Biometrics) والتشفير المتقدم (Zero-Knowledge Architecture)، لتقديم بديل آمن وسلس لكلمات المرور التقليدية.**
+> **نظام مصادقة سحابي متطور يعتمد على القياسات الحيوية للوجه (Biometrics) والتشفير المتقدم، لتقديم بديل آمن وسلس لكلمات المرور التقليدية — بدون كلمة مرور واحدة.**
 
+[![Live Demo](https://img.shields.io/badge/🌐_Live_Demo-Cloud_Run-4285F4.svg)](https://face-crypt-cloud-184918603595.us-central1.run.app/)
 [![Python Version](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
 [![Flask](https://img.shields.io/badge/Flask-3.1.x-green.svg)](https://flask.palletsprojects.com/)
+[![Docker](https://img.shields.io/badge/Docker-Ready-2496ED.svg)](https://www.docker.com/)
+[![Tests](https://img.shields.io/badge/tests-18%20passing-brightgreen.svg)]()
 [![Firebase](https://img.shields.io/badge/Firebase-Firestore%20%7C%20Storage-orange.svg)](https://firebase.google.com/)
-[![Security](https://img.shields.io/badge/Security-Advanced-red.svg)]()
-[![Design](https://img.shields.io/badge/UI%2FUX-Glassmorphism-00D4FF.svg)]()
 [![Academic](https://img.shields.io/badge/University_of_Bisha-Cybersecurity-1a4659.svg)]()
 
----
-
-## 📖 عن المشروع (About The Project)
-**Face Crypt Cloud** هو مشروع تخرج هندسي متقدم يهدف إلى القضاء على الث الثغرات الأمنية المرتبطة بكلمات المرور (مثل التصيد الاحتيالي، هجمات القوة الغاشمة، وإعادة استخدام الكلمات السريّة). 
-
-يعمل النظام عبر التقاط صورة حية للمستخدم، واستخراج المعالم الحيوية للوجه (Face Encodings) بدقة، ثم **تشفير هذه المعالم** قبل إرسالها وتخزينها في السحابة (Google Firebase). عند محاولة تسجيل الدخول، يتم فك التشفير والمطابقة برمجياً في الذاكرة المؤقتة للخادم فقط، مما يضمن بيئة وصول سلسة (Passwordless) ومحصنة بالكامل.
+**🔗 جرّب النظام مباشرة:** [face-crypt-cloud-184918603595.us-central1.run.app](https://face-crypt-cloud-184918603595.us-central1.run.app/)
 
 ---
 
-## ✨ الميزات الرئيسية (Key Features)
+## 📖 عن المشروع
 
-* **🔐 مصادقة حيوية بدون كلمات مرور (Passwordless Auth):** دخول آمن وسريع بمجرد التعرف على ملامح الوجه باستخدام خوارزميات الذكاء الاصطناعي.
-* **🛡️ تشفير البيانات الحيوية (Biometric Encryption):** لا يتم حفظ بصمات الوجوه كنصوص واضحة أبداً. يتم تشفيرها بخوارزمية التشفير المتماثل `Fernet` (AES-128) لضمان الخصوصية التامة.
-* **🚦 نظام حماية ومكافحة التخمين (Anti-Enumeration & Rate Limiting):**
-  * حظر مؤقت آلي (5 دقائق) بعد 3 محاولات فاشلة.
-  * حظر دائم يتطلب تدخلاً إدارياً بعد 5 محاولات.
-  * رسائل خطأ موحدة (Generic Responses) لمنع المهاجمين من استنتاج حالة الحساب.
-* **🛡️ حماية متقدمة ضد الهجمات (Advanced Hardening):** 
-  * مقارنة كلمات المرور بوقت ثابت (Constant-Time Comparison) لمنع هجمات التوقيت.
-  * حماية مدمجة ضد هجمات تزوير الطلبات عبر المواقع (CSRF) للوحة الإدارة.
-  * منع الوصول المباشر لقاعدة البيانات عبر قواعد Firestore الصارمة (Defense-in-Depth).
-* **🎨 واجهة مستخدم حديثة (Modern UI/UX):** تصميم مبتكر يعتمد على "Glassmorphism" والألوان الداكنة (Dark Cyberpunk Theme) مع تجربة مستخدم سلسة ومتجاوبة عبر جميع الأجهزة.
-* **📊 لوحة تحكم مركزية (Admin Dashboard):** واجهة مخصصة وآمنة لإدارة المستخدمين، ومراقبة إحصائيات النظام في الوقت الفعلي.
-* **📝 سجلات تدقيق غير قابلة للتلاعب (Audit Logs):** توثيق شامل لكل العمليات (ناجحة/فاشلة/حظر) مع تسجيل دقيق للوقت ومعرف المستخدم لضمان المساءلة.
+**Face Crypt Cloud** مشروع تخرج هندسي يهدف إلى القضاء على الثغرات الأمنية المرتبطة بكلمات المرور التقليدية (التصيّد الاحتيالي، هجمات القوة الغاشمة، وإعادة استخدام الكلمات السرية بين المواقع).
+
+يعمل النظام عبر التقاط صورة حية للمستخدم عبر الكاميرا، واستخراج المعالم الحيوية للوجه (Face Encodings) بدقة، ثم **تشفير هذه المعالم** قبل تخزينها في السحابة (Google Firebase). عند تسجيل الدخول، تتم المطابقة برمجيًا في ذاكرة الخادم المؤقتة فقط — بدون أي كلمة مرور، وبدون حفظ صور الوجه نفسها، فقط تمثيلها الرقمي المشفّر.
 
 ---
 
-## 🛠️ التقنيات المستخدمة (Tech Stack)
+## ✨ الميزات الرئيسية
 
-* **الواجهة الخلفية (Backend):** Python 3.10+, Flask Framework.
-* **الذكاء الاصطناعي ومعالجة الصور:** `face_recognition`, `dlib`, `OpenCV`, `Pillow`, `NumPy`.
-* **قاعدة البيانات والسحابة:** Google Firebase (Cloud Firestore & Cloud Storage).
-* **الواجهة الأمامية (Frontend):** HTML5, Vanilla CSS3 (Custom Design System), Vanilla JS, Bootstrap Grid, SweetAlert2.
-* **الأمان والتشفير:** `cryptography` (Fernet), HMAC (Constant-time comparison).
+* **🔐 مصادقة حيوية بدون كلمات مرور:** دخول آمن وسريع بمجرد التعرف على ملامح الوجه، باستخدام `dlib`/`face_recognition`.
+* **🕵️ فحص حيوية أساسي (Liveness Detection):** ميزة اختيارية (`FACECRYPT_ENABLE_LIVENESS_CHECK`) تكشف الصور المطبوعة الثابتة عبر قياس وضوح الصورة، وتتحقق من حركة طبيعية بين إطارين عند تفعيل التحدي التفاعلي.
+* **🛡️ تشفير البيانات الحيوية:** لا تُحفظ ملامح الوجه كنص واضح أبدًا — تُشفَّر بخوارزمية `Fernet` (AES-128 + HMAC-SHA256) قبل التخزين.
+* **🚦 حماية من التخمين والحظر الجماعي:**
+  * حظر مؤقت آلي (5 دقائق) بعد 3 محاولات فاشلة، وحظر دائم يتطلب تدخلًا إداريًا بعد 5 محاولات — **لكل مستخدم على حدة**، وليس حظرًا جماعيًا يطال كل الحسابات من محاولة واحدة.
+  * حد معدّل صريح على بوابة تسجيل الدخول (10 طلبات/دقيقة، 30 طلبات/ساعة لكل IP) عبر `Flask-Limiter`.
+  * رسائل خطأ موحدة (Generic Responses) تمنع مهاجمًا من استنتاج وجود الحساب أو حالته.
+* **🔒 تحصين إضافي:** مقارنة كلمات المرور ورموز CSRF بوقت ثابت (`hmac.compare_digest`)، جلسات أدمن محمية بـ CSRF، وقواعد Firestore تمنع أي وصول مباشر من العميل (كل الوصول عبر Admin SDK بالخادم فقط).
+* **🎨 واجهة مستخدم حديثة:** تصميم "Dark Glassmorphism" مخصص بالكامل، متجاوب عبر كل أحجام الشاشات، ويحترم `prefers-reduced-motion` لذوي الحساسية للحركة.
+* **📊 لوحة تحكم إدارية:** إدارة المستخدمين، إحصائيات لحظية (عبر Firestore Aggregation Queries، لا تحميل كامل للسجلات)، وسجلات تدقيق مُقسّمة على صفحات (Pagination).
+* **📝 سجلات تدقيق شاملة:** توثيق كل عملية (نجاح/فشل/حظر) مع الوقت ومعرف المستخدم وعنوان IP.
 
 ---
 
-## 🚀 البدء والتشغيل (Getting Started)
+## 🛠️ التقنيات المستخدمة
 
-### 1. المتطلبات الأساسية (Prerequisites)
-* تثبيت `Python 3.10` أو أحدث.
-* إنشاء مشروع على منصة **Google Firebase** وتفعيل خدمتي (Firestore Database) و (Storage).
-* تنزيل مفتاح الخدمة `serviceAccountKey.json` من إعدادات Firebase ووضعه داخل مجلد `firebase/`.
+| الفئة | التقنيات |
+|---|---|
+| **الخلفية (Backend)** | Python 3.10+, Flask 3.1, Waitress (WSGI للإنتاج) |
+| **الذكاء الاصطناعي ومعالجة الصور** | `face_recognition`, `dlib`, `opencv-python-headless`, `Pillow`, `NumPy` |
+| **قاعدة البيانات والسحابة** | Google Firebase (Cloud Firestore & Cloud Storage) |
+| **الأمان** | `cryptography` (Fernet), `Flask-Limiter`, HMAC (مقارنة بوقت ثابت) |
+| **الحاويات والنشر** | Docker, Docker Compose, Google Cloud Run |
+| **الواجهة الأمامية** | HTML5, Vanilla CSS3 (نظام تصميم مخصص), Vanilla JS, SweetAlert2 |
+| **الاختبارات** | pytest (18 اختبار: مصادقة، صلاحيات، منع تعداد الحسابات، حماية XSS) |
 
-### 2. التثبيت (Installation)
+---
+
+## 🚀 البدء والتشغيل
+
+### الطريقة الموصى بها: Docker (الأسرع والأضمن)
+
+لا حاجة لتثبيت `cmake` أو أي أدوات بناء يدويًا — كل شيء داخل الحاوية.
+
 ```bash
-# 1. استنساخ المستودع
-git clone https://github.com/YourUsername/Face-Crypt-Cloud.git
-cd Face-Crypt-Cloud
+git clone https://github.com/Ammar-1993/Face-Crypt-Cloud-Arabic.git
+cd Face-Crypt-Cloud-Arabic
 
-# 2. إنشاء بيئة افتراضية وتفعيلها
+cp .env.example .env
+# عدّل .env بقيمك الفعلية (راجع قسم المتغيرات البيئية أدناه)
+# ضع ملف اعتماد Firebase بالمسار: firebase/serviceAccountKey.json
+
+docker compose build
+docker compose up -d
+docker compose exec app pytest -v   # تأكيد: 18 passed
+```
+افتح `http://localhost:8080`. لدليل تفصيلي عن الإعداد على WSL2 تحديدًا (بما فيه إعداد HTTPS محلي لاختبار لوحة الأدمن)، راجع [`WSL2_DOCKER_SETUP.md`](./WSL2_DOCKER_SETUP.md).
+
+### الطريقة التقليدية: بيئة افتراضية محلية
+
+يتطلب تثبيت `cmake` ومترجم ++C على جهازك مسبقًا (لازمة لتجميع `dlib`).
+
+```bash
+git clone https://github.com/Ammar-1993/Face-Crypt-Cloud-Arabic.git
+cd Face-Crypt-Cloud-Arabic
+
 python -m venv venv
 source venv/bin/activate  # Windows: venv\Scripts\activate
 
-# 3. تثبيت الاعتمادات
 pip install -r requirements.txt
+cp .env.example .env      # عدّل القيم، وضع serviceAccountKey.json بمساره
 ```
 
-### 3. إعداد المتغيرات البيئية (Environment Setup)
-قم بإنشاء ملف باسم `.env` في المسار الرئيسي للمشروع. **يجب ألا يتم رفع هذا الملف إطلاقاً لأي مستودع عام**.
-
-```env
-# مفتاح تشفير البيانات الحيوية (مطلوب - يولد عبر مكتبة cryptography - Fernet)
-FACECRYPT_SECRET_KEY=your_generated_fernet_key_here
-
-# مفتاح تشفير جلسات Flask (مطلوب - استخدم قيمة عشوائية طويلة مثل 32-byte hex)
-FACECRYPT_FLASK_SECRET_KEY=your_generated_flask_secret_key_here
-
-# كلمة مرور الدخول للوحة تحكم المسؤول (مطلوب)
-FACECRYPT_ADMIN_PASSWORD=YourStrongAdminPassword
-
-# مسار مفتاح فايربيس (مطلوب)
-FACECRYPT_SERVICE_ACCOUNT_PATH=firebase/serviceAccountKey.json
-
-# رابط التخزين الخاص بمشروعك السحابي (مطلوب)
-FACECRYPT_STORAGE_BUCKET=your-firebase-project-id.appspot.com
-
-# إعدادات التشغيل (اختياري)
-FLASK_DEBUG=False
-PORT=8080
-FACECRYPT_WSGI_THREADS=4
-```
-*(ملاحظة: النظام مزود بآلية "Fail-Fast"، ولن يعمل إذا كانت أي من المتغيرات السرية مفقودة).*
-
-### 4. التشغيل (Run the Application)
-
-**لبيئة التطوير (Development):**
+**تشغيل التطوير** (بإعادة تحميل تلقائي إن فُعّل `FLASK_DEBUG=True`):
 ```bash
 python app.py
 ```
 
-**لبيئة الإنتاج (Production):**
-يُمنع استخدام خادم التطوير. استخدم `Waitress`:
+**تشغيل يحاكي الإنتاج محليًا:**
 ```bash
-waitress-serve --port=8080 wsgi:app
+waitress-serve --host=0.0.0.0 --port=8080 wsgi:app
 ```
-* بوابة المستخدمين: `http://127.0.0.1:8080/`
+
+* بوابة المستخدمين: `http://127.0.0.1:8080/verify`
 * بوابة المسؤول: `http://127.0.0.1:8080/admin/`
 
 ---
 
-## 🛡️ هندسة الأمان والملاحظات (Security Architecture)
+## ⚙️ إعداد المتغيرات البيئية
 
-تم بناء **Face Crypt Cloud** مع مراعاة أعلى معايير الأمان:
+انسخ `.env.example` إلى `.env` (هذا الملف جاهز بالمستودع وأسماء متغيراته مطابقة تمامًا لما يقرأه الكود):
 
-1. **مكافحة الهجمات الجانبية والتخمين:** 
-   * يتم استخدام `hmac.compare_digest` لمقارنة كلمات المرور ورموز CSRF لمنع استنتاج البيانات عبر هجمات التوقيت (Timing Attacks).
-   * استجابات الواجهة البرمجية API موحدة تماماً عند فشل تسجيل الدخول، مما يمنع المهاجم من معرفة ما إذا كان الحساب غير موجود، أو محظوراً، أو غير مطابق (User Enumeration Prevention).
-2. **الحد من حجم الحمولات (DoS Prevention):** تم تقييد حجم الصور المرفوعة بـ 5 ميجابايت (`MAX_CONTENT_LENGTH`) لمنع هجمات حرمان الخدمة (DoS) التي تستهدف إرهاق المعالج أثناء استخراج ملامح الوجه.
-3. **الدفاع المتعدد الطبقات (Defense in Depth):** 
-   * ملف `firestore.rules` يغلق تماماً إمكانية القراءة/الكتابة من جانب العميل. التطبيق يتواصل حصرياً وموثوقاً عبر `Firebase Admin SDK` في الواجهة الخلفية.
-   * إدارة أخطاء شاملة تمنع تسريب تفاصيل الأكواد أو البنية التحتية (Traceback Leaks) للمستخدم النهائي، مع الاكتفاء بتسجيلها في النظام.
-4. **تدقيق الاعتمادات (CI/CD Auditing):** المشروع مزود بمسار عمل GitHub Actions لتشغيل `pip-audit` آلياً لاكتشاف أي ثغرات (CVEs) في مكتبات الطرف الثالث.
+```env
+FACECRYPT_SECRET_KEY=your_generated_fernet_key_here
+FACECRYPT_FLASK_SECRET_KEY=your_generated_flask_secret_key_here
+FACECRYPT_ADMIN_PASSWORD=YourStrongAdminPassword
+FACECRYPT_SERVICE_ACCOUNT_PATH=firebase/serviceAccountKey.json
+FACECRYPT_STORAGE_BUCKET=your-firebase-project-id.appspot.com
+FACECRYPT_ENABLE_LIVENESS_CHECK=False
+
+FLASK_DEBUG=False
+PORT=8080
+FACECRYPT_WSGI_THREADS=4
+```
+
+لتوليد مفتاح عشوائي قوي لأي من المتغيرين السريين:
+```bash
+python -c "import secrets; print(secrets.token_hex(32))"
+```
+
+> **النظام مزوّد بآلية Fail-Fast:** لن يبدأ التشغيل إطلاقًا إذا كان أي متغير سري مفقودًا — يطبع رسالة خطأ واضحة تحدد بالضبط أي متغير ناقص، بدل فشل غامض لاحقًا.
 
 ---
 
-## 🌍 النشر في الإنتاج (Production Deployment)
+## 🧪 الاختبارات
 
-لضمان أمان البيانات والجلسات، **يُعتبر استخدام بروتوكول HTTPS شرطاً إلزامياً** في الإنتاج. 
+```bash
+pytest -v          # محليًا (بعد تفعيل البيئة الافتراضية)
+docker compose exec app pytest -v   # داخل الحاوية
+```
+18 اختبارًا تغطي: نجاح/فشل تسجيل الدخول، منع تعداد الحسابات (Anti-Enumeration)، عدم معاقبة كل المستخدمين من محاولة فاشلة واحدة، حماية XSS بلوحة الأدمن، صلاحيات الجلسات، وترقيم صفحات سجلات التدقيق. `pytest.ini` يقيّد التنفيذ على مجلد `tests/` حصرًا.
 
-التطبيق مُعد لإنشاء جلسات مؤمنة (`SESSION_COOKIE_SECURE = True`). عبر اتصال HTTP غير مشفر، لن تحتفظ المتصفحات بجلسة المشرف، وسيفشل تسجيل الدخول.
+---
 
-### إعداد الخادم الوكيل العكسي (Nginx Reverse Proxy)
+## 🛡️ هندسة الأمان
 
-يجب وضع خادم `Waitress` خلف خادم وكيل يعالج التشفير (TLS Termination). مثال التكوين:
+1. **مكافحة التخمين والتوقيت:** `hmac.compare_digest` لكل مقارنة كلمة مرور/رمز CSRF، واستجابات API موحدة عند فشل تسجيل الدخول بغض النظر عن السبب الفعلي.
+2. **الحد من حجم الحمولات:** الصور المرفوعة محدودة بـ 5 ميجابايت (`MAX_CONTENT_LENGTH`) لمنع استنزاف المعالج عبر رفع ملفات ضخمة.
+3. **الدفاع متعدد الطبقات:** `firestore.rules` يمنع أي قراءة/كتابة مباشرة من العميل — كل الوصول حصريًا عبر `Firebase Admin SDK` بالخادم. معالجة أخطاء مركزية تمنع تسريب أي تفاصيل داخلية (Traceback) للمستخدم النهائي.
+4. **تدقيق آلي للاعتماديات:** GitHub Actions يشغّل `pip-audit` أسبوعيًا لاكتشاف ثغرات (CVEs) بمكتبات الطرف الثالث.
+
+---
+
+## 🌍 النشر في الإنتاج
+
+النسخة الحية من هذا المشروع تعمل فعليًا على **Google Cloud Run** (رابط أعلى الصفحة)، مبنية مباشرة من `Dockerfile` الموجود بالمستودع عبر:
+```bash
+gcloud run deploy face-crypt-cloud --source . --region us-central1 --allow-unauthenticated \
+  --memory 1Gi --cpu 2 --min-instances 0 \
+  --set-secrets FACECRYPT_ADMIN_PASSWORD=...,FACECRYPT_SECRET_KEY=...,FACECRYPT_FLASK_SECRET_KEY=...,/secrets/serviceAccountKey.json=...
+```
+Cloud Run يوفّر HTTPS تلقائيًا بشهادة مُدارة، وهذا شرط ضروري لعمل التطبيق: `SESSION_COOKIE_SECURE=True` بالكود يعني جلسة تسجيل دخول الأدمن **لن تُحفظ** على اتصال HTTP غير مشفّر.
+
+### بديل: خادم ذاتي خلف Nginx
+
+لو تفضّل استضافة ذاتية (VPS) بدل منصة PaaS، شغّل `waitress` مقيّدًا بـ `127.0.0.1` خلف وكيل عكسي يتولى التشفير:
 
 ```nginx
 server {
@@ -149,12 +175,11 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
-        
-        # السماح برفع صور تصل إلى 5MB (مطابق لإعدادات التطبيق)
         client_max_body_size 5M;
     }
 }
 ```
 
 ---
+
 *© 2024–2026 Face-Crypt-Cloud — جميع الحقوق محفوظة.*
