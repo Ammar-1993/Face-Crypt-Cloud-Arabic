@@ -303,3 +303,34 @@ def admin_clear_audit_logs():
 def admin_logout():
     session.clear()
     return jsonify({"message": "✅ تم تسجيل الخروج بنجاح"}), 200
+
+@admin_bp.route('/api/settings/tolerance', methods=['GET'])
+@login_required
+def get_tolerance():
+    config = firebase_utils.get_security_config()
+    return jsonify({"tolerance": config.get("tolerance", 0.6)}), 200
+
+@admin_bp.route('/api/settings/tolerance', methods=['POST'])
+@login_required
+def update_tolerance():
+    data = request.get_json()
+    if not data or 'tolerance' not in data:
+        return jsonify({"error": "❌ المعلمة tolerance مطلوبة"}), 400
+        
+    try:
+        tolerance = float(data['tolerance'])
+        if not (0.1 <= tolerance <= 1.0):
+            return jsonify({"error": "❌ يجب أن تكون القيمة بين 0.1 و 1.0"}), 400
+            
+        firebase_utils.update_security_config({"tolerance": tolerance})
+        
+        firebase_utils.log_audit_event(
+            "admin", 
+            "Update_Tolerance", 
+            status="success", 
+            ip_address=request.remote_addr
+        )
+        return jsonify({"message": "✅ تم تحديث دقة التعرف على الوجه بنجاح"}), 200
+        
+    except (ValueError, TypeError):
+        return jsonify({"error": "❌ قيمة غير صالحة"}), 400

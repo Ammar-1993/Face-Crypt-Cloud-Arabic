@@ -7,6 +7,7 @@ from PIL import Image
 from io import BytesIO
 from cryptography.fernet import Fernet
 from app.config import SECRET_KEY
+from utils import firebase_utils
 fernet = Fernet(SECRET_KEY.encode())
 
 
@@ -45,21 +46,27 @@ def extract_face_encoding(image_array, face_locations=None):
         raise ValueError(f"فشل في ترميز الوجه: {str(e)}")
 
 
-def compare_encodings(known_encoding, unknown_encoding, tolerance=0.6):
+def compare_encodings(known_encoding, unknown_encoding, tolerance=None):
     """
     Compares two face encodings.
     Returns True if they match within the given tolerance.
     """
+    if tolerance is None:
+        tolerance = firebase_utils.get_security_config().get("tolerance", 0.6)
+        
     if known_encoding is None or unknown_encoding is None:
         raise ValueError("❌ أحد التشفيرات أو كلاهما غير صالح.")
     results = face_recognition.compare_faces([known_encoding], unknown_encoding, tolerance=tolerance)
     return results[0]
 
-def find_best_match(known_encodings_list, unknown_encoding, tolerance=0.6):
+def find_best_match(known_encodings_list, unknown_encoding, tolerance=None):
     """
     Finds the best match for an unknown encoding against a list of known encodings.
     Returns the index of the best match within the tolerance, or None if no match is found.
     """
+    if tolerance is None:
+        tolerance = firebase_utils.get_security_config().get("tolerance", 0.6)
+        
     if not known_encodings_list:
         return None
     

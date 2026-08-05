@@ -600,4 +600,76 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   }
+
+  // ==========================================
+  // Tolerance Slider Logic
+  // ==========================================
+  const toleranceSlider = document.getElementById('tolerance-slider');
+  const toleranceDisplay = document.getElementById('tolerance-display');
+  const saveToleranceBtn = document.getElementById('save-tolerance-btn');
+
+  if (toleranceSlider && toleranceDisplay && saveToleranceBtn) {
+      // 1. Fetch current tolerance value on page load
+      adminFetch("/admin/api/settings/tolerance")
+          .then(res => res.json())
+          .then(data => {
+              if (data && data.tolerance !== undefined) {
+                  toleranceSlider.value = data.tolerance;
+                  toleranceDisplay.textContent = parseFloat(data.tolerance).toFixed(2);
+              }
+          })
+          .catch(err => console.error("Error fetching tolerance:", err));
+
+      // 2. Update badge number locally as admin slides it
+      toleranceSlider.addEventListener('input', (e) => {
+          toleranceDisplay.textContent = parseFloat(e.target.value).toFixed(2);
+      });
+
+      // 3. Save new value to backend
+      saveToleranceBtn.addEventListener('click', async () => {
+          const newTolerance = parseFloat(toleranceSlider.value);
+          
+          // Add a spinning loading state to button
+          const originalText = saveToleranceBtn.innerHTML;
+          saveToleranceBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الحفظ...';
+          saveToleranceBtn.disabled = true;
+
+          try {
+              const res = await adminFetch("/admin/api/settings/tolerance", {
+                  method: "POST",
+                  body: JSON.stringify({ tolerance: newTolerance })
+              });
+              
+              const data = await res.json();
+
+              if (data.message) {
+                  Swal.fire({
+                      icon: "success",
+                      title: "تم الحفظ",
+                      text: data.message,
+                      background: '#1a1a2e',
+                      color: '#fff',
+                      confirmButtonColor: '#4facfe',
+                      customClass: { popup: 'swal-dark-popup' }
+                  });
+              } else if (data.error) {
+                  throw new Error(data.error);
+              }
+          } catch (error) {
+              Swal.fire({
+                  icon: "error",
+                  title: "خطأ",
+                  text: error.message || "حدث خطأ أثناء حفظ الإعدادات",
+                  background: '#1a1a2e',
+                  color: '#fff',
+                  confirmButtonColor: '#e74c3c',
+                  customClass: { popup: 'swal-dark-popup' }
+              });
+          } finally {
+              // Restore button state
+              saveToleranceBtn.innerHTML = originalText;
+              saveToleranceBtn.disabled = false;
+          }
+      });
+  }
 });

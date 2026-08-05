@@ -88,3 +88,22 @@ def update_user_fields(user_id, data):
     doc_ref = db.collection('users').document(user_id)
     doc_ref.update(data)
     logger.info("✅ Updated user %s with keys: %s", user_id, list(data.keys()))
+
+def get_security_config():
+    """
+    Retrieves the security configuration from the Firestore 'settings' collection.
+    Returns the config dictionary. If it doesn't exist, returns default values.
+    """
+    doc_ref = db.collection('settings').document('security_config')
+    doc = doc_ref.get()
+    if doc.exists:
+        return doc.to_dict()
+    return {"tolerance": 0.6}
+
+def update_security_config(data):
+    """
+    Updates the security configuration in the Firestore 'settings' collection.
+    """
+    doc_ref = db.collection('settings').document('security_config')
+    doc_ref.set(data, merge=True)
+    logger.info("✅ Updated security config with: %s", list(data.keys()))

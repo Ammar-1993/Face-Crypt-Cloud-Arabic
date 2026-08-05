@@ -370,3 +370,104 @@ h1 {
     font-size: 1.5rem !important;
   }
 }
+
+/* --- Security Settings Panel (Glassmorphism) --- */
+.settings-panel {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 25px;
+    margin-top: 20px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.settings-panel:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.4);
+}
+
+.setting-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.setting-info h3 {
+    color: #ffffff;
+    margin-bottom: 8px;
+    font-weight: 600;
+    font-size: 1.2rem;
+}
+
+.setting-info p {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.95rem;
+    max-width: 450px;
+    line-height: 1.5;
+}
+
+.setting-control {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: rgba(0, 0, 0, 0.25);
+    padding: 15px 25px;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.tolerance-badge {
+    background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+    color: #fff;
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1.2rem;
+    box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
+    min-width: 65px;
+    text-align: center;
+}
+
+/* Custom Sleek Range Slider */
+input[type=range] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 220px;
+    background: transparent;
+}
+
+input[type=range]:focus {
+    outline: none;
+}
+
+input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 22px;
+    width: 22px;
+    border-radius: 50%;
+    background: #ffffff;
+    cursor: pointer;
+    margin-top: -8px;
+    box-shadow: 0 0 12px rgba(255, 255, 255, 0.6);
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+input[type=range]::-webkit-slider-thumb:hover {
+    transform: scale(1.25);
+}
+
+input[type=range]::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 6px;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 5px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
