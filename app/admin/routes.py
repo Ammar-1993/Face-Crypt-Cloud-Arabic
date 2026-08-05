@@ -228,13 +228,18 @@ def admin_unblock_user():
         return jsonify({"error": "❌ معرف المستخدم مطلوب"}), 400
 
     user_id = data['user_id']
-    # تحديث حالة المستخدم في Firestore
-    firebase_utils.update_user_fields(user_id, {
-        "blocked": False,
-        "failed_attempts": 0,
-        "soft_block": False,
-        "soft_block_time": None
-    })
+    from google.api_core.exceptions import NotFound
+    
+    try:
+        # تحديث حالة المستخدم في Firestore
+        firebase_utils.update_user_fields(user_id, {
+            "blocked": False,
+            "failed_attempts": 0,
+            "soft_block": False,
+            "soft_block_time": None
+        })
+    except NotFound:
+        return jsonify({"error": "❌ لا يمكن فك الحظر: هذا المستخدم غير مسجل في قاعدة البيانات."}), 404
 
     # سجل في Audit Logs
     firebase_utils.log_audit_event(
