@@ -471,3 +471,27 @@ input[type=range]::-webkit-slider-runnable-track {
     border-radius: 5px;
     border: 1px solid rgba(0, 0, 0, 0.1);
 }
+
+.neon-control-box {
+    background: rgba(0, 0, 0, 0.25);
+    padding: 15px 25px;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.neon-btn {
+    background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+    border: none;
+    box-shadow: 0 4px 15px rgba(79, 172, 254, 0.4);
+    transition: transform 0.2s, box-shadow 0.2s;
+    font-weight: 600;
+}
+
+.neon-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(79, 172, 254, 0.6);
+}
+
+.custom-range-glow {
+    width: 100%;
+}

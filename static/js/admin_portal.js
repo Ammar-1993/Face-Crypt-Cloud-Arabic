@@ -637,6 +637,7 @@ document.addEventListener("DOMContentLoaded", () => {
           try {
               const res = await adminFetch("/admin/api/settings/tolerance", {
                   method: "POST",
+                  headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({ tolerance: newTolerance })
               });
               
