@@ -108,10 +108,13 @@ def decrypt_encoding(encrypted_str):
     decoded = json.loads(decrypted.decode())
     return decoded
 
-def check_liveness(image_array_1, image_array_2=None, face_locations_1=None, face_locations_2=None):
+def check_liveness(image_array_1, image_array_2=None, face_locations_1=None, face_locations_2=None, challenge=None):
     """
     Basic anti-spoofing liveness check.
     If image_array_2 is provided, checks for natural head movement (landmark distance).
+    If a challenge is provided, it explicitly verifies the requested movement (smile, raise_eyebrows, turn_right).
+    This defends against PRE-RECORDED replay attacks specifically (a fixed video can't react to a random prompt).
+    It does NOT defend against real-time deepfake puppeteering, which is a harder and costlier threat model out of scope here.
     If only one image is provided, falls back to a texture heuristic (Laplacian variance) to reject extremely flat/blurry photos.
     Returns: (is_live: bool, reason: str)
     """
@@ -149,6 +152,30 @@ def check_liveness(image_array_1, image_array_2=None, face_locations_1=None, fac
             # If the difference is extremely small, it's a static printed photo or a screen
             if diff < 0.5:
                 return False, "لم يتم اكتشاف أي حركة طبيعية للوجه (صورة ثابتة)."
+
+            # Verify the specific random challenge if provided
+            # This defends against pre-recorded replay attacks.
+            if challenge:
+                if challenge == "smile":
+                    mouth_w1 = get_distance(l1['top_lip'][0], l1['top_lip'][6])
+                    mouth_w2 = get_distance(l2['top_lip'][0], l2['top_lip'][6])
+                    mouth_h1 = get_distance(l1['top_lip'][3], l1['bottom_lip'][3])
+                    mouth_h2 = get_distance(l2['top_lip'][3], l2['bottom_lip'][3])
+                    # Require mouth to widen or open
+                    if mouth_w2 - mouth_w1 < 1.0 and mouth_h2 - mouth_h1 < 1.0:
+                        return False, "لم يتم تنفيذ التحدي المطلوب (الابتسامة)."
+                elif challenge == "raise_eyebrows":
+                    brow_dist1 = l1['left_eye'][0][1] - l1['left_eyebrow'][2][1]
+                    brow_dist2 = l2['left_eye'][0][1] - l2['left_eyebrow'][2][1]
+                    # Require eyebrows to go up (distance from eye increases)
+                    if brow_dist2 - brow_dist1 < 1.0:
+                        return False, "لم يتم تنفيذ التحدي المطلوب (رفع الحاجبين)."
+                elif challenge == "turn_right":
+                    nose_x1 = l1['nose_tip'][2][0]
+                    nose_x2 = l2['nose_tip'][2][0]
+                    # Require horizontal nose movement
+                    if abs(nose_x2 - nose_x1) < 3.0:
+                        return False, "لم يتم تنفيذ التحدي المطلوب (تحريك الرأس)."
                 
         except Exception as e:
             return False, f"خطأ أثناء الفحص: {str(e)}"

@@ -168,3 +168,58 @@ def test_failed_login_does_not_penalize_all_users(mock_compare, mock_decrypt, mo
     
     # Assert that no users were updated/penalized
     mock_update.assert_not_called()
+
+@patch('app.users.routes.generate_registration_options')
+def test_webauthn_register_begin(mock_generate, client, mock_firebase):
+    """Test webauthn registration begins successfully for authenticated user."""
+    mock_firebase['get_all_users'].return_value = [{'id': 'user123', 'name': 'Test User', 'email': 'test@example.com'}]
+    
+    mock_options = MagicMock()
+    mock_options.challenge = b'test_challenge'
+    mock_options.json.return_value = '{"challenge": "dGVzdF9jaGFsbGVuZ2U"}'
+    mock_generate.return_value = mock_options
+
+    with client.session_transaction() as sess:
+        sess['user_id'] = 'user123'
+
+    response = client.post('/users/webauthn/register/begin')
+    assert response.status_code == 200
+    assert 'challenge' in response.json
+    mock_generate.assert_called_once()
+
+def test_webauthn_register_begin_unauthorized(client):
+    """Test webauthn registration begin rejects unauthenticated requests."""
+    response = client.post('/users/webauthn/register/begin')
+    assert response.status_code == 401
+
+@patch('app.users.routes.verify_registration_response')
+@patch('app.users.routes.firebase_utils.update_user_fields')
+def test_webauthn_register_complete_success(mock_update, mock_verify, client):
+    """Test successful webauthn registration completion."""
+    with client.session_transaction() as sess:
+        sess['user_id'] = 'user123'
+        sess['webauthn_challenge'] = 'dGVzdF9jaGFsbGVuZ2U'
+
+    mock_verification = MagicMock()
+    mock_verification.credential_id = b'cred_id'
+    mock_verification.credential_public_key = b'pub_key'
+    mock_verify.return_value = mock_verification
+
+    response = client.post('/users/webauthn/register/complete', json={'id': 'test', 'rawId': 'test', 'type': 'public-key'})
+    assert response.status_code == 200
+    assert response.json['status'] == 'success'
+    mock_update.assert_called_once()
+    assert 'webauthn_credential_id' in mock_update.call_args[0][1]
+
+@patch('app.users.routes.verify_registration_response')
+def test_webauthn_register_complete_invalid(mock_verify, client):
+    """Test webauthn registration complete handles verification failure."""
+    with client.session_transaction() as sess:
+        sess['user_id'] = 'user123'
+        sess['webauthn_challenge'] = 'dGVzdF9jaGFsbGVuZ2U'
+
+    mock_verify.side_effect = Exception("Invalid credential")
+
+    response = client.post('/users/webauthn/register/complete', json={'id': 'invalid'})
+    assert response.status_code == 400
+    assert 'error' in response.json

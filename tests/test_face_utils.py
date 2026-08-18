@@ -55,3 +55,32 @@ def test_check_liveness_spoof_detected():
             is_live, reason = check_liveness(image_array)
             assert is_live is False
             assert "احتيال" in reason
+
+def test_check_liveness_active_challenge_mismatch():
+    image_array_1 = np.random.randint(0, 255, (500, 500, 3), dtype=np.uint8)
+    image_array_2 = np.random.randint(0, 255, (500, 500, 3), dtype=np.uint8)
+    
+    with patch('face_recognition.face_landmarks') as mock_landmarks:
+        # Mock slightly different landmarks to pass the generic movement check, but fail the specific challenge
+        landmarks1 = {
+            'nose_tip': [(0, 0), (0, 0), (10, 10), (0, 0), (0, 0)],
+            'chin': [(0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (10, 20)],
+            'top_lip': [(5, 5), (0, 0), (0, 0), (5, 6), (0, 0), (0, 0), (10, 5)],
+            'bottom_lip': [(5, 5), (0, 0), (0, 0), (5, 7), (0, 0), (0, 0), (10, 5)],
+            'left_eye': [(5, 5)],
+            'left_eyebrow': [(0, 0), (0, 0), (5, 3)]
+        }
+        landmarks2 = {
+            'nose_tip': [(0, 0), (0, 0), (10, 11), (0, 0), (0, 0)], # slight movement to pass generic check
+            'chin': [(0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (10, 20)],
+            'top_lip': [(5, 5), (0, 0), (0, 0), (5, 6), (0, 0), (0, 0), (10, 5)], # mouth didn't change
+            'bottom_lip': [(5, 5), (0, 0), (0, 0), (5, 7), (0, 0), (0, 0), (10, 5)],
+            'left_eye': [(5, 5)],
+            'left_eyebrow': [(0, 0), (0, 0), (5, 3)]
+        }
+        mock_landmarks.side_effect = [[landmarks1], [landmarks2]]
+        
+        # Test "smile" challenge failure
+        is_live, reason = check_liveness(image_array_1, image_array_2, challenge="smile")
+        assert is_live is False
+        assert "الابتسامة" in reason

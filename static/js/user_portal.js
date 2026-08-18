@@ -48,18 +48,28 @@ captureButton.addEventListener("click", async () => {
   const ctx1 = canvas1.getContext("2d");
   ctx1.drawImage(cameraStream, 0, 0);
 
+  const challenges = [
+    { code: "smile", text: "ابتسم بوضوح" },
+    { code: "turn_right", text: "أدر رأسك يمينًا قليلاً" },
+    { code: "raise_eyebrows", text: "ارفع حاجبيك" }
+  ];
+  const randomChallenge = challenges[Math.floor(Math.random() * challenges.length)];
+  
+  // Store the challenge code to send it later
+  preview.dataset.challenge = randomChallenge.code;
+
   // Active Challenge UI Hint
   Swal.fire({
-    title: 'الرجاء تحريك رأسك قليلاً أو الرمش',
+    title: randomChallenge.text,
     text: 'جاري التقاط الإطار الثاني للتأكد من الحيوية...',
     icon: 'info',
-    timer: 1000,
+    timer: 1500,
     showConfirmButton: false,
     allowOutsideClick: false
   });
   
-  // Wait ~1 second for the user to make a micro-movement
-  await new Promise(r => setTimeout(r, 1000));
+  // Wait ~1.5 seconds for the user to make a micro-movement
+  await new Promise(r => setTimeout(r, 1500));
   
   const canvas2 = document.createElement("canvas");
   canvas2.width = cameraStream.videoWidth;
@@ -162,6 +172,9 @@ sendButton.addEventListener("click", async () => {
     if (preview.dataset.frame2) {
       const blob2 = dataURLtoBlob(preview.dataset.frame2);
       formData.append("image2", blob2, "capture2.jpg");
+      if (preview.dataset.challenge) {
+        formData.append("challenge", preview.dataset.challenge);
+      }
     }
 
     const response = await fetch(`${API_BASE}/users/verify_login`, {
@@ -171,7 +184,69 @@ sendButton.addEventListener("click", async () => {
     const data = await response.json();
 
     if (response.ok) {
-      showAlert(`تم تسجيل الدخول بنجاح. أهلاً بك، <strong>${escapeHTML(data.user.name)}</strong>`, "success");
+      Swal.fire({
+        icon: 'success',
+        title: 'نجاح',
+        html: `تم تسجيل الدخول بنجاح. أهلاً بك، <strong>${escapeHTML(data.user.name)}</strong><br><br>` +
+              `<button id="registerPasskeyBtn" class="btn-cta-primary" style="font-size: 0.9em; padding: 10px 20px; width: auto; display: inline-flex; justify-content: center; margin-top: 10px;">🔑 تسجيل مفتاح مرور لهذا الجهاز</button>`,
+        showConfirmButton: true,
+        confirmButtonText: 'إغلاق',
+        customClass: { popup: 'swal-dark-popup' },
+        didRender: () => {
+          const btn = document.getElementById('registerPasskeyBtn');
+          if (btn) {
+            btn.addEventListener('click', async () => {
+              btn.disabled = true;
+              btn.innerHTML = `<span class="fc-spinner" role="status" aria-hidden="true" style="margin-left: 8px;"></span> جاري الإعداد...`;
+              try {
+                // 1. Begin registration
+                const beginResp = await fetch(`${API_BASE}/users/webauthn/register/begin`, { method: 'POST' });
+                if (!beginResp.ok) throw new Error("Failed to start WebAuthn");
+                const options = await beginResp.json();
+                
+                // Convert base64url to Uint8Array
+                options.challenge = base64urlToUint8Array(options.challenge);
+                options.user.id = base64urlToUint8Array(options.user.id);
+                if (options.excludeCredentials) {
+                  for (let cred of options.excludeCredentials) {
+                    cred.id = base64urlToUint8Array(cred.id);
+                  }
+                }
+
+                // 2. Create credential
+                const credential = await navigator.credentials.create({ publicKey: options });
+                
+                // Convert credential to JSON
+                const credentialJSON = {
+                  id: credential.id,
+                  rawId: uint8ArrayToBase64url(new Uint8Array(credential.rawId)),
+                  type: credential.type,
+                  response: {
+                    attestationObject: uint8ArrayToBase64url(new Uint8Array(credential.response.attestationObject)),
+                    clientDataJSON: uint8ArrayToBase64url(new Uint8Array(credential.response.clientDataJSON))
+                  }
+                };
+
+                // 3. Complete registration
+                const completeResp = await fetch(`${API_BASE}/users/webauthn/register/complete`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(credentialJSON)
+                });
+
+                if (completeResp.ok) {
+                  Swal.fire({icon: 'success', title: 'تم بنجاح!', text: 'تم تسجيل مفتاح المرور الخاص بك.', customClass: { popup: 'swal-dark-popup' }});
+                } else {
+                  Swal.fire({icon: 'error', title: 'خطأ', text: 'فشل تسجيل مفتاح المرور.', customClass: { popup: 'swal-dark-popup' }});
+                }
+              } catch (err) {
+                console.error(err);
+                Swal.fire({icon: 'error', title: 'خطأ', text: 'حدث خطأ أثناء إعداد مفتاح المرور أو تم الإلغاء.', customClass: { popup: 'swal-dark-popup' }});
+              }
+            });
+          }
+        }
+      });
     } else {
       // Check if it's a ban or soft block to show a more prominent message
       const message = data.message || data.error || "تم رفض الوصول. يرجى المحاولة مرة أخرى.";
@@ -230,4 +305,23 @@ function showAlert(message, type) {
       resultDiv.innerHTML = "";
     }, 4000);
   }
+}
+
+function base64urlToUint8Array(base64url) {
+  const padding = '='.repeat((4 - base64url.length % 4) % 4);
+  const base64 = (base64url + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const rawData = atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+  for (let i = 0; i < rawData.length; ++i) {
+    outputArray[i] = rawData.charCodeAt(i);
+  }
+  return outputArray;
+}
+
+function uint8ArrayToBase64url(bytes) {
+  let binary = '';
+  for (let i = 0; i < bytes.byteLength; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }

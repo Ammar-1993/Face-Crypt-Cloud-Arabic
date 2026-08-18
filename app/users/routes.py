@@ -1,6 +1,10 @@
 import time
 import logging
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, session
+from webauthn import generate_registration_options, verify_registration_response
+from webauthn.helpers.structs import RegistrationCredential
+from webauthn.helpers import bytes_to_base64url, base64url_to_bytes
+import os
 
 logger = logging.getLogger(__name__)
 from utils import face_utils, firebase_utils
@@ -102,10 +106,12 @@ def verify_login():
                 face_locations_1 = face_recognition.face_locations(image_array)
                 image_array_2 = face_utils.load_image_from_request(image2_file) if image2_file else None
                 face_locations_2 = face_recognition.face_locations(image_array_2) if image_array_2 is not None else None
+                challenge = request.form.get("challenge")
                 is_live, reason = face_utils.check_liveness(
                     image_array, image_array_2,
                     face_locations_1=face_locations_1,
-                    face_locations_2=face_locations_2
+                    face_locations_2=face_locations_2,
+                    challenge=challenge
                 )
                 if not is_live:
                     # Penalize targeted user for spoofing attempt
@@ -132,6 +138,9 @@ def verify_login():
                 "soft_block_time": None
             })
             firebase_utils.log_audit_event(user_id, "User_Login", status='success', ip_address=request.remote_addr)
+            
+            # Establish session for subsequent authenticated actions (like WebAuthn registration)
+            session['user_id'] = user_id
 
             return jsonify({
                 "message": f"✅ تم تسجيل الدخول بنجاح. أهلاً بك، {matched_user.get('name', '[User Name]')}",
@@ -143,17 +152,74 @@ def verify_login():
             }), 200
 
         # 3. If NO match is found
-        # PREVIOUS DESIGN FLAW: 
-        # The previous design incorrectly looped through all users and penalized them
-        # for a single failed login attempt. This was highly unsafe as it allowed
-        # one brute-force attack to lock out every single user in the system.
-        # We now use Flask-Limiter for IP-based rate limiting instead of global user penalization.
-        
-        # Log the unknown login attempt for auditing without associating it to a specific user
         firebase_utils.log_audit_event("unknown_user", "User_Login", status='failure', ip_address=request.remote_addr)
-
         return jsonify({"message": GENERIC_ERROR_MSG}), 403
-
 
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
+
+@users_bp.route('/webauthn/register/begin', methods=['POST'])
+def webauthn_register_begin():
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({"error": "Unauthorized"}), 401
+    
+    # Retrieve user to get their info
+    users = firebase_utils.get_all_users()
+    user = next((u for u in users if u['id'] == user_id), None)
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    # Generate registration options
+    rp_id = request.host.split(':')[0]
+    rp_name = "Face-Crypt-Cloud"
+    user_name = user.get('email', user_id)
+    
+    options = generate_registration_options(
+        rp_id=rp_id,
+        rp_name=rp_name,
+        user_id=user_id.encode("utf-8"),
+        user_name=user_name,
+        user_display_name=user.get('name', user_name),
+    )
+    
+    session['webauthn_challenge'] = bytes_to_base64url(options.challenge)
+    
+    import json
+    # Use json.loads(options.json()) since py_webauthn options object provides a json() method
+    return jsonify(json.loads(options.json()))
+
+@users_bp.route('/webauthn/register/complete', methods=['POST'])
+def webauthn_register_complete():
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    challenge = session.get('webauthn_challenge')
+    if not challenge:
+        return jsonify({"error": "No registration in progress"}), 400
+
+    try:
+        credential_data = request.json
+        rp_id = request.host.split(':')[0]
+
+        verification = verify_registration_response(
+            credential=credential_data,
+            expected_challenge=base64url_to_bytes(challenge),
+            expected_origin=request.host_url.rstrip("/"),
+            expected_rp_id=rp_id
+        )
+        
+        # Save the credential for the user
+        firebase_utils.update_user_fields(user_id, {
+            "webauthn_credential_id": bytes_to_base64url(verification.credential_id),
+            "webauthn_public_key": bytes_to_base64url(verification.credential_public_key)
+        })
+
+        # Clear challenge
+        session.pop('webauthn_challenge', None)
+        
+        return jsonify({"status": "success", "message": "Passkey registered successfully!"})
+    except Exception as e:
+        logger.error(f"WebAuthn registration failed: {e}")
+        return jsonify({"error": f"Registration failed: {e}"}), 400
