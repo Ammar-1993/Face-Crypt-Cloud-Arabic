@@ -5,7 +5,7 @@
 [![Python Version](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
 [![Flask](https://img.shields.io/badge/Flask-3.1.x-green.svg)](https://flask.palletsprojects.com/)
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED.svg)](https://www.docker.com/)
-[![Tests](https://img.shields.io/badge/tests-18%20passing-brightgreen.svg)]()
+[![Tests](https://img.shields.io/badge/tests-26%20passing-brightgreen.svg)]()
 [![Firebase](https://img.shields.io/badge/Firebase-Firestore%20%7C%20Storage-orange.svg)](https://firebase.google.com/)
 [![Academic](https://img.shields.io/badge/University_of_Bisha-Cybersecurity-1a4659.svg)]()
 
@@ -24,6 +24,7 @@
 ## ✨ الميزات الرئيسية
 
 * **🔐 مصادقة حيوية بدون كلمات مرور:** دخول آمن وسريع بمجرد التعرف على ملامح الوجه، باستخدام `dlib`/`face_recognition`.
+* **🔑 دعم مفاتيح المرور (WebAuthn/Passkeys):** طبقة مصادقة إضافية تعتمد على الأجهزة، تتيح ربط حسابك بمفتاح مرور محلي بأمان تام بعد اجتياز التحقق الأمني الأساسي بالوجه.
 * **🕵️ فحص حيوية أساسي (Liveness Detection):** ميزة اختيارية (`FACECRYPT_ENABLE_LIVENESS_CHECK`) تكشف الصور المطبوعة الثابتة عبر قياس وضوح الصورة، وتتحقق من حركة طبيعية بين إطارين عند تفعيل التحدي التفاعلي.
 * **🛡️ تشفير البيانات الحيوية:** لا تُحفظ ملامح الوجه كنص واضح أبدًا — تُشفَّر بخوارزمية `Fernet` (AES-128 + HMAC-SHA256) قبل التخزين.
 * **🚦 حماية من التخمين والحظر الجماعي:**
@@ -76,10 +77,10 @@
 | **الخلفية (Backend)** | Python 3.10+, Flask 3.1, Waitress (WSGI للإنتاج) |
 | **الذكاء الاصطناعي ومعالجة الصور** | `face_recognition`, `dlib`, `opencv-python-headless`, `onnxruntime` (MiniFASNetV2 للتحقق من الاحتيال - Apache 2.0), `Pillow`, `NumPy` |
 | **قاعدة البيانات والسحابة** | Google Firebase (Cloud Firestore & Cloud Storage) |
-| **الأمان** | `cryptography` (Fernet), `Flask-Limiter`, HMAC (مقارنة بوقت ثابت)[cite: 1] |
+| **الأمان** | `cryptography` (Fernet), `Flask-Limiter`, HMAC (مقارنة بوقت ثابت), WebAuthn (Passkeys)[cite: 1] |
 | **الحاويات والنشر**[cite: 1] | Docker, Docker Compose, Google Cloud Run[cite: 1] |
 | **الواجهة الأمامية**[cite: 1] | HTML5, Vanilla CSS3 (نظام تصميم مخصص), Vanilla JS, SweetAlert2[cite: 1] |
-| **الاختبارات**[cite: 1] | pytest (18 اختبار: مصادقة، صلاحيات، منع تعداد الحسابات، حماية XSS)[cite: 1] |
+| **الاختبارات**[cite: 1] | pytest (26 اختبار: مصادقة، صلاحيات، حماية XSS، ليفنس، مفاتيح مرور WebAuthn)[cite: 1] |
 
 ---
 
@@ -99,7 +100,7 @@ cp .env.example .env
 
 docker compose build
 docker compose up -d
-docker compose exec app pytest -v   # تأكيد: 18 passed
+docker compose exec app pytest -v   # تأكيد: 26 passed
 ```
 افتح `http://localhost:8080`. لدليل تفصيلي عن الإعداد على WSL2 تحديدًا (بما فيه إعداد HTTPS محلي لاختبار لوحة الأدمن)، راجع [`WSL2_DOCKER_SETUP.md`](./WSL2_DOCKER_SETUP.md).
 
@@ -165,7 +166,7 @@ python -c "import secrets; print(secrets.token_hex(32))"
 pytest -v          # محليًا (بعد تفعيل البيئة الافتراضية)
 docker compose exec app pytest -v   # داخل الحاوية
 ```
-18 اختبارًا تغطي: نجاح/فشل تسجيل الدخول، منع تعداد الحسابات (Anti-Enumeration)، عدم معاقبة كل المستخدمين من محاولة فاشلة واحدة، حماية XSS بلوحة الأدمن، صلاحيات الجلسات، وترقيم صفحات سجلات التدقيق. `pytest.ini` يقيّد التنفيذ على مجلد `tests/` حصرًا.
+26 اختبارًا تغطي: نجاح/فشل تسجيل الدخول، ليفنس، منع تعداد الحسابات (Anti-Enumeration)، عدم معاقبة كل المستخدمين من محاولة فاشلة واحدة، حماية XSS بلوحة الأدمن، صلاحيات الجلسات، ترقيم صفحات سجلات التدقيق، وتسجيل مفاتيح المرور (WebAuthn/Passkeys). `pytest.ini` يقيّد التنفيذ على مجلد `tests/` حصرًا.
 
 ---
 
@@ -176,6 +177,7 @@ docker compose exec app pytest -v   # داخل الحاوية
 3. **الدفاع متعدد الطبقات:** `firestore.rules` يمنع أي قراءة/كتابة مباشرة من العميل — كل الوصول حصريًا عبر `Firebase Admin SDK` بالخادم. معالجة أخطاء مركزية تمنع تسريب أي تفاصيل داخلية (Traceback) للمستخدم النهائي.
 4. **تدقيق آلي للاعتماديات:** GitHub Actions يشغّل `pip-audit` أسبوعيًا لاكتشاف ثغرات (CVEs) بمكتبات الطرف الثالث.
 5. **مكافحة الانتحال (Liveness Check):** يجمع بين فحص ضبابية الصورة (Laplacian)، والتحدي العشوائي التفاعلي (Active Random Challenge) عبر طلب حركة الوجه للتحقق من المعالم باستخدام `dlib`، بالإضافة إلى نموذج MiniFASNet الذكي. هذه الاستراتيجية تمنع هجمات إعادة التشغيل المُسجلة مسبقًا (Pre-recorded Replay Attacks) بشكل فعّال، لأن الفيديو الثابت لا يمكنه التفاعل مع تحدٍ عشوائي. (ملاحظة: هذا النظام لا يهدف إلى منع هجمات التزييف العميق المباشرة Real-time Deepfake Puppeteering نظراً لتعقيدها وتكلفتها).
+6. **مفاتيح المرور (WebAuthn/Passkeys):** دعم بروتوكول FIDO2 كطبقة مصادقة إضافية تستخدم المعالجات الآمنة في أجهزة المستخدمين (Hardware-backed)، ولا يتم ربط المفتاح إلا بعد نجاح التحقق الحيوي (Face Recognition).
 
 ---
 
