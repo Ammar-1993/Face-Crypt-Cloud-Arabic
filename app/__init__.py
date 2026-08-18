@@ -39,8 +39,19 @@ def create_app():
     app.register_blueprint(admin_bp)
 
     import traceback
-    from flask import jsonify
+    from flask import jsonify, request, render_template
     from werkzeug.exceptions import HTTPException
+
+    def wants_json_response():
+        if request.path.startswith('/admin') or request.path.startswith('/users'):
+            return True
+        return request.accept_mimetypes.accept_json and not request.accept_mimetypes.accept_html
+
+    @app.errorhandler(404)
+    def page_not_found(e):
+        if wants_json_response():
+            return jsonify({"error": "المورد غير موجود (404)."}), 404
+        return render_template('404.html'), 404
 
     @app.errorhandler(Exception)
     def handle_exception(e):
@@ -50,10 +61,12 @@ def create_app():
             
         logger.error("Unhandled Exception: %s\n%s", str(e), traceback.format_exc())
         
-        if app.debug:
-            return jsonify({"error": f"❌ خطأ داخلي: {str(e)}"}), 500
+        error_msg = f"❌ خطأ داخلي: {str(e)}" if app.debug else "❌ خطأ داخلي في الخادم. يرجى المحاولة مرة أخرى لاحقاً."
+        
+        if wants_json_response():
+            return jsonify({"error": error_msg}), 500
             
-        return jsonify({"error": "❌ خطأ داخلي في الخادم. يرجى المحاولة مرة أخرى لاحقاً."}), 500
+        return render_template('500.html'), 500
     @app.errorhandler(413)
     def request_entity_too_large(error):
         logger.warning("Request Entity Too Large: %s", str(error))

@@ -183,9 +183,11 @@ docker compose exec app pytest -v   # داخل الحاوية
 النسخة الحية من هذا المشروع تعمل فعليًا على **Google Cloud Run** (رابط أعلى الصفحة)، مبنية مباشرة من `Dockerfile` الموجود بالمستودع عبر:
 ```bash
 gcloud run deploy face-crypt-cloud --source . --region us-central1 --allow-unauthenticated \
-  --memory 1Gi --cpu 2 --min-instances 0 \
+  --memory 1Gi --cpu 2 --min-instances 0 --concurrency 8 \
   --set-secrets FACECRYPT_ADMIN_PASSWORD=...,FACECRYPT_SECRET_KEY=...,FACECRYPT_FLASK_SECRET_KEY=...,/secrets/serviceAccountKey.json=...
 ```
+
+> **Note on Concurrency:** Because `dlib`-based face processing is highly CPU-bound per request, the default Cloud Run concurrency of 80 simultaneous requests per instance would allow far more concurrent work to pile onto one instance's allocated vCPUs than it can realistically handle. This causes severe latency spikes or timeouts under load. Setting `--concurrency 8` forces Cloud Run to spin up additional instances (up to `--max-instances`) sooner instead of overloading a single instance.
 Cloud Run يوفّر HTTPS تلقائيًا بشهادة مُدارة، وهذا شرط ضروري لعمل التطبيق: `SESSION_COOKIE_SECURE=True` بالكود يعني جلسة تسجيل دخول الأدمن **لن تُحفظ** على اتصال HTTP غير مشفّر.
 
 ### بديل: خادم ذاتي خلف Nginx
