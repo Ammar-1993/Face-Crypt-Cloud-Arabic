@@ -24,3 +24,34 @@ def test_find_best_match():
     
     # Empty list
     assert find_best_match([], unknown_encoding) is None
+
+from unittest.mock import patch, MagicMock
+from utils.face_utils import check_liveness
+
+def test_check_liveness_genuine():
+    image_array = np.random.randint(0, 255, (500, 500, 3), dtype=np.uint8)
+    
+    with patch('utils.face_utils.fas_session') as mock_session:
+        with patch('cv2.Laplacian') as mock_lap:
+            mock_lap.return_value.var.return_value = 100.0
+            
+            # mock output: class 1 (genuine), high probability
+            mock_session.run.return_value = [[np.array([-10.0, 10.0, -10.0])]]
+            
+            is_live, reason = check_liveness(image_array)
+            assert is_live is True
+            assert reason == "نجاح"
+
+def test_check_liveness_spoof_detected():
+    image_array = np.random.randint(0, 255, (500, 500, 3), dtype=np.uint8)
+    
+    with patch('utils.face_utils.fas_session') as mock_session:
+        with patch('cv2.Laplacian') as mock_lap:
+            mock_lap.return_value.var.return_value = 100.0
+            
+            # mock output: class 0 (spoof), high probability
+            mock_session.run.return_value = [[np.array([10.0, -10.0, -10.0])]]
+            
+            is_live, reason = check_liveness(image_array)
+            assert is_live is False
+            assert "احتيال" in reason

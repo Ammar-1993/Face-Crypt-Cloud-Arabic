@@ -74,7 +74,7 @@
 | الفئة | التقنيات |
 |---|---|
 | **الخلفية (Backend)** | Python 3.10+, Flask 3.1, Waitress (WSGI للإنتاج) |
-| **الذكاء الاصطناعي ومعالجة الصور** | `face_recognition`, `dlib`, `opencv-python-headless`, `Pillow`, `NumPy` |
+| **الذكاء الاصطناعي ومعالجة الصور** | `face_recognition`, `dlib`, `opencv-python-headless`, `onnxruntime` (MiniFASNetV2 للتحقق من الاحتيال - Apache 2.0), `Pillow`, `NumPy` |
 | **قاعدة البيانات والسحابة** | Google Firebase (Cloud Firestore & Cloud Storage) |
 | **الأمان** | `cryptography` (Fernet), `Flask-Limiter`, HMAC (مقارنة بوقت ثابت)[cite: 1] |
 | **الحاويات والنشر**[cite: 1] | Docker, Docker Compose, Google Cloud Run[cite: 1] |

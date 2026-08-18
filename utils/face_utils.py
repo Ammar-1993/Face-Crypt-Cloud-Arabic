@@ -6,9 +6,22 @@ import json
 from PIL import Image
 from io import BytesIO
 from cryptography.fernet import Fernet
+import os
+import onnxruntime as ort
+import time
+import logging
+
 from app.config import SECRET_KEY
 from utils import firebase_utils
 fernet = Fernet(SECRET_KEY.encode())
+
+MODEL_PATH = os.path.join(os.path.dirname(__file__), 'models', 'minifasnet_v2.onnx')
+try:
+    fas_session = ort.InferenceSession(MODEL_PATH)
+    fas_input_name = fas_session.get_inputs()[0].name
+except Exception as e:
+    logging.getLogger(__name__).error(f"Failed to load MiniFASNet model: {e}")
+    fas_session = None
 
 
 def load_image_from_request(file):
@@ -139,6 +152,35 @@ def check_liveness(image_array_1, image_array_2=None, face_locations_1=None, fac
                 
         except Exception as e:
             return False, f"خطأ أثناء الفحص: {str(e)}"
+            
+    # 3. MiniFASNet Anti-Spoofing Check
+    if fas_session is not None:
+        try:
+            start_time = time.time()
+            face_img = cv2.resize(image_array_1, (80, 80))
+            face_img = np.transpose(face_img, (2, 0, 1)).astype(np.float32)
+            face_img = face_img / 255.0
+            face_img = np.expand_dims(face_img, axis=0)
+            
+            out = fas_session.run(None, {fas_input_name: face_img})[0][0]
+            
+            def softmax(x):
+                e_x = np.exp(x - np.max(x))
+                return e_x / e_x.sum()
+            
+            probs = softmax(out)
+            predicted_class = np.argmax(probs)
+            real_prob = probs[1]
+            
+            latency = (time.time() - start_time) * 1000
+            logging.getLogger(__name__).info(f"MiniFASNet inference latency: {latency:.2f}ms, real_prob: {real_prob:.4f}, class: {predicted_class}")
+            
+            # Require class 1 (real face) and high probability
+            if predicted_class != 1 or real_prob < 0.6:
+                return False, "تم اكتشاف محاولة احتيال (فحص النماذج)."
+                
+        except Exception as e:
+            return False, f"خطأ أثناء فحص الاحتيال: {str(e)}"
             
     return True, "نجاح"
 
