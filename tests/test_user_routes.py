@@ -9,6 +9,7 @@ def test_missing_image_error(client, mock_firebase):
     assert response.status_code == 400
     assert 'error' in response.json
 
+@patch('app.users.routes.ENABLE_LIVENESS_CHECK', new=False)
 @patch('app.users.routes.face_utils.load_image_from_request')
 @patch('app.users.routes.face_utils.extract_face_encoding')
 @patch('app.users.routes.face_utils.decrypt_encoding')

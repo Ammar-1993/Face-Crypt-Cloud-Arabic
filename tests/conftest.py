@@ -2,6 +2,7 @@ import pytest
 import sys
 import os
 from unittest.mock import patch, MagicMock
+from utils.firebase_utils import get_security_config
 
 # Mock firebase_admin before importing the app to avoid real initialization
 sys.modules['firebase_admin'] = MagicMock()
@@ -15,6 +16,7 @@ os.environ.setdefault('FACECRYPT_SERVICE_ACCOUNT_PATH', 'test_path.json')
 os.environ.setdefault('FACECRYPT_STORAGE_BUCKET', 'test.appspot.com')
 os.environ.setdefault('FACECRYPT_SECRET_KEY', 'R7kyQt7z69lzAyu1NQEFYvJYb0preezrytAENnh7src=')
 os.environ.setdefault('FACECRYPT_FLASK_SECRET_KEY', 'R7kyQt7z69lzAyu1NQEFYvJYb0preezrytAENnh7src=')
+get_security_config
 
 from app import create_app
 
@@ -32,11 +34,14 @@ def mock_firebase():
          patch('utils.firebase_utils.get_all_users') as mock_get_all, \
          patch('utils.firebase_utils.get_all_users_summary') as mock_get_all_summary, \
          patch('utils.firebase_utils.update_user_fields') as mock_update_user, \
-         patch('utils.firebase_utils.log_audit_event') as mock_log_audit:
+         patch('utils.firebase_utils.log_audit_event') as mock_log_audit, \
+         patch('utils.firebase_utils.get_security_config') as mock_get_security_config:
         
         # Configure default return values
         mock_get_all.return_value = []
         mock_get_all_summary.return_value = []
+        mock_get_security_config.return_value = {"tolerance": 0.6, "enable_liveness": True}
+        
 
         yield {
             'add_user_to_firestore': mock_add_user,
