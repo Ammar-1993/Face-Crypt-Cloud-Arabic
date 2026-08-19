@@ -76,7 +76,7 @@ docker compose build
 docker compose up
 
 # 5) بنافذة ثانية: تأكد إن السيرفر يستجيب
-curl http://localhost:8080/health
+curl http://localhost:8081/health
 
 # 6) شغّل مجموعة الاختبارات — الآن pytest.ini يضمن تشغيل tests/ فقط،
 #    بلا خطر لمس أي سكربت تجريبي بالجذر
@@ -88,7 +88,7 @@ docker compose exec app pytest -v
 
 ## 4. فخ لوحة الأدمن (HTTPS)
 
-`SESSION_COOKIE_SECURE = True` يعني جلسة تسجيل دخول الأدمن **لن تثبّت** على `http://localhost:8080` العادي. بوابة الوجه العامة تشتغل طبيعي بدون هذا القيد. لاختبار لوحة الأدمن كاملة محليًا: فعّل خدمة `caddy` المعلّقة بـ `docker-compose.yml`، وزُر `https://localhost:8443` بدلًا من المنفذ العادي.
+`SESSION_COOKIE_SECURE = True` يعني جلسة تسجيل دخول الأدمن **لن تثبّت** على `http://localhost:8081` العادي. بوابة الوجه العامة تشتغل طبيعي بدون هذا القيد. لاختبار لوحة الأدمن كاملة محليًا: فعّل خدمة `caddy` المعلّقة بـ `docker-compose.yml`، وزُر `https://localhost:8443` بدلًا من المنفذ العادي.
 
 ---
 
@@ -96,9 +96,9 @@ docker compose exec app pytest -v
 
 - [ ] `pytest.ini` منسوخ لجذر المشروع (يمنع أي خطر لمس بيانات حقيقية عبر تشغيل pytest بالخطأ)
 - [ ] `docker compose build` نجح
-- [ ] `curl http://localhost:8080/health` يرجع 200
+- [ ] `curl http://localhost:8081/health` يرجع 200
 - [ ] `docker compose exec app pytest -v` يعطي 18/18 ناجح
-- [ ] تسجيل دخول حقيقي بوجه فعلي يشتغل عبر `http://localhost:8080`
+- [ ] تسجيل دخول حقيقي بوجه فعلي يشتغل عبر `http://localhost:8081`
 - [ ] (لو فعّلت Caddy) تسجيل دخول أدمن كامل يشتغل عبر `https://localhost:8443`
 - [ ] تعديل بسيط بأي ملف ينعكس تلقائيًا بالحاوية بدون إعادة بناء
 - [ ] نقلت أو حذفت السكربتات التجريبية الـ11 من جذر المشروع (خطوة نظافة، مو حرجة لـ Docker نفسه)

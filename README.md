@@ -102,7 +102,7 @@ docker compose build
 docker compose up -d
 docker compose exec app pytest -v   # تأكيد: 26 passed
 ```
-افتح `http://localhost:8080`. لدليل تفصيلي عن الإعداد على WSL2 تحديدًا (بما فيه إعداد HTTPS محلي لاختبار لوحة الأدمن)، راجع [`WSL2_DOCKER_SETUP.md`](./WSL2_DOCKER_SETUP.md).
+افتح `http://localhost:8081`. لدليل تفصيلي عن الإعداد على WSL2 تحديدًا (بما فيه إعداد HTTPS محلي لاختبار لوحة الأدمن)، راجع [`WSL2_DOCKER_SETUP.md`](./WSL2_DOCKER_SETUP.md).
 
 ### الطريقة التقليدية: بيئة افتراضية محلية
 
@@ -129,8 +129,8 @@ python app.py
 waitress-serve --host=0.0.0.0 --port=8080 wsgi:app
 ```
 
-* بوابة المستخدمين: `http://127.0.0.1:8080/verify`
-* بوابة المسؤول: `http://127.0.0.1:8080/admin/`
+* بوابة المستخدمين: `http://127.0.0.1:8081/verify`
+* بوابة المسؤول: `http://127.0.0.1:8081/admin/`
 
 ---
 
