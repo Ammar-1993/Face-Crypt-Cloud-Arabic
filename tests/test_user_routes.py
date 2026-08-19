@@ -223,3 +223,83 @@ def test_webauthn_register_complete_invalid(mock_verify, client):
     response = client.post('/users/webauthn/register/complete', json={'id': 'invalid'})
     assert response.status_code == 400
     assert 'error' in response.json
+
+@patch('app.users.routes.generate_authentication_options')
+def test_webauthn_login_begin(mock_generate, client):
+    """Test webauthn login begins successfully."""
+    mock_options = MagicMock()
+    mock_options.challenge = b'login_challenge'
+    mock_options.json.return_value = '{"challenge": "bG9naW5fY2hhbGxlbmdl"}'
+    mock_generate.return_value = mock_options
+
+    response = client.post('/users/webauthn/login/begin')
+    assert response.status_code == 200
+    assert 'challenge' in response.json
+    mock_generate.assert_called_once()
+
+
+@patch('app.users.routes.verify_authentication_response')
+@patch('app.users.routes.firebase_utils.update_user_fields')
+@patch('app.users.routes.firebase_utils.log_audit_event')
+def test_webauthn_login_complete_success(mock_log, mock_update, mock_verify, client, mock_firebase):
+    """Test successful webauthn login."""
+    mock_firebase['get_all_users'].return_value = [{
+        'id': 'user123',
+        'name': 'Test User',
+        'email': 'test@example.com',
+        'webauthn_credential_id': 'cred_id',
+        'webauthn_public_key': 'pub_key'
+    }]
+
+    with client.session_transaction() as sess:
+        sess['webauthn_challenge'] = 'bG9naW5fY2hhbGxlbmdl'
+
+    mock_verification = MagicMock()
+    mock_verify.return_value = mock_verification
+
+    response = client.post('/users/webauthn/login/complete', json={'id': 'cred_id', 'rawId': 'test', 'type': 'public-key'})
+    assert response.status_code == 200
+    assert 'نجاح' in response.json['message']
+    
+    mock_log.assert_called_with('user123', 'User_Login', status='success', ip_address='127.0.0.1')
+    mock_update.assert_called_with('user123', {'failed_attempts': 0, 'soft_block': False, 'soft_block_time': None})
+
+
+def test_webauthn_login_complete_not_registered(client, mock_firebase):
+    """Test webauthn login for a user with no registered passkey."""
+    mock_firebase['get_all_users'].return_value = [{
+        'id': 'user123',
+        'name': 'Test User',
+        'webauthn_credential_id': 'different_cred',
+        'webauthn_public_key': 'pub_key'
+    }]
+
+    with client.session_transaction() as sess:
+        sess['webauthn_challenge'] = 'bG9naW5fY2hhbGxlbmdl'
+
+    response = client.post('/users/webauthn/login/complete', json={'id': 'unregistered_cred'})
+    assert response.status_code == 404
+    assert 'error' in response.json
+    assert 'Credential not registered' in response.json['error']
+
+
+@patch('app.users.routes.verify_authentication_response')
+def test_webauthn_login_complete_invalid_assertion(mock_verify, client, mock_firebase):
+    """Test webauthn login handles rejected/invalid assertion."""
+    mock_firebase['get_all_users'].return_value = [{
+        'id': 'user123',
+        'name': 'Test User',
+        'webauthn_credential_id': 'cred_id',
+        'webauthn_public_key': 'pub_key'
+    }]
+
+    with client.session_transaction() as sess:
+        sess['webauthn_challenge'] = 'bG9naW5fY2hhbGxlbmdl'
+
+    mock_verify.side_effect = Exception("Invalid signature")
+
+    response = client.post('/users/webauthn/login/complete', json={'id': 'cred_id'})
+    assert response.status_code == 400
+    assert 'error' in response.json
+    assert 'Login failed: Invalid signature' in response.json['error']
+

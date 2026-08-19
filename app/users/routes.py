@@ -1,8 +1,8 @@
 import time
 import logging
 from flask import Blueprint, request, jsonify, session
-from webauthn import generate_registration_options, verify_registration_response
-from webauthn.helpers.structs import RegistrationCredential
+from webauthn import generate_registration_options, verify_registration_response, generate_authentication_options, verify_authentication_response
+from webauthn.helpers.structs import RegistrationCredential, AuthenticationCredential
 from webauthn.helpers import bytes_to_base64url, base64url_to_bytes
 import os
 
@@ -223,3 +223,74 @@ def webauthn_register_complete():
     except Exception as e:
         logger.error(f"WebAuthn registration failed: {e}")
         return jsonify({"error": f"Registration failed: {e}"}), 400
+
+@users_bp.route('/webauthn/login/begin', methods=['POST'])
+@limiter.limit("10 per minute")
+@limiter.limit("30 per hour")
+def webauthn_login_begin():
+    rp_id = request.host.split(':')[0]
+    options = generate_authentication_options(
+        rp_id=rp_id,
+        user_verification="preferred"
+    )
+    session['webauthn_challenge'] = bytes_to_base64url(options.challenge)
+    import json
+    return jsonify(json.loads(options.json()))
+
+@users_bp.route('/webauthn/login/complete', methods=['POST'])
+@limiter.limit("10 per minute")
+@limiter.limit("30 per hour")
+def webauthn_login_complete():
+    challenge = session.get('webauthn_challenge')
+    if not challenge:
+        return jsonify({"error": "No login in progress"}), 400
+
+    try:
+        credential_data = request.json
+        credential_id = credential_data.get('id')
+        
+        users = firebase_utils.get_all_users()
+        matched_user = None
+        for u in users:
+            if u.get('webauthn_credential_id') == credential_id:
+                matched_user = u
+                break
+                
+        if not matched_user:
+            return jsonify({"error": "Credential not registered"}), 404
+
+        rp_id = request.host.split(':')[0]
+
+        verification = verify_authentication_response(
+            credential=credential_data,
+            expected_challenge=base64url_to_bytes(challenge),
+            expected_origin=request.host_url.rstrip("/"),
+            expected_rp_id=rp_id,
+            credential_public_key=base64url_to_bytes(matched_user['webauthn_public_key']),
+            credential_current_sign_count=0
+        )
+
+        user_id = matched_user['id']
+
+        firebase_utils.update_user_fields(user_id, {
+            "failed_attempts": 0,
+            "soft_block": False,
+            "soft_block_time": None
+        })
+        firebase_utils.log_audit_event(user_id, "User_Login", status='success', ip_address=request.remote_addr)
+        
+        session['user_id'] = user_id
+        session.pop('webauthn_challenge', None)
+
+        return jsonify({
+            "message": f"✅ تم تسجيل الدخول بنجاح. أهلاً بك، {matched_user.get('name', '[User Name]')}",
+            "user": {
+                "id": user_id,
+                "name": matched_user.get('name'),
+                "email": matched_user.get('email')
+            }
+        }), 200
+
+    except Exception as e:
+        logger.error(f"WebAuthn login failed: {e}")
+        return jsonify({"error": f"Login failed: {e}"}), 400

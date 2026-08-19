@@ -325,3 +325,89 @@ function uint8ArrayToBase64url(bytes) {
   }
   return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
+
+/**
+ * WebAuthn (Passkey) Login Flow
+ */
+const btnPasskeyLogin = document.getElementById("btnPasskeyLogin");
+if (btnPasskeyLogin) {
+  btnPasskeyLogin.addEventListener("click", async () => {
+    btnPasskeyLogin.disabled = true;
+    const originalContent = btnPasskeyLogin.innerHTML;
+    btnPasskeyLogin.innerHTML = `<span class="fc-spinner" role="status" aria-hidden="true" style="margin-left:8px;"></span> جاري الإعداد...`;
+
+    try {
+      // 1. Begin Login
+      const beginResp = await fetch(`${API_BASE}/users/webauthn/login/begin`, { method: 'POST' });
+      if (!beginResp.ok) throw new Error("Failed to start WebAuthn login");
+      const options = await beginResp.json();
+
+      // Convert challenge
+      options.challenge = base64urlToUint8Array(options.challenge);
+      if (options.allowCredentials) {
+        for (let cred of options.allowCredentials) {
+          cred.id = base64urlToUint8Array(cred.id);
+        }
+      }
+
+      // 2. Request credential from browser
+      btnPasskeyLogin.innerHTML = `<span class="fc-spinner" role="status" aria-hidden="true" style="margin-left:8px;"></span> في انتظار البصمة...`;
+      const assertion = await navigator.credentials.get({ publicKey: options });
+
+      // Convert assertion to JSON
+      const assertionJSON = {
+        id: assertion.id,
+        rawId: uint8ArrayToBase64url(new Uint8Array(assertion.rawId)),
+        type: assertion.type,
+        response: {
+          authenticatorData: uint8ArrayToBase64url(new Uint8Array(assertion.response.authenticatorData)),
+          clientDataJSON: uint8ArrayToBase64url(new Uint8Array(assertion.response.clientDataJSON)),
+          signature: uint8ArrayToBase64url(new Uint8Array(assertion.response.signature)),
+          userHandle: assertion.response.userHandle ? uint8ArrayToBase64url(new Uint8Array(assertion.response.userHandle)) : null
+        }
+      };
+
+      // 3. Complete Login
+      btnPasskeyLogin.innerHTML = `<span class="fc-spinner" role="status" aria-hidden="true" style="margin-left:8px;"></span> جاري التحقق...`;
+      const completeResp = await fetch(`${API_BASE}/users/webauthn/login/complete`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(assertionJSON)
+      });
+
+      const data = await completeResp.json();
+
+      if (completeResp.ok) {
+        Swal.fire({
+          icon: 'success',
+          title: 'نجاح',
+          html: `تم تسجيل الدخول بنجاح. أهلاً بك، <strong>${escapeHTML(data.user.name)}</strong>`,
+          showConfirmButton: true,
+          confirmButtonText: 'إغلاق',
+          customClass: { popup: 'swal-dark-popup' }
+        });
+      } else {
+        const message = data.message || data.error || "تم رفض الوصول. يرجى المحاولة مرة أخرى.";
+        if (message.includes("حظر") || message.includes("تجاوز")) {
+            Swal.fire({
+                icon: 'error',
+                title: 'تنبيه أمني',
+                html: message.replace(/\n/g, '<br>'),
+                confirmButtonText: 'موافق',
+                confirmButtonColor: '#d33',
+                customClass: { popup: 'swal-dark-popup' }
+            });
+        } else {
+            showAlert(message, "danger");
+        }
+      }
+
+    } catch (err) {
+      console.error(err);
+      showAlert("تم الإلغاء أو فشل تسجيل الدخول بمفتاح المرور.", "danger");
+    } finally {
+      btnPasskeyLogin.disabled = false;
+      btnPasskeyLogin.innerHTML = originalContent;
+    }
+  });
+}

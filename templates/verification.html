@@ -66,8 +66,8 @@
           </div>
         </div>
 
-        <!-- ── CTA: Open Camera ── -->
-        <div id="openCameraWrapper" class="btn-cta-primary-wrapper">
+        <!-- ── CTA: Open Camera / WebAuthn ── -->
+        <div id="openCameraWrapper" class="btn-cta-primary-wrapper" style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
           <button id="btnOpenCamera"
                   class="btn-cta-primary"
                   aria-label="بدء عملية التحقق من الوجه – فتح الكاميرا">
@@ -75,6 +75,17 @@
             <div class="btn-cta-text">
               <span class="main-text">بدء التحقق من الوجه</span>
               <span class="sub-text">افتح الكاميرا لتسجيل دخول آمن</span>
+            </div>
+          </button>
+
+          <button id="btnPasskeyLogin"
+                  class="btn-cta-primary"
+                  style="background: rgba(40, 167, 69, 0.1); border-color: rgba(40, 167, 69, 0.4);"
+                  aria-label="الدخول بمفتاح المرور">
+            <div class="btn-cta-icon" aria-hidden="true">🔑</div>
+            <div class="btn-cta-text">
+              <span class="main-text">الدخول بمفتاح المرور</span>
+              <span class="sub-text">تسجيل دخول سريع للأجهزة المسجلة</span>
             </div>
           </button>
         </div>
