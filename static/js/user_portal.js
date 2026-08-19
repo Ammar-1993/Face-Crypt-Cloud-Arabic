@@ -8,21 +8,179 @@ const sendButton = document.getElementById("sendButton");
 const retakeButton = document.getElementById("retakeButton");
 const btnCancelCamera = document.getElementById("btnCancelCamera");
 const cameraStream = document.getElementById("cameraStream");
+const overlayCanvas = document.getElementById("overlayCanvas");
 const openCameraWrapper = document.getElementById("openCameraWrapper");
 const securityDisclaimer = document.getElementById("securityDisclaimer");
 
 let stream = null;
+let faceLandmarker = null;
+let lastVideoTime = -1;
+let animationFrameId = null;
+let activeChallenge = null;
+let challengeInitialState = null;
+
+// MediaPipe Initialization
+async function initializeMediaPipe() {
+  const { FaceLandmarker, FilesetResolver } = window;
+  if (!FaceLandmarker) return;
+  
+  try {
+    const vision = await FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm");
+    faceLandmarker = await FaceLandmarker.createFromOptions(vision, {
+      baseOptions: {
+        modelAssetPath: `https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task`,
+        delegate: "GPU"
+      },
+      outputFaceBlendshapes: true,
+      runningMode: "VIDEO",
+      numFaces: 1
+    });
+  } catch (err) {
+    console.error("Failed to initialize MediaPipe:", err);
+  }
+}
+
+// Call init on load
+initializeMediaPipe();
+
+function startFaceDetection() {
+  if (!faceLandmarker) return;
+  overlayCanvas.width = cameraStream.videoWidth;
+  overlayCanvas.height = cameraStream.videoHeight;
+  const ctx = overlayCanvas.getContext("2d");
+
+  function predict() {
+    if (!cameraStream.videoWidth) {
+      animationFrameId = requestAnimationFrame(predict);
+      return;
+    }
+    
+    if (cameraStream.currentTime !== lastVideoTime) {
+      lastVideoTime = cameraStream.currentTime;
+      const results = faceLandmarker.detectForVideo(cameraStream, performance.now());
+      
+      ctx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+      
+      if (results.faceLandmarks && results.faceLandmarks.length > 0) {
+        // Draw basic mesh
+        const landmarks = results.faceLandmarks[0];
+        
+        ctx.fillStyle = "rgba(0, 255, 0, 0.5)";
+        for (let pt of landmarks) {
+          ctx.beginPath();
+          ctx.arc(pt.x * overlayCanvas.width, pt.y * overlayCanvas.height, 1, 0, 2 * Math.PI);
+          ctx.fill();
+        }
+
+        // Active Challenge Logic
+        if (activeChallenge) {
+          checkChallenge(results);
+        }
+      }
+    }
+    animationFrameId = requestAnimationFrame(predict);
+  }
+  predict();
+}
+
+function checkChallenge(results) {
+  if (!results.faceBlendshapes || results.faceBlendshapes.length === 0) return;
+  const blendshapes = results.faceBlendshapes[0].categories;
+  
+  // Find specific blendshapes
+  const getScore = (name) => {
+    const shape = blendshapes.find(b => b.categoryName === name);
+    return shape ? shape.score : 0;
+  };
+
+  if (activeChallenge === "smile") {
+    const smileLeft = getScore("mouthSmileLeft");
+    const smileRight = getScore("mouthSmileRight");
+    if (smileLeft > 0.5 && smileRight > 0.5) {
+      completeChallenge();
+    }
+  } else if (activeChallenge === "turn_right") {
+    const lookRight = getScore("eyeLookInLeft"); // If left eye looks in, head is turning right relative to camera
+    const turnRight = getScore("headTurnRight") || lookRight; // Sometimes blendshapes might lack direct head pose, relying on eyes
+    // A better approach for turn is using geometric landmarks, but blendshapes are easier.
+    // Let's use simple nose vs eye geometry for turn:
+    const landmarks = results.faceLandmarks[0];
+    const nose = landmarks[1]; // tip of nose
+    const leftEye = landmarks[33];
+    const rightEye = landmarks[263];
+    // If nose is closer to right eye (user's left) -> turning right
+    const distToRightEye = Math.abs(nose.x - rightEye.x);
+    const distToLeftEye = Math.abs(nose.x - leftEye.x);
+    
+    if (distToRightEye < distToLeftEye * 0.4) {
+      completeChallenge();
+    }
+  } else if (activeChallenge === "raise_eyebrows") {
+    const browInnerUp = getScore("browInnerUp");
+    if (browInnerUp > 0.4) {
+      completeChallenge();
+    }
+  }
+}
+
+function completeChallenge() {
+  activeChallenge = null;
+  Swal.close();
+  Swal.fire({
+    icon: 'success',
+    title: 'تم اجتياز الفحص!',
+    text: 'جاري التحضير...',
+    timer: 1000,
+    showConfirmButton: false
+  });
+  
+  setTimeout(() => {
+    captureFinalImage();
+  }, 1000);
+}
+
+function captureFinalImage() {
+  const canvas = document.createElement("canvas");
+  canvas.width = cameraStream.videoWidth;
+  canvas.height = cameraStream.videoHeight;
+  const ctx = canvas.getContext("2d");
+  ctx.drawImage(cameraStream, 0, 0);
+
+  preview.src = canvas.toDataURL("image/jpeg", 0.85);
+  
+  // UI Transitions
+  preview.style.display = "block";
+  cameraStream.style.display = "none";
+  overlayCanvas.style.display = "none";
+  captureButton.style.display = "none";
+  stopCameraButton.style.display = "none";
+  
+  sendButton.style.display = "inline-block";
+  retakeButton.style.display = "inline-block";
+  btnCancelCamera.style.display = "inline-block";
+
+  if (stream) {
+    stream.getTracks().forEach((track) => track.stop());
+  }
+  if (animationFrameId) cancelAnimationFrame(animationFrameId);
+}
 
 /**
  * State 1: Start Camera
  */
 btnOpenCamera.addEventListener("click", async () => {
   try {
+    if (!faceLandmarker) {
+      btnOpenCamera.innerHTML = `<span class="fc-spinner"></span> جاري تحميل نموذج الذكاء الاصطناعي...`;
+      await initializeMediaPipe();
+    }
+
     stream = await navigator.mediaDevices.getUserMedia({ video: { width: { ideal: 640 }, height: { ideal: 480 } } });
     cameraStream.srcObject = stream;
     
     // UI Transitions
     cameraStream.style.display = "block";
+    overlayCanvas.style.display = "block";
     preview.style.display = "none";
     openCameraWrapper.classList.add("d-none");
     securityDisclaimer.classList.add("d-none");
@@ -33,78 +191,59 @@ btnOpenCamera.addEventListener("click", async () => {
     sendButton.style.display = "none";
     retakeButton.style.display = "none";
     btnCancelCamera.style.display = "none";
+
+    // Wait for video to be ready before starting detection
+    cameraStream.onloadeddata = () => {
+        startFaceDetection();
+    };
   } catch (error) {
-    showAlert("فشل في الوصول إلى الكاميرا. يرجى التأكد من منح الأذونات.", "danger");
+    showAlert("فشل في الوصول إلى الكاميرا أو تحميل النموذج. يرجى التأكد من الأذونات والاتصال.", "danger");
+  } finally {
+    // Reset button text
+    btnOpenCamera.innerHTML = `<div class="btn-cta-icon" aria-hidden="true">📷</div>
+            <div class="btn-cta-text">
+              <span class="main-text">بدء التحقق من الوجه</span>
+              <span class="sub-text">افتح الكاميرا لتسجيل دخول آمن</span>
+            </div>`;
   }
 });
 
 /**
- * State 2: Capture Photo
+ * State 2: Capture Photo (Start Active Challenge)
  */
-captureButton.addEventListener("click", async () => {
-  const canvas1 = document.createElement("canvas");
-  canvas1.width = cameraStream.videoWidth;
-  canvas1.height = cameraStream.videoHeight;
-  const ctx1 = canvas1.getContext("2d");
-  ctx1.drawImage(cameraStream, 0, 0);
+captureButton.addEventListener("click", () => {
+  if (!faceLandmarker) {
+      captureFinalImage(); // fallback if models fail
+      return;
+  }
 
   const challenges = [
-    { code: "smile", text: "ابتسم بوضوح" },
+    { code: "smile", text: "الرجاء الابتسام بوضوح" },
     { code: "turn_right", text: "أدر رأسك يمينًا قليلاً" },
-    { code: "raise_eyebrows", text: "ارفع حاجبيك" }
+    { code: "raise_eyebrows", text: "الرجاء رفع حاجبيك" }
   ];
   const randomChallenge = challenges[Math.floor(Math.random() * challenges.length)];
   
-  // Store the challenge code to send it later
-  preview.dataset.challenge = randomChallenge.code;
+  activeChallenge = randomChallenge.code;
 
-  // Active Challenge UI Hint
   Swal.fire({
-    title: randomChallenge.text,
-    text: 'جاري التقاط الإطار الثاني للتأكد من الحيوية...',
+    title: 'فحص الحيوية',
+    text: randomChallenge.text,
     icon: 'info',
-    timer: 1500,
     showConfirmButton: false,
     allowOutsideClick: false
   });
-  
-  // Wait ~1.5 seconds for the user to make a micro-movement
-  await new Promise(r => setTimeout(r, 1500));
-  
-  const canvas2 = document.createElement("canvas");
-  canvas2.width = cameraStream.videoWidth;
-  canvas2.height = cameraStream.videoHeight;
-  const ctx2 = canvas2.getContext("2d");
-  ctx2.drawImage(cameraStream, 0, 0);
-
-  preview.src = canvas1.toDataURL("image/jpeg", 0.85);
-  preview.dataset.frame2 = canvas2.toDataURL("image/jpeg", 0.85);
-  
-  // UI Transitions
-  preview.style.display = "block";
-  cameraStream.style.display = "none";
-  captureButton.style.display = "none";
-  stopCameraButton.style.display = "none";
-  
-  sendButton.style.display = "inline-block";
-  retakeButton.style.display = "inline-block";
-  btnCancelCamera.style.display = "inline-block";
-
-  // Stop camera stream to save resources
-  if (stream) {
-    stream.getTracks().forEach((track) => track.stop());
-  }
 });
 
 /**
  * State 3: Retake Photo
  */
 retakeButton.addEventListener("click", () => {
-  // Reset UI and re-trigger camera
   preview.style.display = "none";
   sendButton.style.display = "none";
   retakeButton.style.display = "none";
   btnCancelCamera.style.display = "none";
+  activeChallenge = null;
   
   btnOpenCamera.click(); 
 });
@@ -113,11 +252,13 @@ retakeButton.addEventListener("click", () => {
  * State 4: Cancel Camera/Preview
  */
 btnCancelCamera.addEventListener("click", () => {
-  if (stream) {
-    stream.getTracks().forEach((track) => track.stop());
-  }
+  if (stream) stream.getTracks().forEach((track) => track.stop());
+  if (animationFrameId) cancelAnimationFrame(animationFrameId);
+  
   cameraStream.style.display = "none";
+  overlayCanvas.style.display = "none";
   preview.style.display = "none";
+  activeChallenge = null;
   
   sendButton.style.display = "none";
   retakeButton.style.display = "none";
@@ -128,18 +269,17 @@ btnCancelCamera.addEventListener("click", () => {
   preview.src = "#";
 });
 
-/**
- * Helper: Stop Camera manually
- */
 stopCameraButton.addEventListener("click", () => {
-  if (stream) {
-    stream.getTracks().forEach((track) => track.stop());
-    cameraStream.style.display = "none";
-    captureButton.style.display = "none";
-    stopCameraButton.style.display = "none";
-    openCameraWrapper.classList.remove("d-none");
-    securityDisclaimer.classList.remove("d-none");
-  }
+  if (stream) stream.getTracks().forEach((track) => track.stop());
+  if (animationFrameId) cancelAnimationFrame(animationFrameId);
+  
+  cameraStream.style.display = "none";
+  overlayCanvas.style.display = "none";
+  captureButton.style.display = "none";
+  stopCameraButton.style.display = "none";
+  openCameraWrapper.classList.remove("d-none");
+  securityDisclaimer.classList.remove("d-none");
+  activeChallenge = null;
 });
 
 /**
@@ -152,7 +292,6 @@ sendButton.addEventListener("click", async () => {
     return;
   }
 
-  // 1. Immediate Disable & Loading UI
   sendButton.disabled = true;
   retakeButton.disabled = true;
   const originalBtnContent = sendButton.innerHTML;
@@ -160,22 +299,11 @@ sendButton.addEventListener("click", async () => {
 
   try {
     const blob = dataURLtoBlob(imageData);
-
-    if (blob.size === 0) {
-        throw new Error("❌ فشل في إنشاء بيانات الصورة.");
-    }
+    if (blob.size === 0) throw new Error("❌ فشل في إنشاء بيانات الصورة.");
 
     const formData = new FormData();
     formData.append("image", blob, "capture.jpg");
-    
-    // Add second frame if available for Liveness challenge
-    if (preview.dataset.frame2) {
-      const blob2 = dataURLtoBlob(preview.dataset.frame2);
-      formData.append("image2", blob2, "capture2.jpg");
-      if (preview.dataset.challenge) {
-        formData.append("challenge", preview.dataset.challenge);
-      }
-    }
+    // Notice: We NO LONGER send image2 or challenge, because Liveness is verified on frontend!
 
     const response = await fetch(`${API_BASE}/users/verify_login`, {
       method: "POST",
@@ -199,12 +327,10 @@ sendButton.addEventListener("click", async () => {
               btn.disabled = true;
               btn.innerHTML = `<span class="fc-spinner" role="status" aria-hidden="true" style="margin-left: 8px;"></span> جاري الإعداد...`;
               try {
-                // 1. Begin registration
                 const beginResp = await fetch(`${API_BASE}/users/webauthn/register/begin`, { method: 'POST' });
                 if (!beginResp.ok) throw new Error("Failed to start WebAuthn");
                 const options = await beginResp.json();
                 
-                // Convert base64url to Uint8Array
                 options.challenge = base64urlToUint8Array(options.challenge);
                 options.user.id = base64urlToUint8Array(options.user.id);
                 if (options.excludeCredentials) {
@@ -213,10 +339,8 @@ sendButton.addEventListener("click", async () => {
                   }
                 }
 
-                // 2. Create credential
                 const credential = await navigator.credentials.create({ publicKey: options });
                 
-                // Convert credential to JSON
                 const credentialJSON = {
                   id: credential.id,
                   rawId: uint8ArrayToBase64url(new Uint8Array(credential.rawId)),
@@ -227,7 +351,6 @@ sendButton.addEventListener("click", async () => {
                   }
                 };
 
-                // 3. Complete registration
                 const completeResp = await fetch(`${API_BASE}/users/webauthn/register/complete`, {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
@@ -248,7 +371,6 @@ sendButton.addEventListener("click", async () => {
         }
       });
     } else {
-      // Check if it's a ban or soft block to show a more prominent message
       const message = data.message || data.error || "تم رفض الوصول. يرجى المحاولة مرة أخرى.";
       if (message.includes("حظر") || message.includes("تجاوز")) {
         Swal.fire({
@@ -257,9 +379,7 @@ sendButton.addEventListener("click", async () => {
           html: message.replace(/\n/g, '<br>'),
           confirmButtonText: 'موافق',
           confirmButtonColor: '#d33',
-          customClass: {
-            popup: 'swal-dark-popup'
-          }
+          customClass: { popup: 'swal-dark-popup' }
         });
       } else {
         showAlert(message, "danger");
@@ -268,16 +388,12 @@ sendButton.addEventListener("click", async () => {
   } catch (error) {
     showAlert("خطأ في الشبكة. يرجى المحاولة مرة أخرى.", "danger");
   } finally {
-    // 2. Safe Restoration
     sendButton.disabled = false;
     retakeButton.disabled = false;
     sendButton.innerHTML = originalBtnContent;
   }
 });
 
-/**
- * Utility: Convert DataURL to Blob
- */
 function dataURLtoBlob(dataurl) {
     const byteString = atob(dataurl.split(',')[1]);
     const mimeString = dataurl.split(',')[0].split(':')[1].split(';')[0];
@@ -300,10 +416,7 @@ function showAlert(message, type) {
   const resultDiv = document.getElementById("result");
   if (resultDiv) {
     resultDiv.innerHTML = `<div class="custom-alert custom-alert-${type}">${message}</div>`;
-    // Auto-hide alert after 4 seconds for a clean UX
-    setTimeout(() => {
-      resultDiv.innerHTML = "";
-    }, 4000);
+    setTimeout(() => resultDiv.innerHTML = "", 4000);
   }
 }
 
@@ -337,12 +450,10 @@ if (btnPasskeyLogin) {
     btnPasskeyLogin.innerHTML = `<span class="fc-spinner" role="status" aria-hidden="true" style="margin-left:8px;"></span> جاري الإعداد...`;
 
     try {
-      // 1. Begin Login
       const beginResp = await fetch(`${API_BASE}/users/webauthn/login/begin`, { method: 'POST' });
       if (!beginResp.ok) throw new Error("Failed to start WebAuthn login");
       const options = await beginResp.json();
 
-      // Convert challenge
       options.challenge = base64urlToUint8Array(options.challenge);
       if (options.allowCredentials) {
         for (let cred of options.allowCredentials) {
@@ -350,11 +461,9 @@ if (btnPasskeyLogin) {
         }
       }
 
-      // 2. Request credential from browser
       btnPasskeyLogin.innerHTML = `<span class="fc-spinner" role="status" aria-hidden="true" style="margin-left:8px;"></span> في انتظار البصمة...`;
       const assertion = await navigator.credentials.get({ publicKey: options });
 
-      // Convert assertion to JSON
       const assertionJSON = {
         id: assertion.id,
         rawId: uint8ArrayToBase64url(new Uint8Array(assertion.rawId)),
@@ -367,7 +476,6 @@ if (btnPasskeyLogin) {
         }
       };
 
-      // 3. Complete Login
       btnPasskeyLogin.innerHTML = `<span class="fc-spinner" role="status" aria-hidden="true" style="margin-left:8px;"></span> جاري التحقق...`;
       const completeResp = await fetch(`${API_BASE}/users/webauthn/login/complete`, {
         method: 'POST',
