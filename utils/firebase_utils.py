@@ -27,6 +27,22 @@ def delete_user_from_firestore(user_id):
     doc_ref.delete()
     logger.info("✅ User %s deleted from Firestore.", user_id)
 
+def get_user_by_webauthn_credential_id(credential_id):
+    """
+    Fetch a single user by their WebAuthn credential ID using a direct query.
+    """
+    try:
+        query = db.collection('users').where('webauthn_credential_id', '==', credential_id).limit(1)
+        docs = query.stream()
+        for doc in docs:
+            user_data = doc.to_dict()
+            user_data['id'] = doc.id
+            return user_data
+        return None
+    except Exception as e:
+        logger.error(f"Error fetching user by credential ID: {e}")
+        return None
+
 def get_all_users():
     """
     Retrieves all user documents from the Firestore 'users' collection.

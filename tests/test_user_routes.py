@@ -243,36 +243,36 @@ def test_webauthn_login_begin(mock_generate, client):
 @patch('app.users.routes.firebase_utils.log_audit_event')
 def test_webauthn_login_complete_success(mock_log, mock_update, mock_verify, client, mock_firebase):
     """Test successful webauthn login."""
-    mock_firebase['get_all_users'].return_value = [{
+    mock_firebase['get_user_by_webauthn_credential_id'].return_value = {
         'id': 'user123',
         'name': 'Test User',
         'email': 'test@example.com',
         'webauthn_credential_id': 'cred_id',
-        'webauthn_public_key': 'pub_key'
-    }]
+        'webauthn_public_key': 'pub_key',
+        'webauthn_sign_count': 5
+    }
 
     with client.session_transaction() as sess:
         sess['webauthn_challenge'] = 'bG9naW5fY2hhbGxlbmdl'
 
     mock_verification = MagicMock()
+    mock_verification.new_sign_count = 6
     mock_verify.return_value = mock_verification
 
     response = client.post('/users/webauthn/login/complete', json={'id': 'cred_id', 'rawId': 'test', 'type': 'public-key'})
     assert response.status_code == 200
     assert 'نجاح' in response.json['message']
     
+    mock_verify.assert_called_once()
+    assert mock_verify.call_args[1]['credential_current_sign_count'] == 5
+    
     mock_log.assert_called_with('user123', 'User_Login', status='success', ip_address='127.0.0.1')
-    mock_update.assert_called_with('user123', {'failed_attempts': 0, 'soft_block': False, 'soft_block_time': None})
+    mock_update.assert_called_with('user123', {'failed_attempts': 0, 'soft_block': False, 'soft_block_time': None, 'webauthn_sign_count': 6})
 
 
 def test_webauthn_login_complete_not_registered(client, mock_firebase):
     """Test webauthn login for a user with no registered passkey."""
-    mock_firebase['get_all_users'].return_value = [{
-        'id': 'user123',
-        'name': 'Test User',
-        'webauthn_credential_id': 'different_cred',
-        'webauthn_public_key': 'pub_key'
-    }]
+    mock_firebase['get_user_by_webauthn_credential_id'].return_value = None
 
     with client.session_transaction() as sess:
         sess['webauthn_challenge'] = 'bG9naW5fY2hhbGxlbmdl'
@@ -286,12 +286,12 @@ def test_webauthn_login_complete_not_registered(client, mock_firebase):
 @patch('app.users.routes.verify_authentication_response')
 def test_webauthn_login_complete_invalid_assertion(mock_verify, client, mock_firebase):
     """Test webauthn login handles rejected/invalid assertion."""
-    mock_firebase['get_all_users'].return_value = [{
+    mock_firebase['get_user_by_webauthn_credential_id'].return_value = {
         'id': 'user123',
         'name': 'Test User',
         'webauthn_credential_id': 'cred_id',
         'webauthn_public_key': 'pub_key'
-    }]
+    }
 
     with client.session_transaction() as sess:
         sess['webauthn_challenge'] = 'bG9naW5fY2hhbGxlbmdl'
@@ -301,5 +301,28 @@ def test_webauthn_login_complete_invalid_assertion(mock_verify, client, mock_fir
     response = client.post('/users/webauthn/login/complete', json={'id': 'cred_id'})
     assert response.status_code == 400
     assert 'error' in response.json
-    assert 'Login failed: Invalid signature' in response.json['error']
+    assert 'حدث خطأ أثناء معالجة الطلب.' in response.json['error']
 
+
+@patch('app.users.routes.verify_authentication_response')
+def test_webauthn_login_stale_sign_count(mock_verify, client, mock_firebase):
+    """Test webauthn login rejects stale sign count."""
+    mock_firebase['get_user_by_webauthn_credential_id'].return_value = {
+        'id': 'user123',
+        'name': 'Test User',
+        'webauthn_credential_id': 'cred_id',
+        'webauthn_public_key': 'pub_key',
+        'webauthn_sign_count': 10
+    }
+
+    with client.session_transaction() as sess:
+        sess['webauthn_challenge'] = 'bG9naW5fY2hhbGxlbmdl'
+
+    # The exception thrown by py_webauthn for a stale sign count:
+    from webauthn.helpers.exceptions import InvalidAuthenticationResponse
+    mock_verify.side_effect = InvalidAuthenticationResponse("Sign count is less than or equal to stored sign count")
+
+    response = client.post('/users/webauthn/login/complete', json={'id': 'cred_id'})
+    assert response.status_code == 400
+    assert 'error' in response.json
+    assert 'حدث خطأ أثناء معالجة الطلب.' in response.json['error']

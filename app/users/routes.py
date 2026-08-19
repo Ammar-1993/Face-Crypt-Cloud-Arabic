@@ -213,7 +213,8 @@ def webauthn_register_complete():
         # Save the credential for the user
         firebase_utils.update_user_fields(user_id, {
             "webauthn_credential_id": bytes_to_base64url(verification.credential_id),
-            "webauthn_public_key": bytes_to_base64url(verification.credential_public_key)
+            "webauthn_public_key": bytes_to_base64url(verification.credential_public_key),
+            "webauthn_sign_count": getattr(verification, 'sign_count', 0)
         })
 
         # Clear challenge
@@ -222,7 +223,7 @@ def webauthn_register_complete():
         return jsonify({"status": "success", "message": "Passkey registered successfully!"})
     except Exception as e:
         logger.error(f"WebAuthn registration failed: {e}")
-        return jsonify({"error": f"Registration failed: {e}"}), 400
+        return jsonify({"error": "حدث خطأ أثناء معالجة الطلب."}), 400
 
 @users_bp.route('/webauthn/login/begin', methods=['POST'])
 @limiter.limit("10 per minute")
@@ -249,12 +250,7 @@ def webauthn_login_complete():
         credential_data = request.json
         credential_id = credential_data.get('id')
         
-        users = firebase_utils.get_all_users()
-        matched_user = None
-        for u in users:
-            if u.get('webauthn_credential_id') == credential_id:
-                matched_user = u
-                break
+        matched_user = firebase_utils.get_user_by_webauthn_credential_id(credential_id)
                 
         if not matched_user:
             return jsonify({"error": "Credential not registered"}), 404
@@ -267,7 +263,7 @@ def webauthn_login_complete():
             expected_origin=request.host_url.rstrip("/"),
             expected_rp_id=rp_id,
             credential_public_key=base64url_to_bytes(matched_user['webauthn_public_key']),
-            credential_current_sign_count=0
+            credential_current_sign_count=matched_user.get('webauthn_sign_count', 0)
         )
 
         user_id = matched_user['id']
@@ -275,7 +271,8 @@ def webauthn_login_complete():
         firebase_utils.update_user_fields(user_id, {
             "failed_attempts": 0,
             "soft_block": False,
-            "soft_block_time": None
+            "soft_block_time": None,
+            "webauthn_sign_count": getattr(verification, 'new_sign_count', 0)
         })
         firebase_utils.log_audit_event(user_id, "User_Login", status='success', ip_address=request.remote_addr)
         
@@ -293,4 +290,4 @@ def webauthn_login_complete():
 
     except Exception as e:
         logger.error(f"WebAuthn login failed: {e}")
-        return jsonify({"error": f"Login failed: {e}"}), 400
+        return jsonify({"error": "حدث خطأ أثناء معالجة الطلب."}), 400

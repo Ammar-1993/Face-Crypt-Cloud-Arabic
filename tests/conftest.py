@@ -31,13 +31,14 @@ def mock_firebase():
          patch('utils.firebase_utils.get_all_users_summary') as mock_get_all_summary, \
          patch('utils.firebase_utils.update_user_fields') as mock_update_user, \
          patch('utils.firebase_utils.log_audit_event') as mock_log_audit, \
-         patch('utils.firebase_utils.get_security_config') as mock_get_security_config:
+         patch('utils.firebase_utils.get_security_config') as mock_get_security_config, \
+         patch('utils.firebase_utils.get_user_by_webauthn_credential_id') as mock_get_user_by_cred:
         
         # Configure default return values
         mock_get_all.return_value = []
         mock_get_all_summary.return_value = []
         mock_get_security_config.return_value = {"tolerance": 0.6, "enable_liveness": True}
-        
+        mock_get_user_by_cred.return_value = None
 
         yield {
             'add_user_to_firestore': mock_add_user,
@@ -45,5 +46,6 @@ def mock_firebase():
             'get_all_users': mock_get_all,
             'get_all_users_summary': mock_get_all_summary,
             'update_user_fields': mock_update_user,
-            'log_audit_event': mock_log_audit
+            'log_audit_event': mock_log_audit,
+            'get_user_by_webauthn_credential_id': mock_get_user_by_cred
         }
