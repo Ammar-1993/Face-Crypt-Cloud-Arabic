@@ -29,18 +29,16 @@ The system works by capturing a live image of the user via webcam, extracting pr
 
 ## ✨ Key Features
 
-| Feature | Description |
-|---|---|
-| 🔐 **Passwordless Biometric Auth** | Fast, secure login via facial recognition using `dlib` / `face_recognition`. No password required at any point. |
-| 🔑 **WebAuthn / Passkey Support** | Optional FIDO2 hardware-backed passkey registration after a successful face verification. Serves as a convenience layer, not a standalone replacement for the initial face enrollment. |
-| 🕵️ **Multi-Layer Liveness Detection** | Detects static printed photos via Laplacian blur analysis, performs real-time geometric challenge validation (MediaPipe in-browser), and runs AI-based spoof detection (MiniFASNetV2 ONNX — ~2.7ms per inference on CPU). |
-| 🛡️ **Biometric Data Encryption** | Face encodings are **never stored in plaintext**. Encrypted with `cryptography.Fernet` (AES-128-CBC + HMAC-SHA256) before being persisted to Firestore. |
-| 🚦 **Rate Limiting & Account Lockout** | Automatic 5-minute soft-block after 3 consecutive failures and permanent admin-mediated block after 5. Rate-limited login endpoint: 10 requests/min and 30 requests/hour per IP via `Flask-Limiter`. |
-| 🕶️ **Anti-Enumeration** | All login failure states (wrong face, blocked, soft-blocked) return identical HTTP 403 responses, preventing attackers from inferring account existence or status. |
-| ⏱️ **Timing-Attack Resistance** | All password and CSRF token comparisons use `hmac.compare_digest` for constant-time evaluation. |
-| 📊 **Admin Dashboard** | Real-time user management, aggregation-query-based statistics (no full collection scans), and paginated audit logs. |
-| 📝 **Comprehensive Audit Trail** | Every authentication event (success, failure, block) is logged to Firestore with timestamp, user ID, and source IP. |
-| 🎨 **Modern UI** | Custom "Dark Glassmorphism" design system built with Vanilla CSS3, fully responsive, and respects `prefers-reduced-motion` for accessibility. |
+* 🔐 **Passwordless Biometric Auth:** Fast, secure login via facial recognition using `dlib` / `face_recognition`. No password required at any point.
+* 🔑 **WebAuthn / Passkey Support:** Optional FIDO2 hardware-backed passkey registration after a successful face verification. Serves as a convenience layer, not a standalone replacement for the initial face enrollment.
+* 🕵️ **Multi-Layer Liveness Detection:** Detects static printed photos via Laplacian blur analysis, performs real-time geometric challenge validation (MediaPipe in-browser), and runs AI-based spoof detection (MiniFASNetV2 ONNX — ~2.7ms per inference on CPU).
+* 🛡️ **Biometric Data Encryption:** Face encodings are **never stored in plaintext**. Encrypted with `cryptography.Fernet` (AES-128-CBC + HMAC-SHA256) before being persisted to Firestore.
+* 🚦 **Rate Limiting & Account Lockout:** Automatic 5-minute soft-block after 3 consecutive failures and permanent admin-mediated block after 5. Rate-limited login endpoint: 10 requests/min and 30 requests/hour per IP via `Flask-Limiter`.
+* 🕶️ **Anti-Enumeration:** All login failure states (wrong face, blocked, soft-blocked) return identical HTTP 403 responses, preventing attackers from inferring account existence or status.
+* ⏱️ **Timing-Attack Resistance:** All password and CSRF token comparisons use `hmac.compare_digest` for constant-time evaluation.
+* 📊 **Admin Dashboard:** Real-time user management, aggregation-query-based statistics (no full collection scans), and paginated audit logs.
+* 📝 **Comprehensive Audit Trail:** Every authentication event (success, failure, block) is logged to Firestore with timestamp, user ID, and source IP.
+* 🎨 **Modern UI:** Custom "Dark Glassmorphism" design system built with Vanilla CSS3, fully responsive, and respects `prefers-reduced-motion` for accessibility.
 
 ---
 
