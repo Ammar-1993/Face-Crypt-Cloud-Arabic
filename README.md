@@ -45,6 +45,7 @@ The system works by capturing a live image of the user via webcam, extracting pr
 ## 📸 System Interface Tour
 
 ### 1. Main System Portal
+
 A modern dark landing page showcasing the core technologies (AES-128 encryption, AI, and cloud infrastructure), featuring a live server health indicator and a clear call-to-action to the security verification gateway.
 
 ![Main System Portal](docs/01_main_portal.webp)
