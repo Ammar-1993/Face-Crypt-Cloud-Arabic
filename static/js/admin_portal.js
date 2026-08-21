@@ -131,6 +131,7 @@ async function adminLogin() {
       await loadUsers();
       await fetchAuditLogs();
       await refreshStats();
+      await loadTolerance();
     } else {
       setText(
         "loginMessage",
@@ -453,6 +454,23 @@ async function refreshStats() {
   }
 }
 
+async function loadTolerance() {
+  const toleranceSlider = document.getElementById('tolerance-slider');
+  const toleranceDisplay = document.getElementById('tolerance-display');
+  if (toleranceSlider && toleranceDisplay) {
+    try {
+      const res = await adminFetch(`${API_BASE}/admin/api/settings/tolerance`);
+      const data = await res.json();
+      if (data && data.tolerance !== undefined) {
+        toleranceSlider.value = data.tolerance;
+        toleranceDisplay.textContent = parseFloat(data.tolerance).toFixed(2);
+      }
+    } catch (err) {
+      console.error("Error fetching tolerance:", err);
+    }
+  }
+}
+
 async function refreshAuditLogs() {
   try {
     setText(
@@ -609,16 +627,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const saveToleranceBtn = document.getElementById('save-tolerance-btn');
 
   if (toleranceSlider && toleranceDisplay && saveToleranceBtn) {
-      // 1. Fetch current tolerance value on page load
-      adminFetch("/admin/api/settings/tolerance")
-          .then(res => res.json())
-          .then(data => {
-              if (data && data.tolerance !== undefined) {
-                  toleranceSlider.value = data.tolerance;
-                  toleranceDisplay.textContent = parseFloat(data.tolerance).toFixed(2);
-              }
-          })
-          .catch(err => console.error("Error fetching tolerance:", err));
+      // (The value will now be fetched after a successful login via loadTolerance)
 
       // 2. Update badge number locally as admin slides it
       toleranceSlider.addEventListener('input', (e) => {
