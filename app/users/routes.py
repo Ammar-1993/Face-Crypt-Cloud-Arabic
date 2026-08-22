@@ -16,6 +16,53 @@ users_bp = Blueprint('users', __name__, url_prefix='/users')
 
 GENERIC_ERROR_MSG = "❌ **فشل تسجيل الدخول**\nالرجاء المحاولة مرة أخرى، أو التواصل مع إدارة النظام إذا استمرت المشكلة."
 
+
+def _serialize_registration_options(opts):
+    """
+    Manually serialize py_webauthn 2.x PublicKeyCredentialCreationOptions to a
+    JSON-safe dict. The library dropped Pydantic in v2.x, so the old .json()
+    method no longer exists — all bytes fields must be base64url-encoded by hand.
+    """
+    return {
+        'rp': {
+            'id': opts.rp.id,
+            'name': opts.rp.name,
+        },
+        'user': {
+            'id': bytes_to_base64url(opts.user.id),
+            'name': opts.user.name,
+            'displayName': opts.user.display_name,
+        },
+        'challenge': bytes_to_base64url(opts.challenge),
+        'pubKeyCredParams': [
+            {'type': p.type, 'alg': p.alg.value}
+            for p in opts.pub_key_cred_params
+        ],
+        'timeout': opts.timeout,
+        'excludeCredentials': [
+            {'type': c.type, 'id': bytes_to_base64url(c.id)}
+            for c in (opts.exclude_credentials or [])
+        ],
+        'attestation': opts.attestation.value,
+    }
+
+
+def _serialize_authentication_options(opts):
+    """
+    Manually serialize py_webauthn 2.x PublicKeyCredentialRequestOptions to a
+    JSON-safe dict. Same reason as above — .json() was removed in v2.x.
+    """
+    return {
+        'challenge': bytes_to_base64url(opts.challenge),
+        'timeout': opts.timeout,
+        'rpId': opts.rp_id,
+        'allowCredentials': [
+            {'type': c.type, 'id': bytes_to_base64url(c.id)}
+            for c in (opts.allow_credentials or [])
+        ],
+        'userVerification': opts.user_verification.value,
+    }
+
 def is_soft_blocked(user):
     """
     Checks if a user is currently under a temporary (soft) block.
@@ -186,9 +233,7 @@ def webauthn_register_begin():
     
     session['webauthn_challenge'] = bytes_to_base64url(options.challenge)
     
-    import json
-    # Use json.loads(options.json()) since py_webauthn options object provides a json() method
-    return jsonify(json.loads(options.json()))
+    return jsonify(_serialize_registration_options(options))
 
 @users_bp.route('/webauthn/register/complete', methods=['POST'])
 def webauthn_register_complete():
@@ -233,11 +278,9 @@ def webauthn_login_begin():
     rp_id = request.host.split(':')[0]
     options = generate_authentication_options(
         rp_id=rp_id,
-        user_verification="preferred"
     )
     session['webauthn_challenge'] = bytes_to_base64url(options.challenge)
-    import json
-    return jsonify(json.loads(options.json()))
+    return jsonify(_serialize_authentication_options(options))
 
 @users_bp.route('/webauthn/login/complete', methods=['POST'])
 @limiter.limit("10 per minute")

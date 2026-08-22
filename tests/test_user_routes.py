@@ -172,12 +172,18 @@ def test_failed_login_does_not_penalize_all_users(mock_compare, mock_decrypt, mo
 @patch('app.users.routes.generate_registration_options')
 def test_webauthn_register_begin(mock_generate, client, mock_firebase):
     """Test webauthn registration begins successfully for authenticated user."""
+    from webauthn import generate_registration_options as _real_gen
     mock_firebase['get_all_users'].return_value = [{'id': 'user123', 'name': 'Test User', 'email': 'test@example.com'}]
     
-    mock_options = MagicMock()
-    mock_options.challenge = b'test_challenge'
-    mock_options.json.return_value = '{"challenge": "dGVzdF9jaGFsbGVuZ2U"}'
-    mock_generate.return_value = mock_options
+    # Return a real options object so _serialize_registration_options can access real attributes
+    real_options = _real_gen(
+        rp_id='localhost',
+        rp_name='Face-Crypt-Cloud',
+        user_id=b'user123',
+        user_name='test@example.com',
+        user_display_name='Test User',
+    )
+    mock_generate.return_value = real_options
 
     with client.session_transaction() as sess:
         sess['user_id'] = 'user123'
@@ -227,16 +233,16 @@ def test_webauthn_register_complete_invalid(mock_verify, client):
 @patch('app.users.routes.generate_authentication_options')
 def test_webauthn_login_begin(mock_generate, client):
     """Test webauthn login begins successfully."""
-    mock_options = MagicMock()
-    mock_options.challenge = b'login_challenge'
-    mock_options.json.return_value = '{"challenge": "bG9naW5fY2hhbGxlbmdl"}'
-    mock_generate.return_value = mock_options
+    from webauthn import generate_authentication_options as _real_auth_gen
+    
+    # Return a real options object so _serialize_authentication_options can access real attributes
+    real_options = _real_auth_gen(rp_id='localhost')
+    mock_generate.return_value = real_options
 
     response = client.post('/users/webauthn/login/begin')
     assert response.status_code == 200
     assert 'challenge' in response.json
     mock_generate.assert_called_once()
-
 
 @patch('app.users.routes.verify_authentication_response')
 @patch('app.users.routes.firebase_utils.update_user_fields')
