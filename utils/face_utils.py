@@ -209,13 +209,19 @@ def check_liveness(image_array_1, image_array_2=None, face_locations_1=None, fac
             
             probs = softmax(out)
             predicted_class = np.argmax(probs)
-            real_prob = probs[1]
+            # Class mapping for this MiniFASNetV2 ONNX variant (3-class output):
+            #   class 0 = spoof (print attack)
+            #   class 1 = spoof (video/replay attack)
+            #   class 2 = real live face  <-- dominant class for genuine faces (~99.4%)
+            # NOTE: The original Silent-Face paper used a 2-class model (spoof/real),
+            # but this ONNX export is a 3-class variant where index 2 is the "real" class.
+            real_prob = probs[2]
             
             latency = (time.time() - start_time) * 1000
             logging.getLogger(__name__).info(f"MiniFASNet inference latency: {latency:.2f}ms, real_prob: {real_prob:.4f}, class: {predicted_class}")
             
-            # Require class 1 (real face) and high probability
-            if predicted_class != 1 or real_prob < 0.6:
+            # Require class 2 (real face) and high probability
+            if predicted_class != 2 or real_prob < 0.6:
                 return False, "تم اكتشاف محاولة احتيال (فحص النماذج)."
                 
         except Exception as e:

@@ -35,8 +35,9 @@ def test_check_liveness_genuine():
         with patch('cv2.Laplacian') as mock_lap:
             mock_lap.return_value.var.return_value = 100.0
             
-            # mock output: class 1 (genuine), high probability
-            mock_session.run.return_value = [[np.array([-10.0, 10.0, -10.0])]]
+            # mock output: class 2 (genuine/real face), high probability
+            # MiniFASNetV2 3-class mapping: 0=spoof_print, 1=spoof_video, 2=real
+            mock_session.run.return_value = [[np.array([-10.0, -10.0, 10.0])]]
             
             is_live, reason = check_liveness(image_array)
             assert is_live is True
