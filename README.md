@@ -38,6 +38,7 @@ The system works by capturing a live image of the user via webcam, extracting pr
 * ⏱️ **Timing-Attack Resistance:** All password and CSRF token comparisons use `hmac.compare_digest` for constant-time evaluation.
 * 📊 **Admin Dashboard:** Real-time user management, aggregation-query-based statistics (no full collection scans), and paginated audit logs.
 * 📝 **Comprehensive Audit Trail:** Every authentication event (success, failure, block) is logged to Firestore with timestamp, user ID, and source IP.
+* 🌍 **Bilingual Support (AR/EN):** Full English and Arabic localization across all templates, custom alerts, JavaScript popups, and backend API responses. The interface utilizes modern CSS logical properties (`margin-inline-start`, etc.) to natively adapt and mirror layouts seamlessly between LTR and RTL reading directions.
 * 🎨 **Modern UI:** Custom "Dark Glassmorphism" design system built with Vanilla CSS3, fully responsive, and respects `prefers-reduced-motion` for accessibility.
 
 ---
