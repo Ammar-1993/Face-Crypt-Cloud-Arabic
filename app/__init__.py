@@ -12,6 +12,16 @@ from app.routes import bp as routes_bp
 from app.users.routes import users_bp
 from app.admin.routes import admin_bp
 
+from flask import session, request, redirect, jsonify
+from flask_babel import Babel
+
+babel = Babel()
+
+def get_locale():
+    if 'locale' in session:
+        return session['locale']
+    return request.accept_languages.best_match(['ar', 'en']) or 'ar'
+
 
 
 def create_app():
@@ -37,6 +47,25 @@ def create_app():
     app.register_blueprint(routes_bp)
     app.register_blueprint(users_bp)
     app.register_blueprint(admin_bp)
+
+    app.config['BABEL_TRANSLATION_DIRECTORIES'] = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'translations')
+    # تهيئة Babel
+    babel.init_app(app, locale_selector=get_locale)
+
+    # Inject get_locale for templates
+    @app.context_processor
+    def inject_locale():
+        from flask_babel import get_locale
+        return {'get_locale': lambda: str(get_locale())}
+
+
+    @app.route('/set-language/<lang_code>')
+    def set_language(lang_code):
+        if lang_code not in ['ar', 'en']:
+            return jsonify({"error": "Invalid language code"}), 400
+        session['locale'] = lang_code
+        return redirect(request.referrer or '/')
+
 
     import traceback
     from flask import jsonify, request, render_template

@@ -296,7 +296,7 @@ h1 {
   padding-bottom: 12px;
   margin-bottom: 16px !important;
   border-bottom: 1px solid var(--white-10);
-  text-align: right;
+  text-align: start;
 }
 
 /* -- Section title top-border accent line -- */
@@ -332,7 +332,7 @@ h1 {
   font-size: 0.82rem;
   color: var(--white-70);
   line-height: 1.7;
-  text-align: right;
+  text-align: start;
 }
 
 .admin-security-strip .strip-icon {

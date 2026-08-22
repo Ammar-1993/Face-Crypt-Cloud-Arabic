@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify, render_template, session
+from flask_babel import _
 from functools import wraps
 from app.config import ADMIN_PASSWORD, db
 from utils import face_utils, firebase_utils
@@ -11,7 +12,7 @@ def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not session.get('admin_logged_in'):
-            return jsonify({"error": "غير مصرح لك بالوصول"}), 401
+            return jsonify({"error": _("غير مصرح لك بالوصول")}), 401
         return f(*args, **kwargs)
     return decorated_function
 # ✅ إنشاء الـ Blueprint
@@ -26,7 +27,7 @@ def csrf_protect():
         server_token = session.get('csrf_token')
 
         if not client_token or not server_token or not hmac.compare_digest(client_token, server_token):
-            return jsonify({"error": "رمز التحقق (CSRF token) مفقود أو غير صالح."}), 403
+            return jsonify({"error": _("رمز التحقق (CSRF token) مفقود أو غير صالح.")}), 403
 
 
 
@@ -47,7 +48,7 @@ def admin_login():
         firebase_utils.log_audit_event(
             "admin", "Admin_Login", status="failure", ip_address=request.remote_addr
         )
-        return jsonify({"error": "❌ كلمة المرور مطلوبة"}), 400
+        return jsonify({"error": _("❌ كلمة المرور مطلوبة")}), 400
 
     password = data["password"]
     if hmac.compare_digest(password, ADMIN_PASSWORD):
@@ -59,12 +60,12 @@ def admin_login():
         firebase_utils.log_audit_event(
             "admin", "Admin_Login", status="success", ip_address=request.remote_addr
         )
-        return jsonify({"message": "✅ أهلاً بك أيها المسؤول", "csrf_token": csrf_token}), 200
+        return jsonify({"message": _("✅ أهلاً بك أيها المسؤول"), "csrf_token": csrf_token}), 200
     else:
         firebase_utils.log_audit_event(
             "admin", "Admin_Login", status="failure", ip_address=request.remote_addr
         )
-        return jsonify({"error": "كلمة مرور غير صالحة"}), 403
+        return jsonify({"error": _("كلمة مرور غير صالحة")}), 403
 
 
 # ✅ /admin/add_user
@@ -77,13 +78,13 @@ def admin_add_user():
     image_file = request.files.get("image")
 
     if not user_id or not name or not email or not image_file:
-        return jsonify({"error": "❌ حقول مطلوبة مفقودة"}), 400
+        return jsonify({"error": _("❌ حقول مطلوبة مفقودة")}), 400
 
     # Server-side validation against XSS / invalid characters
     if len(user_id) > 50 or not re.match(r"^[\w\-]+$", user_id):
-        return jsonify({"error": "❌ معرف المستخدم غير صالح (أحرف، أرقام، شرطات فقط). ومحدود بـ 50 حرف."}), 400
+        return jsonify({"error": _("❌ معرف المستخدم غير صالح (أحرف، أرقام، شرطات فقط). ومحدود بـ 50 حرف.")}), 400
     if len(name) > 100 or re.search(r"[<>\'\"]", name):
-        return jsonify({"error": "❌ الاسم يحتوي على رموز غير مسموحة."}), 400
+        return jsonify({"error": _("❌ الاسم يحتوي على رموز غير مسموحة.")}), 400
 
     try:
         image_array = face_utils.load_image_from_request(image_file)
@@ -109,7 +110,7 @@ def admin_add_user():
         }
 
         firebase_utils.add_user_to_firestore(user_id, user_data)
-        return jsonify({"message": "تم إضافة المستخدم بنجاح"}), 200
+        return jsonify({"message": _("تم إضافة المستخدم بنجاح")}), 200
 
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
@@ -121,11 +122,11 @@ def admin_add_user():
 def admin_delete_user():
     data = request.get_json()
     if not data or "user_id" not in data:
-        return jsonify({"error": "❌ معرف المستخدم مطلوب"}), 400
+        return jsonify({"error": _("❌ معرف المستخدم مطلوب")}), 400
 
     user_id = data["user_id"]
     firebase_utils.delete_user_from_firestore(user_id)
-    return jsonify({"message": "تم حذف المستخدم بنجاح"}), 200
+    return jsonify({"message": _("تم حذف المستخدم بنجاح")}), 200
 
 
 # ✅ /admin/list_users
@@ -227,7 +228,7 @@ def admin_stats():
 def admin_unblock_user():
     data = request.get_json()
     if not data or 'user_id' not in data:
-        return jsonify({"error": "❌ معرف المستخدم مطلوب"}), 400
+        return jsonify({"error": _("❌ معرف المستخدم مطلوب")}), 400
 
     user_id = data['user_id']
     from google.api_core.exceptions import NotFound
@@ -241,7 +242,7 @@ def admin_unblock_user():
             "soft_block_time": None
         })
     except NotFound:
-        return jsonify({"error": "❌ لا يمكن فك الحظر: هذا المستخدم غير مسجل في قاعدة البيانات."}), 404
+        return jsonify({"error": _("❌ لا يمكن فك الحظر: هذا المستخدم غير مسجل في قاعدة البيانات.")}), 404
 
     # سجل في Audit Logs
     firebase_utils.log_audit_event(
@@ -251,7 +252,7 @@ def admin_unblock_user():
         ip_address=request.remote_addr
     )
 
-    return jsonify({"message": "✅ تم فك حظر المستخدم بنجاح"}), 200
+    return jsonify({"message": _("✅ تم فك حظر المستخدم بنجاح")}), 200
 
 # @admin_bp.route('/clear_audit_logs', methods=['POST'])
 # def admin_clear_audit_logs():
@@ -299,12 +300,12 @@ def admin_clear_audit_logs():
         status='success'
     )
 
-    return jsonify({"message": f"✅ تم مسح {total_count} من سجلات التدقيق."}), 200
+    return jsonify({"message": _("✅ تم مسح %(total_count)s من سجلات التدقيق.", total_count=total_count)}), 200
 
 @admin_bp.route('/logout', methods=['POST'])
 def admin_logout():
     session.clear()
-    return jsonify({"message": "✅ تم تسجيل الخروج بنجاح"}), 200
+    return jsonify({"message": _("✅ تم تسجيل الخروج بنجاح")}), 200
 
 @admin_bp.route('/api/settings/tolerance', methods=['GET'])
 @login_required
@@ -317,12 +318,12 @@ def get_tolerance():
 def update_tolerance():
     data = request.get_json(silent=True)
     if not data or 'tolerance' not in data:
-        return jsonify({"success": False, "error": "❌ المعلمة tolerance مطلوبة"}), 400
+        return jsonify({"success": False, "error": _("❌ المعلمة tolerance مطلوبة")}), 400
         
     try:
         tolerance = float(data['tolerance'])
         if not (0.1 <= tolerance <= 1.0):
-            return jsonify({"success": False, "error": "❌ يجب أن تكون القيمة بين 0.1 و 1.0"}), 400
+            return jsonify({"success": False, "error": _("❌ يجب أن تكون القيمة بين 0.1 و 1.0")}), 400
             
         firebase_utils.update_security_config({"tolerance": tolerance})
         
@@ -332,7 +333,7 @@ def update_tolerance():
             status="success", 
             ip_address=request.remote_addr
         )
-        return jsonify({"success": True, "message": "✅ تم تحديث دقة التعرف على الوجه بنجاح"}), 200
+        return jsonify({"success": True, "message": _("✅ تم تحديث دقة التعرف على الوجه بنجاح")}), 200
         
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500

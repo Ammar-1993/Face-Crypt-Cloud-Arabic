@@ -62,8 +62,7 @@ body {
   color: var(--white);
   min-height: 100vh;
   overflow-x: hidden;
-  direction: rtl;
-  text-align: right;
+  text-align: start;
   position: relative;
 }
 
@@ -98,7 +97,7 @@ body {
   content: '';
   position: absolute;
   bottom: -10%;
-  right: -10%;
+  inset-inline-end: -10%;
   width: 60vw;
   height: 60vw;
   background: radial-gradient(ellipse at center,
@@ -356,8 +355,7 @@ body {
 /* Scan Line Animation over the hero image */
 .scan-line {
   position: absolute;
-  left: 0;
-  right: 0;
+  inset-inline: 0;
   height: 2px;
   background: linear-gradient(90deg,
     transparent 0%,
@@ -392,21 +390,21 @@ body {
   background: var(--cyan-400);
   box-shadow: 0 0 8px var(--cyan-400);
 }
-.bracket-tl { top: 12px; right: 12px; }
-.bracket-tl::before { top: 0; right: 0; width: 100%; height: 3px; }
-.bracket-tl::after  { top: 0; right: 0; width: 3px; height: 100%; }
+.bracket-tl { top: 12px; inset-inline-start: 12px; }
+.bracket-tl::before { top: 0; inset-inline-start: 0; width: 100%; height: 3px; }
+.bracket-tl::after  { top: 0; inset-inline-start: 0; width: 3px; height: 100%; }
 
-.bracket-tr { top: 12px; left: 12px; }
-.bracket-tr::before { top: 0; left: 0; width: 100%; height: 3px; }
-.bracket-tr::after  { top: 0; left: 0; width: 3px; height: 100%; }
+.bracket-tr { top: 12px; inset-inline-end: 12px; }
+.bracket-tr::before { top: 0; inset-inline-end: 0; width: 100%; height: 3px; }
+.bracket-tr::after  { top: 0; inset-inline-end: 0; width: 3px; height: 100%; }
 
-.bracket-bl { bottom: 12px; right: 12px; }
-.bracket-bl::before { bottom: 0; right: 0; width: 100%; height: 3px; }
-.bracket-bl::after  { bottom: 0; right: 0; width: 3px; height: 100%; }
+.bracket-bl { bottom: 12px; inset-inline-start: 12px; }
+.bracket-bl::before { bottom: 0; inset-inline-start: 0; width: 100%; height: 3px; }
+.bracket-bl::after  { bottom: 0; inset-inline-start: 0; width: 3px; height: 100%; }
 
-.bracket-br { bottom: 12px; left: 12px; }
-.bracket-br::before { bottom: 0; left: 0; width: 100%; height: 3px; }
-.bracket-br::after  { bottom: 0; left: 0; width: 3px; height: 100%; }
+.bracket-br { bottom: 12px; inset-inline-end: 12px; }
+.bracket-br::before { bottom: 0; inset-inline-end: 0; width: 100%; height: 3px; }
+.bracket-br::after  { bottom: 0; inset-inline-end: 0; width: 3px; height: 100%; }
 
 /* Pulse ring around graphic */
 .graphic-ring {
@@ -525,8 +523,7 @@ body {
   content: '';
   position: absolute;
   top: 0;
-  left: 0;
-  right: 0;
+  inset-inline: 0;
   height: 2px;
   background: linear-gradient(90deg,
     transparent 0%,
@@ -687,9 +684,13 @@ body {
 .btn-cta-primary:hover .btn-cta-icon {
   transform: scale(1.1) rotate(-8deg);
 }
+/* html[dir="ltr"] override because transform rotations are physical/directional and cannot use logical properties */
+html[dir="ltr"] .btn-cta-primary:hover .btn-cta-icon {
+  transform: scale(1.1) rotate(8deg);
+}
 
 .btn-cta-text {
-  text-align: right;
+  text-align: start;
 }
 
 .btn-cta-text .main-text {
@@ -871,8 +872,7 @@ body {
   color: #F3F4F6;
   border-radius: 8px;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
-  direction: rtl;
-  text-align: right;
+  text-align: start;
   padding: 14px 18px;
   border: none;
   font-family: var(--font-arabic);
@@ -883,19 +883,19 @@ body {
 }
 
 .custom-alert-danger {
-  border-right: 4px solid #EF4444;
+  border-inline-start: 4px solid #EF4444;
 }
 
 .custom-alert-success {
-  border-right: 4px solid #10B981;
+  border-inline-start: 4px solid #10B981;
 }
 
 .custom-alert-warning {
-  border-right: 4px solid #F59E0B;
+  border-inline-start: 4px solid #F59E0B;
 }
 
 .custom-alert-info {
-  border-right: 4px solid #3B82F6;
+  border-inline-start: 4px solid #3B82F6;
 }
 
 /* ============================================================
@@ -1143,5 +1143,57 @@ body {
   /* Disable smooth scrolling */
   html {
     scroll-behavior: auto !important;
+  }
+}
+
+/* ============================================================
+   LANGUAGE TOGGLE & NAV CONTROLS
+   ============================================================ */
+.nav-controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.lang-toggle {
+  display: flex;
+  align-items: center;
+  background: var(--white-05);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  padding: 4px;
+  backdrop-filter: blur(10px);
+}
+
+.lang-btn {
+  text-decoration: none;
+  color: var(--white-50);
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 16px;
+  transition: var(--transition-smooth);
+}
+
+.lang-btn:hover {
+  color: var(--white);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.lang-btn.active {
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(0, 128, 255, 0.2));
+  color: var(--cyan-300);
+  border: 1px solid rgba(0, 212, 255, 0.3);
+  box-shadow: 0 0 10px rgba(0, 212, 255, 0.2);
+}
+
+@media (max-width: 520px) {
+  .lang-toggle {
+    /* Keep it visible on mobile, maybe adjust padding */
+    padding: 2px;
+  }
+  .lang-btn {
+    padding: 3px 8px;
+    font-size: 0.75rem;
   }
 }

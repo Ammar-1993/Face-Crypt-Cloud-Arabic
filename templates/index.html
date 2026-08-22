@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="{{ get_locale() }}" dir="{{ 'rtl' if get_locale() == 'ar' else 'ltr' }}">
 
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Face-Crypt-Cloud – نظام المصادقة البيومترية السحابي المشفر. تسجيل دخول آمن بتقنية التعرف على الوجه والتشفير المتقدم." />
+  <meta name="description" content="{{ _('Face-Crypt-Cloud – نظام المصادقة البيومترية السحابي المشفر. تسجيل دخول آمن بتقنية التعرف على الوجه والتشفير المتقدم.') }}" />
   <meta name="theme-color" content="#050A18" />
-  <title>Face-Crypt-Cloud | نظام المصادقة بالوجه السحابي المشفر</title>
+  <title>Face-Crypt-Cloud | {{ _('نظام المصادقة بالوجه السحابي المشفر') }}</title>
   <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='images/favicon-32x32.png') }}">
   <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='images/favicon-16x16.png') }}">
 
@@ -41,19 +41,27 @@
   <div class="page-wrapper">
 
     <!-- ── TOP NAVIGATION ── -->
-    <nav class="top-nav" role="navigation" aria-label="شريط التنقل الرئيسي">
+    <nav class="top-nav" role="navigation" aria-label="{{ _('شريط التنقل الرئيسي') }}">
       <!-- Logo (RTL: logo on right) -->
-      <a href="/" class="nav-logo" aria-label="Face-Crypt-Cloud الصفحة الرئيسية">
+      <a href="/" class="nav-logo" aria-label="{{ _('Face-Crypt-Cloud الصفحة الرئيسية') }}">
         <img src="{{ url_for('static', filename='images/face_crypt_cloud_logo.png') }}"
-             alt="شعار Face-Crypt-Cloud"
+             alt="{{ _('شعار Face-Crypt-Cloud') }}"
              width="42" height="42">
         <span class="nav-logo-text">Face Crypt Cloud</span>
       </a>
 
       <!-- Status Badge (LTR: badge on left) -->
-      <div class="nav-badge" role="status" aria-label="حالة النظام">
+      <div class="nav-controls">
+
+      <div class="lang-toggle" role="group" aria-label="{{ _('تغيير اللغة') }}">
+        <a href="/set-language/ar" class="lang-btn {% if get_locale() == 'ar' %}active{% endif %}">AR</a>
+        <a href="/set-language/en" class="lang-btn {% if get_locale() == 'en' %}active{% endif %}">EN</a>
+      </div>
+
+<div class="nav-badge" role="status" aria-label="{{ _('حالة النظام') }}">
         <span class="status-dot" aria-hidden="true"></span>
-        <span>النظام متاح</span>
+        <span>{{ _('النظام متاح') }}</span>
+      </div>
       </div>
     </nav>
 
@@ -66,7 +74,7 @@
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm8.94-3.34a7.72 7.72 0 0 0 .06-.66 7.72 7.72 0 0 0-.06-.66l1.42-1.11a.34.34 0 0 0 .08-.43l-1.35-2.34a.34.34 0 0 0-.41-.15l-1.67.67a6.93 6.93 0 0 0-1.14-.66l-.25-1.78A.33.33 0 0 0 17.28 4h-2.7a.33.33 0 0 0-.33.28l-.25 1.78a6.93 6.93 0 0 0-1.14.66l-1.67-.67a.33.33 0 0 0-.41.15L9.43 8.54a.33.33 0 0 0 .08.43l1.42 1.11A7.15 7.15 0 0 0 10.87 12a7.15 7.15 0 0 0 .06.92L9.51 14.03a.33.33 0 0 0-.08.43l1.35 2.34c.08.14.25.2.41.15l1.67-.67c.36.25.74.47 1.14.66l.25 1.78c.04.18.2.28.33.28h2.7c.17 0 .31-.11.33-.28l.25-1.78a6.93 6.93 0 0 0 1.14-.66l1.67.67c.16.06.33 0 .41-.15l1.35-2.34a.33.33 0 0 0-.08-.43l-1.41-1.09z"/>
         </svg>
-        <span>مصادقة بيومترية سحابية مشفرة</span>
+        <span>{{ _('مصادقة بيومترية سحابية مشفرة') }}</span>
       </div>
 
       <!-- Main Title -->
@@ -75,12 +83,11 @@
       </h1>
 
       <!-- Subtitle -->
-      <p class="hero-subtitle">نظام المصادقة بالوجه السحابي المشفر</p>
+      <p class="hero-subtitle">{{ _('نظام المصادقة بالوجه السحابي المشفر') }}</p>
 
       <!-- Description -->
       <p class="hero-desc">
-        منصة أمنية متقدمة تجمع بين تقنية التعرف على الوجه والتشفير السحابي
-        لضمان هوية المستخدم بدقة عالية وحماية بلا مساومة.
+        {{ _('منصة أمنية متقدمة تجمع بين تقنية التعرف على الوجه والتشفير السحابي لضمان هوية المستخدم بدقة عالية وحماية بلا مساومة.') }}
       </p>
 
       <!-- ── HERO BIOMETRIC GRAPHIC ── -->
@@ -101,38 +108,38 @@
 
           <!-- Hero Image -->
           <img src="{{ url_for('static', filename='images/hero_graphic.png') }}"
-               alt="رسم بياني للتعرف على الوجه ببيانات بيومترية مشفرة"
+               alt="{{ _('رسم بياني للتعرف على الوجه ببيانات بيومترية مشفرة') }}"
                width="360" height="360"
                loading="eager">
         </div>
 
         <!-- CTA: Go to Verification Page -->
-        <a href="/verify" class="btn-cta-primary" style="text-decoration: none; width: auto; max-width: max-content; margin-top: 1.5rem; display: inline-flex;" aria-label="جاهز للمسح البيومتري - انتقل إلى بوابة التحقق">
+        <a href="/verify" class="btn-cta-primary" style="text-decoration: none; width: auto; max-width: max-content; margin-top: 1.5rem; display: inline-flex;" aria-label="{{ _('جاهز للمسح البيومتري - انتقل إلى بوابة التحقق') }}">
           <div class="btn-cta-icon" aria-hidden="true">🪪</div>
           <div class="btn-cta-text">
-            <span class="main-text">جاهز للمسح البيومتري</span>
-            <span class="sub-text">انتقل إلى بوابة التحقق</span>
+            <span class="main-text">{{ _('جاهز للمسح البيومتري') }}</span>
+            <span class="sub-text">{{ _('انتقل إلى بوابة التحقق') }}</span>
           </div>
         </a>
       </div>
 
       <!-- ── FEATURE PILLS ── -->
-      <div class="features-row" role="list" aria-label="مميزات النظام">
+      <div class="features-row" role="list" aria-label="{{ _('مميزات النظام') }}">
         <div class="feature-pill" role="listitem">
           <span class="pill-icon" aria-hidden="true">🔐</span>
-          <span>تشفير AES-128</span>
+          <span>{{ _('تشفير AES-128') }}</span>
         </div>
         <div class="feature-pill" role="listitem">
           <span class="pill-icon" aria-hidden="true">☁️</span>
-          <span>سحابة Firebase</span>
+          <span>{{ _('سحابة Firebase') }}</span>
         </div>
         <div class="feature-pill" role="listitem">
           <span class="pill-icon" aria-hidden="true">🤖</span>
-          <span>ذكاء اصطناعي</span>
+          <span>{{ _('ذكاء اصطناعي') }}</span>
         </div>
         <div class="feature-pill" role="listitem">
           <span class="pill-icon" aria-hidden="true">⚡</span>
-          <span>استجابة فورية</span>
+          <span>{{ _('استجابة فورية') }}</span>
         </div>
       </div>
 
@@ -145,13 +152,13 @@
     <footer class="site-footer" role="contentinfo">
       <p>
         &copy; 2024–2026 <strong>Face Crypt Cloud</strong> —
-        جميع الحقوق محفوظة.
-        مبني بتقنية
+        {{ _('جميع الحقوق محفوظة.') }}
+        {{ _('مبني بتقنية') }}
         <a href="https://flask.palletsprojects.com/" target="_blank" rel="noopener noreferrer">Flask</a>،
         <a href="https://firebase.google.com/" target="_blank" rel="noopener noreferrer">Firebase</a>
         &amp;
         <a href="https://github.com/ageitgey/face_recognition" target="_blank" rel="noopener noreferrer">Face Recognition</a>.
-        <a href="/admin/" style="text-decoration: none; margin-right: 8px; opacity: 0.4; transition: opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.4'" aria-label="بوابة الإدارة">⚙️</a>
+        <a href="/admin/" style="text-decoration: none; margin-right: 8px; opacity: 0.4; transition: opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.4'" aria-label="{{ _('بوابة الإدارة') }}">⚙️</a>
       </p>
     </footer>
 
@@ -231,5 +238,10 @@
 
   <!-- user_portal.js moved to verification page -->
 
+  <!-- Translations for Client-Side JS -->
+  <script>
+    window.CURRENT_LOCALE = "{{ get_locale() }}";
+  </script>
+  <script src="{{ url_for('static', filename='js/translations.js') }}"></script>
 </body>
 </html>

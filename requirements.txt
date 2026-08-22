@@ -63,3 +63,4 @@ waitress==3.0.2
 Werkzeug==3.1.6
 pytest
 webauthn==2.3.0
+Flask-Babel==4.0.0

@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="{{ get_locale() }}" dir="{{ 'rtl' if get_locale() == 'ar' else 'ltr' }}">
 
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Face-Crypt-Cloud – بوابة التحقق البيومتري." />
+  <meta name="description" content="{{ _('Face-Crypt-Cloud – بوابة التحقق البيومتري.') }}" />
   <meta name="theme-color" content="#050A18" />
-  <title>Face-Crypt-Cloud | بوابة التحقق البيومتري</title>
+  <title>Face-Crypt-Cloud | {{ _('بوابة التحقق البيومتري') }}</title>
   <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='images/favicon-32x32.png') }}">
   <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='images/favicon-16x16.png') }}">
 
@@ -39,16 +39,24 @@
   <div class="page-wrapper">
 
     <!-- ── TOP NAVIGATION ── -->
-    <nav class="top-nav" role="navigation" aria-label="شريط التنقل الرئيسي">
-      <a href="/" class="nav-logo" aria-label="Face-Crypt-Cloud الصفحة الرئيسية">
+    <nav class="top-nav" role="navigation" aria-label="{{ _('شريط التنقل الرئيسي') }}">
+      <a href="/" class="nav-logo" aria-label="{{ _('Face-Crypt-Cloud الصفحة الرئيسية') }}">
         <img src="{{ url_for('static', filename='images/face_crypt_cloud_logo.png') }}"
-             alt="شعار Face-Crypt-Cloud"
+             alt="{{ _('شعار Face-Crypt-Cloud') }}"
              width="42" height="42">
         <span class="nav-logo-text">Face Crypt Cloud</span>
       </a>
-      <div class="nav-badge" role="status" aria-label="حالة النظام">
+      <div class="nav-controls">
+
+      <div class="lang-toggle" role="group" aria-label="{{ _('تغيير اللغة') }}">
+        <a href="/set-language/ar" class="lang-btn {% if get_locale() == 'ar' %}active{% endif %}">AR</a>
+        <a href="/set-language/en" class="lang-btn {% if get_locale() == 'en' %}active{% endif %}">EN</a>
+      </div>
+
+<div class="nav-badge" role="status" aria-label="{{ _('حالة النظام') }}">
         <span class="status-dot" aria-hidden="true"></span>
-        <span>النظام متاح</span>
+        <span>{{ _('النظام متاح') }}</span>
+      </div>
       </div>
     </nav>
 
@@ -61,8 +69,8 @@
         <div class="auth-card-header">
           <div class="auth-card-icon" aria-hidden="true">🪪</div>
           <div>
-            <h2 class="auth-card-title" id="auth-card-title">بوابة التحقق البيومتري</h2>
-            <p class="auth-card-sub">ضع وجهك أمام الكاميرا لإتمام عملية التحقق</p>
+            <h2 class="auth-card-title" id="auth-card-title">{{ _('بوابة التحقق البيومتري') }}</h2>
+            <p class="auth-card-sub">{{ _('ضع وجهك أمام الكاميرا لإتمام عملية التحقق') }}</p>
           </div>
         </div>
 
@@ -70,22 +78,22 @@
         <div id="openCameraWrapper" class="btn-cta-primary-wrapper" style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
           <button id="btnOpenCamera"
                   class="btn-cta-primary"
-                  aria-label="بدء عملية التحقق من الوجه – فتح الكاميرا">
+                  aria-label="{{ _('بدء عملية التحقق من الوجه – فتح الكاميرا') }}">
             <div class="btn-cta-icon" aria-hidden="true">📷</div>
             <div class="btn-cta-text">
-              <span class="main-text">بدء التحقق من الوجه</span>
-              <span class="sub-text">افتح الكاميرا لتسجيل دخول آمن</span>
+              <span class="main-text">{{ _('بدء التحقق من الوجه') }}</span>
+              <span class="sub-text">{{ _('افتح الكاميرا لتسجيل دخول آمن') }}</span>
             </div>
           </button>
 
           <button id="btnPasskeyLogin"
                   class="btn-cta-primary"
                   style="background: rgba(40, 167, 69, 0.1); border-color: rgba(40, 167, 69, 0.4);"
-                  aria-label="الدخول بمفتاح المرور">
+                  aria-label="{{ _('الدخول بمفتاح المرور') }}">
             <div class="btn-cta-icon" aria-hidden="true">🔑</div>
             <div class="btn-cta-text">
-              <span class="main-text">الدخول بمفتاح المرور</span>
-              <span class="sub-text">تسجيل دخول سريع للأجهزة المسجلة</span>
+              <span class="main-text">{{ _('الدخول بمفتاح المرور') }}</span>
+              <span class="sub-text">{{ _('تسجيل دخول سريع للأجهزة المسجلة') }}</span>
             </div>
           </button>
         </div>
@@ -94,26 +102,26 @@
         <div id="cameraContainer" style="position: relative;">
           <video id="cameraStream"
                  autoplay playsinline
-                 aria-label="بث الكاميرا للتحقق من الوجه"
+                 aria-label="{{ _('بث الكاميرا للتحقق من الوجه') }}"
                  style="display:none; width: 100%; max-width: 640px;"></video>
           <canvas id="overlayCanvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; display:none;"></canvas>
-          <img id="preview" src="#" alt="معاينة الصورة الملتقطة" style="display:none; width: 100%; max-width: 640px;">
+          <img id="preview" src="#" alt="{{ _('معاينة الصورة الملتقطة') }}" style="display:none; width: 100%; max-width: 640px;">
 
           <!-- Camera Controls -->
           <div class="camera-controls">
             <button id="captureButton"
                     class="btn-cam btn-cam-capture"
                     style="display:none;"
-                    aria-label="التقاط صورة من الكاميرا">
+                    aria-label="{{ _('التقاط صورة من الكاميرا') }}">
               <span aria-hidden="true">📸</span>
-              <span>التقاط الصورة</span>
+              <span>{{ _('التقاط الصورة') }}</span>
             </button>
             <button id="stopCameraButton"
                     class="btn-cam btn-cam-stop"
                     style="display:none;"
-                    aria-label="إغلاق الكاميرا">
+                    aria-label="{{ _('إغلاق الكاميرا') }}">
               <span aria-hidden="true">✕</span>
-              <span>إغلاق الكاميرا</span>
+              <span>{{ _('إغلاق الكاميرا') }}</span>
             </button>
           </div>
         </div>
@@ -123,16 +131,16 @@
           <button id="sendButton"
                   class="btn-submit"
                   style="display:none;"
-                  aria-label="إرسال الصورة للتحقق">
+                  aria-label="{{ _('إرسال الصورة للتحقق') }}">
             <span aria-hidden="true">✅</span>
-            <span>إرسال للتحقق</span>
+            <span>{{ _('إرسال للتحقق') }}</span>
           </button>
           <button id="retakeButton"
                   class="btn-retake"
                   style="display:none;"
-                  aria-label="إعادة التقاط الصورة">
+                  aria-label="{{ _('إعادة التقاط الصورة') }}">
             <span aria-hidden="true">🔄</span>
-            <span>إعادة التقاط</span>
+            <span>{{ _('إعادة التقاط') }}</span>
           </button>
         </div>
 
@@ -140,30 +148,30 @@
                 class="btn-cancel"
                 id="btnCancelCamera"
                 style="display:none;"
-                aria-label="إلغاء عملية التحقق">
-          إلغاء العملية ✖
+                aria-label="{{ _('إلغاء عملية التحقق') }}">
+          {{ _('إلغاء العملية ✖') }}
         </button>
 
         <!-- ── Result Area ── -->
         <div id="result" role="alert" aria-live="polite"></div>
 
         <!-- ── Security Policy ── -->
-        <div class="security-card" id="securityDisclaimer" role="complementary" aria-label="سياسة حماية الحساب">
+        <div class="security-card" id="securityDisclaimer" role="complementary" aria-label="{{ _('سياسة حماية الحساب') }}">
           <div class="security-card-title">
             <!-- Shield icon -->
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
               <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
             </svg>
-            <span>سياسة حماية الحساب</span>
+            <span>{{ _('سياسة حماية الحساب') }}</span>
           </div>
-          <ul class="security-list" aria-label="قواعد الحماية">
+          <ul class="security-list" aria-label="{{ _('قواعد الحماية') }}">
             <li>
-              <span class="sec-badge sec-badge-warn" aria-label="تحذير">٣ محاولات فاشلة</span>
-              <span>حظر مؤقت تلقائي لمدة ٥ دقائق.</span>
+              <span class="sec-badge sec-badge-warn" aria-label="{{ _('تحذير') }}">{{ _('٣ محاولات فاشلة') }}</span>
+              <span>{{ _('حظر مؤقت تلقائي لمدة ٥ دقائق.') }}</span>
             </li>
             <li>
-              <span class="sec-badge sec-badge-danger" aria-label="خطر">٥ محاولات فاشلة</span>
-              <span>حظر دائم — يتطلب مراجعة مسؤول النظام.</span>
+              <span class="sec-badge sec-badge-danger" aria-label="{{ _('خطر') }}">{{ _('٥ محاولات فاشلة') }}</span>
+              <span>{{ _('حظر دائم — يتطلب مراجعة مسؤول النظام.') }}</span>
             </li>
           </ul>
         </div>
@@ -175,13 +183,13 @@
     <footer class="site-footer" role="contentinfo">
       <p>
         &copy; 2024–2026 <strong>Face Crypt Cloud</strong> —
-        جميع الحقوق محفوظة.
-        مبني بتقنية
+        {{ _('جميع الحقوق محفوظة.') }}
+        {{ _('مبني بتقنية') }}
         <a href="https://flask.palletsprojects.com/" target="_blank" rel="noopener noreferrer">Flask</a>،
         <a href="https://firebase.google.com/" target="_blank" rel="noopener noreferrer">Firebase</a>
         &amp;
         <a href="https://github.com/ageitgey/face_recognition" target="_blank" rel="noopener noreferrer">Face Recognition</a>.
-        <a href="/admin/" style="text-decoration: none; margin-right: 8px; opacity: 0.4; transition: opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.4'" aria-label="بوابة الإدارة">⚙️</a>
+        <a href="/admin/" style="text-decoration: none; margin-right: 8px; opacity: 0.4; transition: opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.4'" aria-label="{{ _('بوابة الإدارة') }}">⚙️</a>
       </p>
     </footer>
 
@@ -258,6 +266,11 @@
     })();
   </script>
 
+    <!-- Translations for Client-Side JS -->
+  <script>
+    window.CURRENT_LOCALE = "{{ get_locale() }}";
+  </script>
+  <script src="{{ url_for('static', filename='js/translations.js') }}"></script>
   <!-- User Portal Logic -->
   <script src="{{ url_for('static', filename='js/user_portal.js') }}"></script>
 

@@ -184,7 +184,19 @@ def check_liveness(image_array_1, image_array_2=None, face_locations_1=None, fac
     if fas_session is not None:
         try:
             start_time = time.time()
-            face_img = cv2.resize(image_array_1, (80, 80))
+            if face_locations_1 and len(face_locations_1) > 0:
+                top, right, bottom, left = face_locations_1[0]
+                h, w = image_array_1.shape[:2]
+                margin_h = int((bottom - top) * 0.2)
+                margin_w = int((right - left) * 0.2)
+                t = max(0, top - margin_h)
+                b = min(h, bottom + margin_h)
+                l = max(0, left - margin_w)
+                r = min(w, right + margin_w)
+                face_crop = image_array_1[t:b, l:r]
+            else:
+                face_crop = image_array_1
+            face_img = cv2.resize(face_crop, (80, 80))
             face_img = np.transpose(face_img, (2, 0, 1)).astype(np.float32)
             face_img = face_img / 255.0
             face_img = np.expand_dims(face_img, axis=0)

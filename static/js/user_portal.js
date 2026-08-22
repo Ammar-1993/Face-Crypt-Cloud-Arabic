@@ -128,8 +128,8 @@ function completeChallenge() {
   Swal.close();
   Swal.fire({
     icon: 'success',
-    title: 'تم اجتياز الفحص!',
-    text: 'جاري التحضير...',
+    title: t('success_check'),
+    text: t('preparing'),
     timer: 1000,
     showConfirmButton: false
   });
@@ -171,7 +171,7 @@ function captureFinalImage() {
 btnOpenCamera.addEventListener("click", async () => {
   try {
     if (!faceLandmarker) {
-      btnOpenCamera.innerHTML = `<span class="fc-spinner"></span> جاري تحميل نموذج الذكاء الاصطناعي...`;
+      btnOpenCamera.innerHTML = t('loading_ai');
       await initializeMediaPipe();
     }
 
@@ -197,14 +197,10 @@ btnOpenCamera.addEventListener("click", async () => {
         startFaceDetection();
     };
   } catch (error) {
-    showAlert("فشل في الوصول إلى الكاميرا أو تحميل النموذج. يرجى التأكد من الأذونات والاتصال.", "danger");
+    showAlert(t('camera_fail'), "danger");
   } finally {
     // Reset button text
-    btnOpenCamera.innerHTML = `<div class="btn-cta-icon" aria-hidden="true">📷</div>
-            <div class="btn-cta-text">
-              <span class="main-text">بدء التحقق من الوجه</span>
-              <span class="sub-text">افتح الكاميرا لتسجيل دخول آمن</span>
-            </div>`;
+    btnOpenCamera.innerHTML = t('btn_start_camera');
   }
 });
 
@@ -218,16 +214,16 @@ captureButton.addEventListener("click", () => {
   }
 
   const challenges = [
-    { code: "smile", text: "الرجاء الابتسام بوضوح" },
-    { code: "turn_right", text: "أدر رأسك يمينًا قليلاً" },
-    { code: "raise_eyebrows", text: "الرجاء رفع حاجبيك" }
+    { code: "smile", text: t('smile') },
+    { code: "turn_right", text: t('turn_right') },
+    { code: "raise_eyebrows", text: t('raise_eyebrows') }
   ];
   const randomChallenge = challenges[Math.floor(Math.random() * challenges.length)];
   
   activeChallenge = randomChallenge.code;
 
   Swal.fire({
-    title: 'فحص الحيوية',
+    title: t('liveness_check'),
     text: randomChallenge.text,
     icon: 'info',
     showConfirmButton: false,
@@ -288,18 +284,18 @@ stopCameraButton.addEventListener("click", () => {
 sendButton.addEventListener("click", async () => {
   const imageData = preview.src;
   if (!imageData || imageData === "#") {
-    showAlert("يرجى التقاط صورة أولاً.", "danger");
+    showAlert(t('capture_first'), "danger");
     return;
   }
 
   sendButton.disabled = true;
   retakeButton.disabled = true;
   const originalBtnContent = sendButton.innerHTML;
-  sendButton.innerHTML = `<span class="fc-spinner" role="status" aria-hidden="true"></span> جاري التحقق...`;
+  sendButton.innerHTML = t('verifying');
 
   try {
     const blob = dataURLtoBlob(imageData);
-    if (blob.size === 0) throw new Error("❌ فشل في إنشاء بيانات الصورة.");
+    if (blob.size === 0) throw new Error(t('failed_image_data'));
 
     const formData = new FormData();
     formData.append("image", blob, "capture.jpg");
@@ -314,18 +310,17 @@ sendButton.addEventListener("click", async () => {
     if (response.ok) {
       Swal.fire({
         icon: 'success',
-        title: 'نجاح',
-        html: `تم تسجيل الدخول بنجاح. أهلاً بك، <strong>${escapeHTML(data.user.name)}</strong><br><br>` +
-              `<button id="registerPasskeyBtn" class="btn-cta-primary" style="font-size: 0.9em; padding: 10px 20px; width: auto; display: inline-flex; justify-content: center; margin-top: 10px;">🔑 تسجيل مفتاح مرور لهذا الجهاز</button>`,
+        title: t('success'),
+        html: t('login_success') + `<strong>${escapeHTML(data.user.name)}</strong><br><br><button id=\"registerPasskeyBtn\" class=\"btn-cta-primary\" style=\"font-size: 0.9em; padding: 10px 20px; width: auto; display: inline-flex; justify-content: center; margin-top: 10px;\">${t('register_passkey')}</button>`,
         showConfirmButton: true,
-        confirmButtonText: 'إغلاق',
+        confirmButtonText: t('close'),
         customClass: { popup: 'swal-dark-popup' },
         didRender: () => {
           const btn = document.getElementById('registerPasskeyBtn');
           if (btn) {
             btn.addEventListener('click', async () => {
               btn.disabled = true;
-              btn.innerHTML = `<span class="fc-spinner" role="status" aria-hidden="true" style="margin-left: 8px;"></span> جاري الإعداد...`;
+              btn.innerHTML = t('setting_up');
               try {
                 const beginResp = await fetch(`${API_BASE}/users/webauthn/register/begin`, { method: 'POST' });
                 if (!beginResp.ok) throw new Error("Failed to start WebAuthn");
@@ -358,26 +353,26 @@ sendButton.addEventListener("click", async () => {
                 });
 
                 if (completeResp.ok) {
-                  Swal.fire({icon: 'success', title: 'تم بنجاح!', text: 'تم تسجيل مفتاح المرور الخاص بك.', customClass: { popup: 'swal-dark-popup' }});
+                  Swal.fire({icon: 'success', title: t('done_successfully'), text: t('passkey_registered'), customClass: { popup: 'swal-dark-popup' }});
                 } else {
-                  Swal.fire({icon: 'error', title: 'خطأ', text: 'فشل تسجيل مفتاح المرور.', customClass: { popup: 'swal-dark-popup' }});
+                  Swal.fire({icon: 'error', title: t('error'), text: t('passkey_failed'), customClass: { popup: 'swal-dark-popup' }});
                 }
               } catch (err) {
                 console.error(err);
-                Swal.fire({icon: 'error', title: 'خطأ', text: 'حدث خطأ أثناء إعداد مفتاح المرور أو تم الإلغاء.', customClass: { popup: 'swal-dark-popup' }});
+                Swal.fire({icon: 'error', title: t('error'), text: t('passkey_setup_error'), customClass: { popup: 'swal-dark-popup' }});
               }
             });
           }
         }
       });
     } else {
-      const message = data.message || data.error || "تم رفض الوصول. يرجى المحاولة مرة أخرى.";
-      if (message.includes("حظر") || message.includes("تجاوز")) {
+      const message = data.message || data.error || t('access_denied');
+      if (message.includes(t('block')) || message.includes(t('exceed'))) {
         Swal.fire({
           icon: 'error',
-          title: 'تنبيه أمني',
+          title: t('security_alert'),
           html: message.replace(/\n/g, '<br>'),
-          confirmButtonText: 'موافق',
+          confirmButtonText: t('ok'),
           confirmButtonColor: '#d33',
           customClass: { popup: 'swal-dark-popup' }
         });
@@ -386,7 +381,7 @@ sendButton.addEventListener("click", async () => {
       }
     }
   } catch (error) {
-    showAlert("خطأ في الشبكة. يرجى المحاولة مرة أخرى.", "danger");
+    showAlert(t('network_error'), "danger");
   } finally {
     sendButton.disabled = false;
     retakeButton.disabled = false;
@@ -447,7 +442,7 @@ if (btnPasskeyLogin) {
   btnPasskeyLogin.addEventListener("click", async () => {
     btnPasskeyLogin.disabled = true;
     const originalContent = btnPasskeyLogin.innerHTML;
-    btnPasskeyLogin.innerHTML = `<span class="fc-spinner" role="status" aria-hidden="true" style="margin-left:8px;"></span> جاري الإعداد...`;
+    btnPasskeyLogin.innerHTML = t('setting_up_2');
 
     try {
       const beginResp = await fetch(`${API_BASE}/users/webauthn/login/begin`, { method: 'POST' });
@@ -461,7 +456,7 @@ if (btnPasskeyLogin) {
         }
       }
 
-      btnPasskeyLogin.innerHTML = `<span class="fc-spinner" role="status" aria-hidden="true" style="margin-left:8px;"></span> في انتظار البصمة...`;
+      btnPasskeyLogin.innerHTML = t('waiting_fingerprint');
       const assertion = await navigator.credentials.get({ publicKey: options });
 
       const assertionJSON = {
@@ -476,7 +471,7 @@ if (btnPasskeyLogin) {
         }
       };
 
-      btnPasskeyLogin.innerHTML = `<span class="fc-spinner" role="status" aria-hidden="true" style="margin-left:8px;"></span> جاري التحقق...`;
+      btnPasskeyLogin.innerHTML = t('verifying_2');
       const completeResp = await fetch(`${API_BASE}/users/webauthn/login/complete`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -488,20 +483,20 @@ if (btnPasskeyLogin) {
       if (completeResp.ok) {
         Swal.fire({
           icon: 'success',
-          title: 'نجاح',
-          html: `تم تسجيل الدخول بنجاح. أهلاً بك، <strong>${escapeHTML(data.user.name)}</strong>`,
+          title: t('success'),
+          html: t('login_success') + `<strong>${escapeHTML(data.user.name)}</strong>`,
           showConfirmButton: true,
-          confirmButtonText: 'إغلاق',
+          confirmButtonText: t('close'),
           customClass: { popup: 'swal-dark-popup' }
         });
       } else {
-        const message = data.message || data.error || "تم رفض الوصول. يرجى المحاولة مرة أخرى.";
-        if (message.includes("حظر") || message.includes("تجاوز")) {
+        const message = data.message || data.error || t('access_denied');
+        if (message.includes(t('block')) || message.includes(t('exceed'))) {
             Swal.fire({
                 icon: 'error',
-                title: 'تنبيه أمني',
+                title: t('security_alert'),
                 html: message.replace(/\n/g, '<br>'),
-                confirmButtonText: 'موافق',
+                confirmButtonText: t('ok'),
                 confirmButtonColor: '#d33',
                 customClass: { popup: 'swal-dark-popup' }
             });
@@ -512,7 +507,7 @@ if (btnPasskeyLogin) {
 
     } catch (err) {
       console.error(err);
-      showAlert("تم الإلغاء أو فشل تسجيل الدخول بمفتاح المرور.", "danger");
+      showAlert(t('passkey_login_failed'), "danger");
     } finally {
       btnPasskeyLogin.disabled = false;
       btnPasskeyLogin.innerHTML = originalContent;

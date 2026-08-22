@@ -1,6 +1,7 @@
 import time
 import logging
 from flask import Blueprint, request, jsonify, session
+from flask_babel import _
 from webauthn import generate_registration_options, verify_registration_response, generate_authentication_options, verify_authentication_response
 from webauthn.helpers.structs import RegistrationCredential, AuthenticationCredential
 from webauthn.helpers import bytes_to_base64url, base64url_to_bytes
@@ -40,11 +41,11 @@ def is_soft_blocked(user):
 @limiter.limit("30 per hour")
 def verify_login():
     if 'image' not in request.files:
-        return jsonify({"error": "❌ لم يتم تقديم أي صورة"}), 400
+        return jsonify({"error": _("❌ لم يتم تقديم أي صورة")}), 400
 
     image_file = request.files['image']
     if image_file.filename == '':
-        return jsonify({"error": "❌ اسم الملف فارغ"}), 400
+        return jsonify({"error": _("❌ اسم الملف فارغ")}), 400
 
     image2_file = request.files.get('image2')
 
@@ -85,7 +86,7 @@ def verify_login():
             # Check for Permanent Ban
             if matched_user.get('blocked', False):
                 firebase_utils.log_audit_event(user_id, "User_Login", status='blocked', ip_address=request.remote_addr)
-                return jsonify({"message": GENERIC_ERROR_MSG}), 403
+                return jsonify({"message": _(GENERIC_ERROR_MSG)}), 403
             
             # Check for Soft Block
             if is_soft_blocked(matched_user):
@@ -98,7 +99,7 @@ def verify_login():
 
                 firebase_utils.update_user_fields(user_id, update_data)
                 firebase_utils.log_audit_event(user_id, "User_Login", status=status_to_log, ip_address=request.remote_addr)
-                return jsonify({"message": GENERIC_ERROR_MSG}), 403
+                return jsonify({"message": _(GENERIC_ERROR_MSG)}), 403
 
             # 🛡️ Liveness Check Flow
             if ENABLE_LIVENESS_CHECK:
@@ -129,7 +130,7 @@ def verify_login():
                         
                     firebase_utils.update_user_fields(user_id, update_data)
                     firebase_utils.log_audit_event(user_id, "Spoofing_Attempt", status=status_to_log, ip_address=request.remote_addr)
-                    return jsonify({"message": f"🚨 **فشل الأمان (مكافحة الانتحال):**\n{reason}"}), 403
+                    return jsonify({"message": _("🚨 **فشل الأمان (مكافحة الانتحال):**\n%(reason)s", reason=reason)}), 403
 
             # Success path
             firebase_utils.update_user_fields(user_id, {
@@ -143,7 +144,7 @@ def verify_login():
             session['user_id'] = user_id
 
             return jsonify({
-                "message": f"✅ تم تسجيل الدخول بنجاح. أهلاً بك، {matched_user.get('name', '[User Name]')}",
+                "message": _("✅ تم تسجيل الدخول بنجاح. أهلاً بك، %(name)s", name=matched_user.get('name', '[User Name]')),
                 "user": {
                     "id": user_id,
                     "name": matched_user.get('name'),
@@ -153,7 +154,7 @@ def verify_login():
 
         # 3. If NO match is found
         firebase_utils.log_audit_event("unknown_user", "User_Login", status='failure', ip_address=request.remote_addr)
-        return jsonify({"message": GENERIC_ERROR_MSG}), 403
+        return jsonify({"message": _(GENERIC_ERROR_MSG)}), 403
 
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
@@ -161,14 +162,14 @@ def verify_login():
 @users_bp.route('/webauthn/register/begin', methods=['POST'])
 def webauthn_register_begin():
     if 'user_id' not in session:
-        return jsonify({"error": "غير مصرح لك بالوصول"}), 401
+        return jsonify({"error": _("غير مصرح لك بالوصول")}), 401
     
     # Retrieve user to get their info
     user_id = session['user_id']
     users = firebase_utils.get_all_users()
     user = next((u for u in users if u['id'] == user_id), None)
     if not user:
-        return jsonify({"error": "المستخدم غير موجود"}), 404
+        return jsonify({"error": _("المستخدم غير موجود")}), 404
 
     # Generate registration options
     rp_id = request.host.split(':')[0]
@@ -193,11 +194,11 @@ def webauthn_register_begin():
 def webauthn_register_complete():
     user_id = session.get('user_id')
     if not user_id:
-        return jsonify({"error": "غير مصرح لك بالوصول"}), 401
+        return jsonify({"error": _("غير مصرح لك بالوصول")}), 401
 
     challenge = session.get('webauthn_challenge')
     if not challenge:
-        return jsonify({"error": "لا توجد عملية تسجيل قيد التقدم"}), 400
+        return jsonify({"error": _("لا توجد عملية تسجيل قيد التقدم")}), 400
 
     try:
         credential_data = request.json
@@ -220,10 +221,10 @@ def webauthn_register_complete():
         # Clear challenge
         session.pop('webauthn_challenge', None)
         
-        return jsonify({"status": "success", "message": "تم تسجيل مفتاح المرور بنجاح!"})
+        return jsonify({"status": "success", "message": _("تم تسجيل مفتاح المرور بنجاح!")})
     except Exception as e:
         logger.error(f"WebAuthn registration failed: {e}")
-        return jsonify({"error": "حدث خطأ أثناء معالجة الطلب."}), 400
+        return jsonify({"error": _("حدث خطأ أثناء معالجة الطلب.")}), 400
 
 @users_bp.route('/webauthn/login/begin', methods=['POST'])
 @limiter.limit("10 per minute")
@@ -244,7 +245,7 @@ def webauthn_login_begin():
 def webauthn_login_complete():
     challenge = session.get('webauthn_challenge')
     if not challenge:
-        return jsonify({"error": "لا توجد عملية تسجيل دخول قيد التقدم"}), 400
+        return jsonify({"error": _("لا توجد عملية تسجيل دخول قيد التقدم")}), 400
 
     try:
         credential_data = request.json
@@ -253,7 +254,7 @@ def webauthn_login_complete():
         matched_user = firebase_utils.get_user_by_webauthn_credential_id(credential_id)
                 
         if not matched_user:
-            return jsonify({"error": "بيانات الاعتماد غير مسجلة"}), 404
+            return jsonify({"error": _("بيانات الاعتماد غير مسجلة")}), 404
 
         rp_id = request.host.split(':')[0]
 
@@ -280,7 +281,7 @@ def webauthn_login_complete():
         session.pop('webauthn_challenge', None)
 
         return jsonify({
-            "message": f"✅ تم تسجيل الدخول بنجاح. أهلاً بك، {matched_user.get('name', '[User Name]')}",
+            "message": _("✅ تم تسجيل الدخول بنجاح. أهلاً بك، %(name)s", name=matched_user.get('name', '[User Name]')),
             "user": {
                 "id": user_id,
                 "name": matched_user.get('name'),
@@ -290,4 +291,4 @@ def webauthn_login_complete():
 
     except Exception as e:
         logger.error(f"WebAuthn login failed: {e}")
-        return jsonify({"error": "حدث خطأ أثناء معالجة الطلب."}), 400
+        return jsonify({"error": _("حدث خطأ أثناء معالجة الطلب.")}), 400

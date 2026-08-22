@@ -39,6 +39,10 @@ h1 {
 .btn-modern-primary:hover i {
   transform: scale(1.1) rotate(-5deg);
 }
+/* html[dir="ltr"] override because transform rotations are physical/directional and cannot use logical properties */
+html[dir="ltr"] .btn-modern-primary:hover i {
+  transform: scale(1.1) rotate(5deg);
+}
 
 #cameraContainer {
   max-width: 500px;
@@ -68,8 +72,7 @@ img#preview {
 #result {
   margin-top: 20px;
   max-width: 400px;
-  margin-left: auto;
-  margin-right: auto;
+  margin-inline: auto;
 }
 
 #captureButton,
@@ -91,8 +94,7 @@ img#preview {
 
 #securityDisclaimer {
   max-width: 500px;
-  margin-left: auto;
-  margin-right: auto;
+  margin-inline: auto;
   transition: all 0.3s ease;
 }
 

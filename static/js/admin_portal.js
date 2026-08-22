@@ -11,7 +11,7 @@ async function adminFetch(url, options = {}) {
   }
   const res = await fetch(url, options);
   if (res.status === 401) {
-    Swal.fire({ text: 'انتهت الجلسة. يرجى تسجيل الدخول مجدداً.', icon: 'warning', confirmButtonText: 'حسناً', customClass: { popup: 'swal-dark-popup' } }).then(() => {
+    Swal.fire({ text: t('session_expired'), icon: 'warning', confirmButtonText: t('ok_btn'), customClass: { popup: 'swal-dark-popup' } }).then(() => {
       hide(document.getElementById("adminPanel"));
       show(document.getElementById("loginSection"));
     });
@@ -41,24 +41,24 @@ async function adminLogout() {
 function translateStatus(status) {
   if (!status) return "";
   const s = status.toLowerCase();
-  if (s === "success") return "نجاح";
-  if (s === "failed" || s === "failure") return "فشل";
-  if (s === "blocked") return "محظور";
-  if (s === "soft_block") return "حظر مؤقت";
+  if (s === "success") return t('status_success');
+  if (s === "failed" || s === "failure") return t('status_failed');
+  if (s === "blocked") return t('status_blocked');
+  if (s === "soft_block") return t('status_soft_block');
   return status;
 }
 
 function translateEvent(event) {
   if (!event) return "";
   const e = event.toLowerCase();
-  if (e === "user_login") return "دخول مستخدم";
-  if (e === "admin_login") return "دخول مسؤول";
-  if (e === "add_user") return "إضافة مستخدم";
-  if (e === "delete_user") return "حذف مستخدم";
-  if (e === "unblock_user" || e === "admin_unblock") return "فك حظر مستخدم";
-  if (e === "clear_logs" || e === "clear_audit_logs") return "مسح سجلات التدقيق";
-  if (e === "update_tolerance") return "تحديث نسبة المطابقة";
-  if (e === "spoofing_attempt") return "محاولة تزييف (Spoofing)";
+  if (e === "user_login") return t('event_user_login');
+  if (e === "admin_login") return t('event_admin_login');
+  if (e === "add_user") return t('event_add_user');
+  if (e === "delete_user") return t('event_delete_user');
+  if (e === "unblock_user" || e === "admin_unblock") return t('event_unblock_user');
+  if (e === "clear_logs" || e === "clear_audit_logs") return t('event_clear_logs');
+  if (e === "update_tolerance") return t('event_update_tolerance');
+  if (e === "spoofing_attempt") return t('event_spoofing');
   return event;
 }
 
@@ -82,7 +82,7 @@ async function adminLogin() {
   if (!password) {
     setText(
       "loginMessage",
-      `<div class="custom-alert custom-alert-danger">الرجاء إدخال كلمة المرور أولاً.</div>`
+      `<div class="custom-alert custom-alert-danger">${t('enter_password_first')}</div>`
     );
     setTimeout(() => {
       setText("loginMessage", "");
@@ -94,7 +94,7 @@ async function adminLogin() {
   const originalBtnText = loginBtn.innerHTML;
 
   loginBtn.disabled = true;
-  loginBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> جاري التحقق...`;
+  loginBtn.innerHTML = t('admin_verifying_html');
 
   try {
     const res = await fetch(`${API_BASE}/admin/login`, {
@@ -111,8 +111,8 @@ async function adminLogin() {
       // Professional & Distinctive Welcome Message
       Swal.fire({
         icon: 'success',
-        title: 'تم التحقق بنجاح',
-        html: `<div class="text-center"><h5>${data.message}</h5><p class="text-muted mt-2">جاري تحويلك إلى لوحة التحكم خلال 5 ثوانٍ...</p></div>`,
+        title: t('verify_success'),
+        html: `<div class=\"text-center\"><h5>${data.message}</h5><p class=\"text-muted mt-2\">${t('redirecting_admin')}</p></div>`,
         timer: 5000,
         timerProgressBar: true,
         showConfirmButton: false,
@@ -144,7 +144,7 @@ async function adminLogin() {
     console.error(error);
     setText(
       "loginMessage",
-      `<div class="custom-alert custom-alert-danger">خطأ في الشبكة أو خادم الويب غير متصل.</div>`
+      `<div class="custom-alert custom-alert-danger">${t('admin_network_error')}</div>`
     );
   } finally {
     loginBtn.disabled = false;
@@ -157,7 +157,7 @@ async function addUser() {
   if (!userId) {
     setText(
       "addUserMessage",
-      `<div class="custom-alert custom-alert-danger">يرجى إدخال معرف المستخدم.</div>`
+      `<div class="custom-alert custom-alert-danger">${t('enter_user_id')}</div>`
     );
     return;
   }
@@ -166,7 +166,7 @@ async function addUser() {
   if (!name) {
     setText(
       "addUserMessage",
-      `<div class="custom-alert custom-alert-danger">يرجى إدخال الاسم.</div>`
+      `<div class="custom-alert custom-alert-danger">${t('enter_name')}</div>`
     );
     return;
   }
@@ -176,14 +176,14 @@ async function addUser() {
   if (!email) {
     setText(
       "addUserMessage",
-      `<div class="custom-alert custom-alert-danger">يرجى إدخال البريد الإلكتروني.</div>`
+      `<div class="custom-alert custom-alert-danger">${t('enter_email')}</div>`
     );
     return;
   }
   if (!emailPattern.test(email)) {
     setText(
       "addUserMessage",
-      `<div class="custom-alert custom-alert-danger">يرجى إدخال بريد إلكتروني صالح.</div>`
+      `<div class="custom-alert custom-alert-danger">${t('enter_valid_email')}</div>`
     );
     return;
   }
@@ -192,7 +192,7 @@ async function addUser() {
   if (!image) {
     setText(
       "addUserMessage",
-      `<div class="custom-alert custom-alert-danger">يرجى اختيار صورة.</div>`
+      `<div class="custom-alert custom-alert-danger">${t('choose_image')}</div>`
     );
     return;
   }
@@ -241,7 +241,7 @@ function renderDeleteUserOptions(users) {
   select.innerHTML = "";
   
   const defaultOption = document.createElement("option");
-  defaultOption.text = "اختر مستخدماً للحذف...";
+  defaultOption.text = t('select_user_to_delete');
   defaultOption.value = "";
   defaultOption.disabled = true;
   defaultOption.selected = true;
@@ -268,20 +268,20 @@ async function deleteUser() {
   if (!userId) {
     setText(
       "deleteUserMessage",
-      `<div class="custom-alert custom-alert-danger">يرجى تحديد مستخدم لحذفه.</div>`
+      `<div class="custom-alert custom-alert-danger">${t('select_user_first')}</div>`
     );
     return;
   }
 
   Swal.fire({
-    title: 'تأكيد الإجراء',
-    text: '⚠️ هل أنت متأكد من حذف هذا المستخدم نهائياً؟ لا يمكن التراجع عن هذه الخطوة.',
+    title: t('confirm_action'),
+    text: t('confirm_delete_user'),
     icon: 'warning',
     showCancelButton: true,
     confirmButtonColor: '#d33',
     cancelButtonColor: '#3085d6',
-    confirmButtonText: 'نعم، متأكد',
-    cancelButtonText: 'إلغاء',
+    confirmButtonText: t('yes_sure'),
+    cancelButtonText: t('cancel'),
     customClass: { popup: 'swal-dark-popup' }
   }).then(async (result) => {
     if (result.isConfirmed) {
@@ -312,7 +312,7 @@ async function fetchAuditLogs(loadMore = false) {
   if (!loadMore) {
     auditCursor = null;
     allAuditLogs = [];
-    document.getElementById("auditLogsTable").innerHTML = '<tr><td colspan="5" class="text-center">جاري التحميل...</td></tr>';
+    document.getElementById("auditLogsTable").innerHTML = t('loading_table_row');
   }
 
   let url = `${API_BASE}/admin/audit_logs?limit=50`;
@@ -340,7 +340,7 @@ function renderAuditLogs(logs, append = false) {
   if (!append) {
     table.innerHTML = "";
     if (!logs || logs.length === 0) {
-      table.innerHTML = '<tr><td colspan="5" class="text-center">لم يتم العثور على سجلات.</td></tr>';
+      table.innerHTML = t('no_logs_found_row');
       return;
     }
   }
@@ -364,7 +364,7 @@ function renderAuditLogs(logs, append = false) {
     if (status === "blocked") {
       const btn = document.createElement("button");
       btn.className = "btn btn-sm btn-outline-success rounded-pill px-3";
-      btn.textContent = "فك الحظر";
+      btn.textContent = t('unblock');
       btn.onclick = () => unblockUser(log.user_id);
       tdAction.appendChild(btn);
     }
@@ -379,9 +379,9 @@ function renderAuditLogs(logs, append = false) {
     const tdUserId = document.createElement("td");
     let displayUserId = log.user_id || "";
     if (displayUserId === "unknown_user") {
-      displayUserId = "مستخدم غير معروف";
+      displayUserId = t('unknown_user');
     } else if (displayUserId === "admin") {
-      displayUserId = "المسؤول";
+      displayUserId = t('the_admin');
     }
     tdUserId.textContent = displayUserId;
 
@@ -454,11 +454,11 @@ async function refreshStats() {
       document.getElementById("statTotalUsers").textContent =
         data.total_users ?? 0; // Added for total users
     } else {
-      Swal.fire({ text: "فشل في جلب الإحصائيات", icon: 'error', confirmButtonText: 'حسناً', customClass: { popup: 'swal-dark-popup' } });
+      Swal.fire({ text: t('failed_fetch_stats'), icon: 'error', confirmButtonText: t('ok_btn'), customClass: { popup: 'swal-dark-popup' } });
     }
   } catch (e) {
     console.error(e);
-    Swal.fire({ text: "خطأ في جلب الإحصائيات", icon: 'error', confirmButtonText: 'حسناً', customClass: { popup: 'swal-dark-popup' } });
+    Swal.fire({ text: t('error_fetch_stats'), icon: 'error', confirmButtonText: t('ok_btn'), customClass: { popup: 'swal-dark-popup' } });
   }
 }
 
@@ -483,28 +483,28 @@ async function refreshAuditLogs() {
   try {
     setText(
       "auditLogsTable",
-      '<tr><td colspan="5" class="text-center">جاري التحميل...</td></tr>'
+      t('loading_table_row')
     );
     await fetchAuditLogs();
   } catch (e) {
     console.error(e);
     setText(
       "auditLogsTable",
-      '<tr><td colspan="5" class="text-center text-danger">❌ فشل في تحديث السجلات.</td></tr>'
+      t('failed_refresh_logs_row')
     );
   }
 }
 
 async function unblockUser(userId) {
   Swal.fire({
-    title: 'تأكيد الإجراء',
-    text: `هل أنت متأكد أنك تريد فك حظر المستخدم ${userId}؟`,
+    title: t('confirm_action'),
+    text: t('confirm_unblock_user_prefix') + userId + '?',
     icon: 'warning',
     showCancelButton: true,
     confirmButtonColor: '#d33',
     cancelButtonColor: '#3085d6',
-    confirmButtonText: 'نعم، متأكد',
-    cancelButtonText: 'إلغاء',
+    confirmButtonText: t('yes_sure'),
+    cancelButtonText: t('cancel'),
     customClass: { popup: 'swal-dark-popup' }
   }).then(async (result) => {
     if (result.isConfirmed) {
@@ -517,15 +517,15 @@ async function unblockUser(userId) {
 
         const data = await res.json();
         if (res.ok) {
-          Swal.fire({ text: data.message, icon: 'success', confirmButtonText: 'حسناً', customClass: { popup: 'swal-dark-popup' } });
+          Swal.fire({ text: data.message, icon: 'success', confirmButtonText: t('ok_btn'), customClass: { popup: 'swal-dark-popup' } });
           await fetchAuditLogs();
           await refreshStats();
         } else {
-          Swal.fire({ text: `خطأ: ${data.error}`, icon: 'error', confirmButtonText: 'حسناً', customClass: { popup: 'swal-dark-popup' } });
+          Swal.fire({ text: t('error_prefix') + data.error, icon: 'error', confirmButtonText: t('ok_btn'), customClass: { popup: 'swal-dark-popup' } });
         }
       } catch (e) {
         console.error(e);
-        Swal.fire({ text: "خطأ في فك حظر المستخدم", icon: 'error', confirmButtonText: 'حسناً', customClass: { popup: 'swal-dark-popup' } });
+        Swal.fire({ text: t('error_unblock'), icon: 'error', confirmButtonText: t('ok_btn'), customClass: { popup: 'swal-dark-popup' } });
       }
     }
   });
@@ -533,14 +533,14 @@ async function unblockUser(userId) {
 
 async function clearAuditLogs() {
   Swal.fire({
-    title: 'تأكيد الإجراء',
-    text: '⚠️ هل أنت متأكد من رغبتك في حذف جميع سجلات التدقيق؟ لا يمكن التراجع عن هذا الإجراء.',
+    title: t('confirm_action'),
+    text: t('confirm_clear_logs'),
     icon: 'warning',
     showCancelButton: true,
     confirmButtonColor: '#d33',
     cancelButtonColor: '#3085d6',
-    confirmButtonText: 'نعم، متأكد',
-    cancelButtonText: 'إلغاء',
+    confirmButtonText: t('yes_sure'),
+    cancelButtonText: t('cancel'),
     customClass: { popup: 'swal-dark-popup' }
   }).then(async (result) => {
     if (result.isConfirmed) {
@@ -551,15 +551,15 @@ async function clearAuditLogs() {
 
         const data = await res.json();
         if (res.ok) {
-          Swal.fire({ text: data.message, icon: 'success', confirmButtonText: 'حسناً', customClass: { popup: 'swal-dark-popup' } });
+          Swal.fire({ text: data.message, icon: 'success', confirmButtonText: t('ok_btn'), customClass: { popup: 'swal-dark-popup' } });
           await fetchAuditLogs();
           await refreshStats();
         } else {
-          Swal.fire({ text: `خطأ: ${data.error}`, icon: 'error', confirmButtonText: 'حسناً', customClass: { popup: 'swal-dark-popup' } });
+          Swal.fire({ text: t('error_prefix') + data.error, icon: 'error', confirmButtonText: t('ok_btn'), customClass: { popup: 'swal-dark-popup' } });
         }
       } catch (e) {
         console.error(e);
-        Swal.fire({ text: "خطأ في مسح سجلات التدقيق.", icon: 'error', confirmButtonText: 'حسناً', customClass: { popup: 'swal-dark-popup' } });
+        Swal.fire({ text: t('error_clear_logs'), icon: 'error', confirmButtonText: t('ok_btn'), customClass: { popup: 'swal-dark-popup' } });
       }
     }
   });
@@ -579,7 +579,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (e.target.files.length > 0) {
         fileLabel.innerText = '📷 ' + e.target.files[0].name;
       } else {
-        fileLabel.innerText = "📷 اختر صورة بصمة الوجه...";
+        fileLabel.innerText = t('choose_face_image_label');
       }
     });
   }
@@ -648,7 +648,7 @@ document.addEventListener("DOMContentLoaded", () => {
           
           // Add a spinning loading state to button
           const originalText = saveToleranceBtn.innerHTML;
-          saveToleranceBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الحفظ...';
+          saveToleranceBtn.innerHTML = t('saving_html');
           saveToleranceBtn.disabled = true;
 
           try {
@@ -663,7 +663,7 @@ document.addEventListener("DOMContentLoaded", () => {
               if (data.message) {
                   Swal.fire({
                       icon: "success",
-                      title: "تم الحفظ",
+                      title: t('saved'),
                       text: data.message,
                       background: '#1a1a2e',
                       color: '#fff',
@@ -676,8 +676,8 @@ document.addEventListener("DOMContentLoaded", () => {
           } catch (error) {
               Swal.fire({
                   icon: "error",
-                  title: "خطأ",
-                  text: error.message || "حدث خطأ أثناء حفظ الإعدادات",
+                  title: t('error'),
+                  text: error.message || t('error_save_settings'),
                   background: '#1a1a2e',
                   color: '#fff',
                   confirmButtonColor: '#e74c3c',
