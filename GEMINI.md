@@ -120,3 +120,24 @@ This document summarizes the actions, changes, and notes recorded during this de
 The application has successfully evolved into a highly secure, performant, and user-friendly system. 
 It features robust defense-in-depth mechanisms (anti-enumeration, CSRF tokens, strict rate limits, and custom error handling). 
 Furthermore, the recent architectural shift offloads active geometric liveness tracking (MediaPipe Face Mesh) to the user's browser, enabling zero-latency UI interaction and eliminating Python backend dependency conflicts, while the server retains complete authority over the 128-D cryptographic extraction (dlib), hardware-backed authentication (WebAuthn/Passkeys), and deep-learning anti-spoofing (MiniFASNet).
+
+## 22. MiniFASNet Class Index Mapping Fix (Session 4)
+- **Root Cause Identified:** The `MiniFASNetV2.onnx` model in use is a **3-class variant**, not the 2-class model described in the original Silent-Face paper. Its output classes map as follows:
+  - `class 0` → Spoof (print attack)
+  - `class 1` → Spoof (video/replay attack)
+  - `class 2` → **Real live face** (~99.4% confidence for genuine faces)
+- **Critical Bug:** `utils/face_utils.py` was reading `probs[1]` as the "real face" probability and rejecting every face where `predicted_class != 1`. Since the model **always** predicts `class 2` for genuine faces, **every legitimate login was being rejected** with the anti-spoofing error (`"🚨 فشل الأمان (مكافحة الانتحال)"`), despite a perfect 99.4% real-face confidence score.
+- **Fix Applied:** Changed `real_prob = probs[1]` → `real_prob = probs[2]` and the guard condition `predicted_class != 1` → `predicted_class != 2` in `utils/face_utils.py`. Added a detailed inline comment documenting the 3-class mapping so this assumption can never silently drift again.
+- **Test Suite Updated:** Updated the `test_check_liveness_genuine` mock in `tests/test_face_utils.py` from `[-10.0, 10.0, -10.0]` (old incorrect class-1 assumption) to `[-10.0, -10.0, 10.0]` (correct class-2 real-face mapping).
+- **Verification:** Ran the MiniFASNet model against all 16 real face images in `test_images/` using the corrected index. Every image passed with `real_prob ≈ 0.9945` and `predicted_class = 2`. The full 34-test suite was restored to **34/34 passing**.
+
+## 23. WebAuthn Passkey Registration Fix — py_webauthn 2.x API Compatibility (Session 4)
+- **Root Cause Identified:** The `POST /users/webauthn/register/begin` and `POST /users/webauthn/login/begin` endpoints crashed with `AttributeError: 'PublicKeyCredentialCreationOptions' object has no attribute 'json'`. This was confirmed directly from Docker logs.
+- **API Breaking Change:** `py_webauthn` dropped `Pydantic` as a dependency in version 2.x. The `PublicKeyCredentialCreationOptions` and `PublicKeyCredentialRequestOptions` objects are now plain Python dataclasses/structs — the Pydantic-era `.json()` serialization method no longer exists.
+- **Fix Applied:** Added two private serializer helper functions in `app/users/routes.py`:
+  - `_serialize_registration_options(opts)` — converts `PublicKeyCredentialCreationOptions` to a JSON-safe `dict`, manually base64url-encoding all `bytes` fields (challenge, user.id, excludeCredentials ids) using `bytes_to_base64url`.
+  - `_serialize_authentication_options(opts)` — converts `PublicKeyCredentialRequestOptions` to a JSON-safe `dict` similarly.
+- **Endpoints Fixed:** Both `webauthn_register_begin` and `webauthn_login_begin` now call their respective serializer helpers instead of `json.loads(options.json())`. Removed the now-dead `import json` and misleading comment from both functions.
+- **Test Suite Updated:** Rewrote the `test_webauthn_register_begin` and `test_webauthn_login_begin` test mocks in `tests/test_user_routes.py`. The old mocks returned `MagicMock()` objects configured with a `.json()` side-effect, which no longer matched the new serializer's attribute access pattern. The mocks now return **real** `generate_registration_options` / `generate_authentication_options` objects so the serializer helpers can access the actual dataclass fields correctly.
+- **Verification:** Both passkey endpoints now return valid HTTP 200 JSON responses containing the `challenge` field. Full test suite: **34/34 passing**.
+
