@@ -280,7 +280,7 @@ def test_webauthn_login_complete_not_registered(client, mock_firebase):
     response = client.post('/users/webauthn/login/complete', json={'id': 'unregistered_cred'})
     assert response.status_code == 404
     assert 'error' in response.json
-    assert 'Credential not registered' in response.json['error']
+    assert 'بيانات الاعتماد غير مسجلة' in response.json['error']
 
 
 @patch('app.users.routes.verify_authentication_response')

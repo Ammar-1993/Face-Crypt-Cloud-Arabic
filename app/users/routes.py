@@ -160,15 +160,15 @@ def verify_login():
 
 @users_bp.route('/webauthn/register/begin', methods=['POST'])
 def webauthn_register_begin():
-    user_id = session.get('user_id')
-    if not user_id:
-        return jsonify({"error": "Unauthorized"}), 401
+    if 'user_id' not in session:
+        return jsonify({"error": "غير مصرح لك بالوصول"}), 401
     
     # Retrieve user to get their info
+    user_id = session['user_id']
     users = firebase_utils.get_all_users()
     user = next((u for u in users if u['id'] == user_id), None)
     if not user:
-        return jsonify({"error": "User not found"}), 404
+        return jsonify({"error": "المستخدم غير موجود"}), 404
 
     # Generate registration options
     rp_id = request.host.split(':')[0]
@@ -193,11 +193,11 @@ def webauthn_register_begin():
 def webauthn_register_complete():
     user_id = session.get('user_id')
     if not user_id:
-        return jsonify({"error": "Unauthorized"}), 401
+        return jsonify({"error": "غير مصرح لك بالوصول"}), 401
 
     challenge = session.get('webauthn_challenge')
     if not challenge:
-        return jsonify({"error": "No registration in progress"}), 400
+        return jsonify({"error": "لا توجد عملية تسجيل قيد التقدم"}), 400
 
     try:
         credential_data = request.json
@@ -220,7 +220,7 @@ def webauthn_register_complete():
         # Clear challenge
         session.pop('webauthn_challenge', None)
         
-        return jsonify({"status": "success", "message": "Passkey registered successfully!"})
+        return jsonify({"status": "success", "message": "تم تسجيل مفتاح المرور بنجاح!"})
     except Exception as e:
         logger.error(f"WebAuthn registration failed: {e}")
         return jsonify({"error": "حدث خطأ أثناء معالجة الطلب."}), 400
@@ -244,7 +244,7 @@ def webauthn_login_begin():
 def webauthn_login_complete():
     challenge = session.get('webauthn_challenge')
     if not challenge:
-        return jsonify({"error": "No login in progress"}), 400
+        return jsonify({"error": "لا توجد عملية تسجيل دخول قيد التقدم"}), 400
 
     try:
         credential_data = request.json
@@ -253,7 +253,7 @@ def webauthn_login_complete():
         matched_user = firebase_utils.get_user_by_webauthn_credential_id(credential_id)
                 
         if not matched_user:
-            return jsonify({"error": "Credential not registered"}), 404
+            return jsonify({"error": "بيانات الاعتماد غير مسجلة"}), 404
 
         rp_id = request.host.split(':')[0]
 

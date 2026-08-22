@@ -6,11 +6,12 @@ import app.config as config
 import re
 import hmac
 
+
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not session.get('admin_logged_in'):
-            return jsonify({"error": "Unauthorized"}), 401
+            return jsonify({"error": "غير مصرح لك بالوصول"}), 401
         return f(*args, **kwargs)
     return decorated_function
 # ✅ إنشاء الـ Blueprint
@@ -21,10 +22,11 @@ def csrf_protect():
     if request.method in ["POST", "PUT", "PATCH", "DELETE"]:
         if request.path == "/admin/login":
             return
-        token = session.get("csrf_token")
-        request_token = request.headers.get("X-CSRFToken")
-        if not token or not request_token or not hmac.compare_digest(token, request_token):
-            return jsonify({"error": "CSRF token missing or invalid."}), 403
+        client_token = request.headers.get('X-CSRFToken')
+        server_token = session.get('csrf_token')
+
+        if not client_token or not server_token or not hmac.compare_digest(client_token, server_token):
+            return jsonify({"error": "رمز التحقق (CSRF token) مفقود أو غير صالح."}), 403
 
 
 

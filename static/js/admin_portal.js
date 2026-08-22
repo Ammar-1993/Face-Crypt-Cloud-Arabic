@@ -57,6 +57,8 @@ function translateEvent(event) {
   if (e === "delete_user") return "حذف مستخدم";
   if (e === "unblock_user" || e === "admin_unblock") return "فك حظر مستخدم";
   if (e === "clear_logs" || e === "clear_audit_logs") return "مسح سجلات التدقيق";
+  if (e === "update_tolerance") return "تحديث نسبة المطابقة";
+  if (e === "spoofing_attempt") return "محاولة تزييف (Spoofing)";
   return event;
 }
 
@@ -375,7 +377,13 @@ function renderAuditLogs(logs, append = false) {
     tdStatus.innerHTML = statusBadge;
 
     const tdUserId = document.createElement("td");
-    tdUserId.textContent = log.user_id || "";
+    let displayUserId = log.user_id || "";
+    if (displayUserId === "unknown_user") {
+      displayUserId = "مستخدم غير معروف";
+    } else if (displayUserId === "admin") {
+      displayUserId = "المسؤول";
+    }
+    tdUserId.textContent = displayUserId;
 
     const tdTime = document.createElement("td");
     tdTime.className = "text-center";

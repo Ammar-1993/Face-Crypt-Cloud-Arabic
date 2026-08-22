@@ -177,7 +177,7 @@ docker compose exec app pytest -v
 docker compose exec app pytest tests/test_user_routes.py -v
 
 # Run a single test by name
-docker compose exec app pytest -v -k "test_login_success"
+docker compose exec app pytest -v -k "test_successful_login"
 ```
 
 ### Rebuilding the Image
