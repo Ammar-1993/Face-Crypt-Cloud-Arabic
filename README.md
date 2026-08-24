@@ -94,7 +94,7 @@ A smooth, trustworthy transition modal upon successful admin login, featuring a 
 | **Security** | `cryptography` (Fernet), `Flask-Limiter`, `hmac.compare_digest`, Custom CSRF tokens, WebAuthn (`py_webauthn` / Duo Labs) |
 | **Containerization & Deployment** | Docker (multi-stage build), Docker Compose, Google Cloud Run |
 | **Frontend** | HTML5, Vanilla CSS3 (custom design system), Vanilla JavaScript, SweetAlert2 |
-| **Testing** | `pytest` — 26 tests covering auth flows, liveness, anti-enumeration, XSS protection, session authorization, audit log pagination, and WebAuthn registration |
+| **Testing** | `pytest` — 34 tests covering auth flows, liveness, anti-enumeration, XSS protection, session authorization, audit log pagination, and WebAuthn registration |
 
 ---
 
@@ -119,7 +119,7 @@ docker compose up -d
 
 # Verify everything is working
 curl http://localhost:8081/health
-docker compose exec app pytest -v   # Expected: 26 passed
+docker compose exec app pytest -v   # Expected: 34 passed
 ```
 
 Open **`http://localhost:8081`** in your browser.
@@ -214,8 +214,9 @@ The test suite (`pytest.ini` constrains execution strictly to the `tests/` direc
 | `test_admin_routes.py` | Admin authentication, CSRF protection, session authorization, XSS in audit logs |
 | `test_admin_stats.py` | Dashboard statistics, audit log pagination |
 | `test_face_utils.py` | Liveness detection, active challenge validation, WebAuthn registration |
+| `test_i18n.py` | Localization switching, fallback translation logic, and JSON payload structural integrity |
 
-**26 tests — all passing.**
+**34 tests — all passing.**
 
 ---
 
@@ -342,7 +343,7 @@ Face-Crypt-Cloud/
 │   └── models/                 # ONNX model assets (MiniFASNetV2.onnx)
 ├── static/                     # CSS, JavaScript, images
 ├── templates/                  # Jinja2 HTML templates
-├── tests/                      # pytest test suite (26 tests)
+├── tests/                      # pytest test suite (34 tests)
 ├── docs/                       # UI screenshot assets for this README
 ├── firebase/                   # Firebase service account key (gitignored)
 ├── .github/workflows/          # GitHub Actions: security audit + CI test pipeline
