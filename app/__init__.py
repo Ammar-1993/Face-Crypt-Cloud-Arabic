@@ -70,6 +70,7 @@ def create_app():
     import traceback
     from flask import jsonify, request, render_template
     from werkzeug.exceptions import HTTPException
+    from flask_babel import gettext as _
 
     def wants_json_response():
         if request.path.startswith('/admin') or request.path.startswith('/users'):
@@ -79,32 +80,36 @@ def create_app():
     @app.errorhandler(404)
     def page_not_found(e):
         if wants_json_response():
-            return jsonify({"error": "المورد غير موجود (404)."}), 404
+            return jsonify({"error": _("المورد غير موجود (404).")}), 404
         return render_template('404.html'), 404
 
+    @app.errorhandler(500)
     @app.errorhandler(Exception)
-    def handle_exception(e):
-        # Pass through normal HTTP errors (404, 405, etc.) so they aren't logged as 500s
+    def internal_error(e):
+        from flask_babel import gettext as _
+        from werkzeug.exceptions import HTTPException
         if isinstance(e, HTTPException):
             return e
-            
+
         logger.error("Unhandled Exception: %s\n%s", str(e), traceback.format_exc())
         
-        error_msg = f"❌ خطأ داخلي: {str(e)}" if app.debug else "❌ خطأ داخلي في الخادم. يرجى المحاولة مرة أخرى لاحقاً."
+        error_msg = _("❌ خطأ داخلي: %(err)s", err=str(e)) if app.debug else _("❌ خطأ داخلي في الخادم. يرجى المحاولة مرة أخرى لاحقاً.")
         
-        if wants_json_response():
+        if request.path.startswith('/api/') or request.path.startswith('/admin/api/') or request.headers.get('Accept') == 'application/json' or request.content_type == 'application/json':
             return jsonify({"error": error_msg}), 500
-            
+        
         return render_template('500.html'), 500
     @app.errorhandler(413)
     def request_entity_too_large(error):
+        from flask_babel import gettext as _
         logger.warning("Request Entity Too Large: %s", str(error))
-        return jsonify({"error": "❌ حجم الملف كبير جداً. الحد الأقصى المسموح به هو 5 ميغابايت."}), 413
+        return jsonify({"error": _("❌ حجم الملف كبير جداً. الحد الأقصى المسموح به هو 5 ميغابايت.")}), 413
 
     @app.errorhandler(429)
     def ratelimit_handler(error):
+        from flask_babel import gettext as _
         logger.warning("Rate limit exceeded: %s", str(error))
-        return jsonify({"error": f"❌ عذراً، تم تجاوز الحد المسموح من الطلبات: {error.description}"}), 429
+        return jsonify({"error": _("❌ عذراً، تم تجاوز الحد المسموح من الطلبات: %(desc)s", desc=error.description)}), 429
 
 
 

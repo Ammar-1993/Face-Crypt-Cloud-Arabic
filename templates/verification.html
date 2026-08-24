@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="{{ _('Face-Crypt-Cloud – بوابة التحقق البيومتري.') }}" />
   <meta name="theme-color" content="#050A18" />
-  <title>Face-Crypt-Cloud | {{ _('بوابة التحقق البيومتري') }}</title>
+  <title>{{ _('نظام المصادقة البيومتري') }} | {{ _('بوابة التحقق البيومتري') }}</title>
   <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='images/favicon-32x32.png') }}">
   <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='images/favicon-16x16.png') }}">
 
@@ -44,7 +44,7 @@
         <img src="{{ url_for('static', filename='images/face_crypt_cloud_logo.png') }}"
              alt="{{ _('شعار Face-Crypt-Cloud') }}"
              width="42" height="42">
-        <span class="nav-logo-text">Face Crypt Cloud</span>
+        <span class="nav-logo-text">{{ _('نظام المصادقة البيومتري') }}</span>
       </a>
       <div class="nav-controls">
 
@@ -182,7 +182,7 @@
     <!-- ── SITE FOOTER ── -->
     <footer class="site-footer" role="contentinfo">
       <p>
-        &copy; 2024–2026 <strong>Face Crypt Cloud</strong> —
+        &copy; 2024–2026 <strong>{{ _('نظام المصادقة البيومتري') }}</strong> —
         {{ _('جميع الحقوق محفوظة.') }}
         {{ _('مبني بتقنية') }}
         <a href="https://flask.palletsprojects.com/" target="_blank" rel="noopener noreferrer">Flask</a>،

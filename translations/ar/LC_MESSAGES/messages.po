@@ -7,18 +7,43 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-08-22 16:07+0000\n"
+"POT-Creation-Date: 2026-08-24 20:13+0000\n"
 "PO-Revision-Date: 2026-08-22 15:56+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: ar <LL@li.org>\n"
 "Language: ar\n"
+"Language-Team: ar <LL@li.org>\n"
+"Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : "
+"n%100>=3 && n%100<=10 ? 3 : n%100>=0 && n%100<=2 ? 4 : 5);\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=0 && n%100<=2 ? 4 : 5);\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: app/admin/routes.py:15 app/users/routes.py:165 app/users/routes.py:197
+#: app/__init__.py:83
+#, fuzzy
+msgid "المورد غير موجود (404)."
+msgstr "الصفحة غير موجودة (404)"
+
+#: app/__init__.py:96
+#, python-format
+msgid "❌ خطأ داخلي: %(err)s"
+msgstr ""
+
+#: app/__init__.py:96
+#, fuzzy
+msgid "❌ خطأ داخلي في الخادم. يرجى المحاولة مرة أخرى لاحقاً."
+msgstr "عذراً، حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى لاحقاً."
+
+#: app/__init__.py:106
+msgid "❌ حجم الملف كبير جداً. الحد الأقصى المسموح به هو 5 ميغابايت."
+msgstr ""
+
+#: app/__init__.py:112
+#, python-format
+msgid "❌ عذراً، تم تجاوز الحد المسموح من الطلبات: %(desc)s"
+msgstr ""
+
+#: app/admin/routes.py:15 app/users/routes.py:212 app/users/routes.py:242
 msgid "غير مصرح لك بالوصول"
 msgstr "غير مصرح لك بالوصول"
 
@@ -98,15 +123,15 @@ msgstr "❌ يجب أن تكون القيمة بين 0.1 و 1.0"
 msgid "✅ تم تحديث دقة التعرف على الوجه بنجاح"
 msgstr "✅ تم تحديث دقة التعرف على الوجه بنجاح"
 
-#: app/users/routes.py:44
+#: app/users/routes.py:91
 msgid "❌ لم يتم تقديم أي صورة"
 msgstr "❌ لم يتم تقديم أي صورة"
 
-#: app/users/routes.py:48
+#: app/users/routes.py:95
 msgid "❌ اسم الملف فارغ"
 msgstr "❌ اسم الملف فارغ"
 
-#: app/users/routes.py:133
+#: app/users/routes.py:180
 #, python-format
 msgid ""
 "🚨 **فشل الأمان (مكافحة الانتحال):**\n"
@@ -115,35 +140,45 @@ msgstr ""
 "🚨 **فشل الأمان (مكافحة الانتحال):**\n"
 "%(reason)s"
 
-#: app/users/routes.py:147 app/users/routes.py:284
+#: app/users/routes.py:194 app/users/routes.py:327
 #, fuzzy, python-format
 msgid "✅ تم تسجيل الدخول بنجاح. أهلاً بك، %(name)s"
 msgstr "✅ تم تسجيل الدخول بنجاح. أهلاً بك، %(name)s"
 
-#: app/users/routes.py:172
+#: app/users/routes.py:219
 #, fuzzy
 msgid "المستخدم غير موجود"
 msgstr "المستخدم غير موجود"
 
-#: app/users/routes.py:201
+#: app/users/routes.py:246
 msgid "لا توجد عملية تسجيل قيد التقدم"
 msgstr "لا توجد عملية تسجيل قيد التقدم"
 
-#: app/users/routes.py:224
+#: app/users/routes.py:269
 msgid "تم تسجيل مفتاح المرور بنجاح!"
 msgstr "تم تسجيل مفتاح المرور بنجاح!"
 
-#: app/users/routes.py:227 app/users/routes.py:294
+#: app/users/routes.py:272 app/users/routes.py:337
 msgid "حدث خطأ أثناء معالجة الطلب."
 msgstr "حدث خطأ أثناء معالجة الطلب."
 
-#: app/users/routes.py:248
+#: app/users/routes.py:291
 msgid "لا توجد عملية تسجيل دخول قيد التقدم"
 msgstr "لا توجد عملية تسجيل دخول قيد التقدم"
 
-#: app/users/routes.py:257
+#: app/users/routes.py:300
 msgid "بيانات الاعتماد غير مسجلة"
 msgstr "بيانات الاعتماد غير مسجلة"
+
+#: templates/404.html:7 templates/404.html:22 templates/500.html:7
+#: templates/500.html:22 templates/index.html:9 templates/index.html:50
+#: templates/index.html:82 templates/index.html:154
+#: templates/index_admin.html:33 templates/index_admin.html:262
+#: templates/verification.html:9 templates/verification.html:47
+#: templates/verification.html:185
+#, fuzzy
+msgid "نظام المصادقة البيومتري"
+msgstr "نظام المصادقة بالوجه السحابي المشفر"
 
 #: templates/404.html:7
 msgid "الصفحة غير موجودة (404)"
@@ -180,13 +215,13 @@ msgstr "عذراً، حدث خطأ غير متوقع. يرجى المحاولة 
 
 #: templates/index.html:7
 msgid ""
-"Face-Crypt-Cloud – نظام المصادقة البيومترية السحابي المشفر. تسجيل دخول آمن "
-"بتقنية التعرف على الوجه والتشفير المتقدم."
+"Face-Crypt-Cloud – نظام المصادقة البيومترية السحابي المشفر. تسجيل دخول "
+"آمن بتقنية التعرف على الوجه والتشفير المتقدم."
 msgstr ""
-"Face-Crypt-Cloud – نظام المصادقة البيومترية السحابي المشفر. تسجيل دخول آمن "
-"بتقنية التعرف على الوجه والتشفير المتقدم."
+"Face-Crypt-Cloud – نظام المصادقة البيومترية السحابي المشفر. تسجيل دخول "
+"آمن بتقنية التعرف على الوجه والتشفير المتقدم."
 
-#: templates/index.html:9 templates/index.html:78
+#: templates/index.html:9 templates/index.html:86
 msgid "نظام المصادقة بالوجه السحابي المشفر"
 msgstr "نظام المصادقة بالوجه السحابي المشفر"
 
@@ -198,19 +233,24 @@ msgstr "شريط التنقل الرئيسي"
 msgid "Face-Crypt-Cloud الصفحة الرئيسية"
 msgstr "Face-Crypt-Cloud الصفحة الرئيسية"
 
-#: templates/index.html:54 templates/verification.html:49
+#: templates/index.html:56 templates/index_admin.html:39
+#: templates/verification.html:51
+msgid "تغيير اللغة"
+msgstr ""
+
+#: templates/index.html:61 templates/verification.html:56
 msgid "حالة النظام"
 msgstr "حالة النظام"
 
-#: templates/index.html:56 templates/verification.html:51
+#: templates/index.html:63 templates/verification.html:58
 msgid "النظام متاح"
 msgstr "النظام متاح"
 
-#: templates/index.html:69
+#: templates/index.html:77
 msgid "مصادقة بيومترية سحابية مشفرة"
 msgstr "مصادقة بيومترية سحابية مشفرة"
 
-#: templates/index.html:82
+#: templates/index.html:90
 msgid ""
 "منصة أمنية متقدمة تجمع بين تقنية التعرف على الوجه والتشفير السحابي لضمان "
 "هوية المستخدم بدقة عالية وحماية بلا مساومة."
@@ -218,51 +258,51 @@ msgstr ""
 "منصة أمنية متقدمة تجمع بين تقنية التعرف على الوجه والتشفير السحابي لضمان "
 "هوية المستخدم بدقة عالية وحماية بلا مساومة."
 
-#: templates/index.html:103
+#: templates/index.html:111
 msgid "رسم بياني للتعرف على الوجه ببيانات بيومترية مشفرة"
 msgstr "رسم بياني للتعرف على الوجه ببيانات بيومترية مشفرة"
 
-#: templates/index.html:109
+#: templates/index.html:117
 msgid "جاهز للمسح البيومتري - انتقل إلى بوابة التحقق"
 msgstr "جاهز للمسح البيومتري - انتقل إلى بوابة التحقق"
 
-#: templates/index.html:112
+#: templates/index.html:120
 msgid "جاهز للمسح البيومتري"
 msgstr "جاهز للمسح البيومتري"
 
-#: templates/index.html:113
+#: templates/index.html:121
 msgid "انتقل إلى بوابة التحقق"
 msgstr "انتقل إلى بوابة التحقق"
 
-#: templates/index.html:119
+#: templates/index.html:127
 msgid "مميزات النظام"
 msgstr "مميزات النظام"
 
-#: templates/index.html:122
+#: templates/index.html:130
 msgid "تشفير AES-128"
 msgstr "تشفير AES-128"
 
-#: templates/index.html:126
+#: templates/index.html:134
 msgid "سحابة Firebase"
 msgstr "سحابة Firebase"
 
-#: templates/index.html:130
+#: templates/index.html:138
 msgid "ذكاء اصطناعي"
 msgstr "ذكاء اصطناعي"
 
-#: templates/index.html:134
+#: templates/index.html:142
 msgid "استجابة فورية"
 msgstr "استجابة فورية"
 
-#: templates/index.html:147 templates/verification.html:178
+#: templates/index.html:155 templates/verification.html:186
 msgid "جميع الحقوق محفوظة."
 msgstr "جميع الحقوق محفوظة."
 
-#: templates/index.html:148 templates/verification.html:179
+#: templates/index.html:156 templates/verification.html:187
 msgid "مبني بتقنية"
 msgstr "مبني بتقنية"
 
-#: templates/index.html:153 templates/verification.html:184
+#: templates/index.html:161 templates/verification.html:192
 msgid "بوابة الإدارة"
 msgstr "بوابة الإدارة"
 
@@ -286,180 +326,179 @@ msgstr "شريط التنقل — بوابة المسؤول"
 msgid "Face-Crypt-Cloud — بوابة المسؤول"
 msgstr "Face-Crypt-Cloud — بوابة المسؤول"
 
-#: templates/index_admin.html:37
+#: templates/index_admin.html:44
 msgid "وضع لوحة المسؤول"
 msgstr "وضع لوحة المسؤول"
 
-#: templates/index_admin.html:39 templates/index_admin.html:53
+#: templates/index_admin.html:46 templates/index_admin.html:61
 msgid "بوابة المسؤول"
 msgstr "بوابة المسؤول"
 
-#: templates/index_admin.html:46
+#: templates/index_admin.html:53
 msgid "تسجيل الخروج من لوحة التحكم"
 msgstr "تسجيل الخروج من لوحة التحكم"
 
-#: templates/index_admin.html:48
+#: templates/index_admin.html:55
 msgid "خروج"
 msgstr "خروج"
 
-#: templates/index_admin.html:57
+#: templates/index_admin.html:65
 msgid "تسجيل دخول المسؤول"
 msgstr "تسجيل دخول المسؤول"
 
-#: templates/index_admin.html:59 templates/index_admin.html:61
+#: templates/index_admin.html:67 templates/index_admin.html:69
 msgid "كلمة مرور المسؤول"
 msgstr "كلمة مرور المسؤول"
 
-#: templates/index_admin.html:61
+#: templates/index_admin.html:69
 msgid "أدخل كلمة المرور المعقدة..."
 msgstr "أدخل كلمة المرور المعقدة..."
 
-#: templates/index_admin.html:62
+#: templates/index_admin.html:70
 msgid "إظهار أو إخفاء كلمة المرور"
 msgstr "إظهار أو إخفاء كلمة المرور"
 
-#: templates/index_admin.html:67
+#: templates/index_admin.html:75
 msgid "عذراً، لا يُسمح باستخدام الأحرف العربية هنا. يرجى تحويل لوحة المفاتيح."
-msgstr ""
-"عذراً، لا يُسمح باستخدام الأحرف العربية هنا. يرجى تحويل لوحة المفاتيح."
+msgstr "عذراً، لا يُسمح باستخدام الأحرف العربية هنا. يرجى تحويل لوحة المفاتيح."
 
-#: templates/index_admin.html:69
+#: templates/index_admin.html:77
 msgid "تسجيل الدخول"
 msgstr "تسجيل الدخول"
 
-#: templates/index_admin.html:73
+#: templates/index_admin.html:81
 msgid "معلومات أمان بوابة الإدارة"
 msgstr "معلومات أمان بوابة الإدارة"
 
-#: templates/index_admin.html:76
+#: templates/index_admin.html:84
 msgid "بوابة آمنة ومُراقَبة"
 msgstr "بوابة آمنة ومُراقَبة"
 
-#: templates/index_admin.html:77
-msgid ""
-"الوصول مقيّد بكلمة مرور معقدة. جميع العمليات الإدارية — إضافة المستخدمين، "
-"حذفهم، ومسح السجلات — مُسجَّلة تلقائياً في سجل التدقيق السحابي."
-msgstr ""
-"الوصول مقيّد بكلمة مرور معقدة. جميع العمليات الإدارية — إضافة المستخدمين، "
-"حذفهم، ومسح السجلات — مُسجَّلة تلقائياً في سجل التدقيق السحابي."
-
 #: templates/index_admin.html:85
+msgid ""
+"الوصول مقيّد بكلمة مرور معقدة. جميع العمليات الإدارية — إضافة المستخدمين،"
+" حذفهم، ومسح السجلات — مُسجَّلة تلقائياً في سجل التدقيق السحابي."
+msgstr ""
+"الوصول مقيّد بكلمة مرور معقدة. جميع العمليات الإدارية — إضافة المستخدمين،"
+" حذفهم، ومسح السجلات — مُسجَّلة تلقائياً في سجل التدقيق السحابي."
+
+#: templates/index_admin.html:93
 msgid "تسجيل الخروج"
 msgstr "تسجيل الخروج"
 
-#: templates/index_admin.html:91
+#: templates/index_admin.html:99
 msgid "إضافة مستخدم جديد"
 msgstr "إضافة مستخدم جديد"
 
-#: templates/index_admin.html:92 templates/index_admin.html:134
+#: templates/index_admin.html:100 templates/index_admin.html:142
 msgid "معرف المستخدم"
 msgstr "معرف المستخدم"
 
-#: templates/index_admin.html:93
+#: templates/index_admin.html:101
 msgid "الاسم"
 msgstr "الاسم"
 
-#: templates/index_admin.html:94
+#: templates/index_admin.html:102
 msgid "البريد الإلكتروني"
 msgstr "البريد الإلكتروني"
 
-#: templates/index_admin.html:95
+#: templates/index_admin.html:103
 msgid "زر اختيار صورة بصمة الوجه"
 msgstr "زر اختيار صورة بصمة الوجه"
 
-#: templates/index_admin.html:95
+#: templates/index_admin.html:103
 msgid "اختر صورة بصمة الوجه..."
 msgstr "اختر صورة بصمة الوجه..."
 
-#: templates/index_admin.html:97
+#: templates/index_admin.html:105
 msgid "ملف صورة الوجه"
 msgstr "ملف صورة الوجه"
 
-#: templates/index_admin.html:98
+#: templates/index_admin.html:106
 msgid "إضافة مستخدم"
 msgstr "إضافة مستخدم"
 
-#: templates/index_admin.html:106 templates/index_admin.html:109
+#: templates/index_admin.html:114 templates/index_admin.html:117
 msgid "حذف مستخدم"
 msgstr "حذف مستخدم"
 
-#: templates/index_admin.html:107
+#: templates/index_admin.html:115
 msgid "البحث عن مستخدم..."
 msgstr "البحث عن مستخدم..."
 
-#: templates/index_admin.html:107
+#: templates/index_admin.html:115
 msgid "البحث عن مستخدم للحذف"
 msgstr "البحث عن مستخدم للحذف"
 
-#: templates/index_admin.html:108
+#: templates/index_admin.html:116
 msgid "اختر معرف المستخدم للحذف"
 msgstr "اختر معرف المستخدم للحذف"
 
-#: templates/index_admin.html:109
+#: templates/index_admin.html:117
 msgid "حذف المستخدم المحدد"
 msgstr "حذف المستخدم المحدد"
 
-#: templates/index_admin.html:118
+#: templates/index_admin.html:126
 msgid "سجلات التدقيق"
 msgstr "سجلات التدقيق"
 
-#: templates/index_admin.html:120
+#: templates/index_admin.html:128
 msgid "تحديث سجلات التدقيق"
 msgstr "تحديث سجلات التدقيق"
 
-#: templates/index_admin.html:120
+#: templates/index_admin.html:128
 msgid "تحديث السجلات"
 msgstr "تحديث السجلات"
 
-#: templates/index_admin.html:121
+#: templates/index_admin.html:129
 msgid "مسح كافة سجلات التدقيق"
 msgstr "مسح كافة سجلات التدقيق"
 
-#: templates/index_admin.html:121
+#: templates/index_admin.html:129
 msgid "مسح السجلات"
 msgstr "مسح السجلات"
 
-#: templates/index_admin.html:125
+#: templates/index_admin.html:133
 msgid "البحث في السجلات..."
 msgstr "البحث في السجلات..."
 
-#: templates/index_admin.html:126
+#: templates/index_admin.html:134
 msgid "البحث في سجلات التدقيق"
 msgstr "البحث في سجلات التدقيق"
 
-#: templates/index_admin.html:132
+#: templates/index_admin.html:140
 msgid "الحدث"
 msgstr "الحدث"
 
-#: templates/index_admin.html:133
+#: templates/index_admin.html:141
 msgid "الحالة"
 msgstr "الحالة"
 
-#: templates/index_admin.html:135
+#: templates/index_admin.html:143
 msgid "وقت التسجيل"
 msgstr "وقت التسجيل"
 
-#: templates/index_admin.html:136
+#: templates/index_admin.html:144
 msgid "الإجراءات"
 msgstr "الإجراءات"
 
-#: templates/index_admin.html:141
+#: templates/index_admin.html:149
 msgid "جاري التحميل..."
 msgstr "جاري التحميل..."
 
-#: templates/index_admin.html:147
+#: templates/index_admin.html:155
 msgid "تحميل المزيد"
 msgstr "تحميل المزيد"
 
-#: templates/index_admin.html:154
+#: templates/index_admin.html:162
 msgid "إعدادات الأمان المتقدمة"
 msgstr "إعدادات الأمان المتقدمة"
 
-#: templates/index_admin.html:159
+#: templates/index_admin.html:167
 msgid "دقة التعرف على الوجه (Tolerance)"
 msgstr "دقة التعرف على الوجه (Tolerance)"
 
-#: templates/index_admin.html:160
+#: templates/index_admin.html:168
 msgid ""
 "قم بضبط مستوى الدقة المطلوبة لمطابقة الوجوه. (قيمة أقل = دقة أعلى وأكثر "
 "صرامة ضد الاختراق، قيمة أعلى = تساهل في التعرف)."
@@ -467,85 +506,83 @@ msgstr ""
 "قم بضبط مستوى الدقة المطلوبة لمطابقة الوجوه. (قيمة أقل = دقة أعلى وأكثر "
 "صرامة ضد الاختراق، قيمة أعلى = تساهل في التعرف)."
 
-#: templates/index_admin.html:172
+#: templates/index_admin.html:180
 msgid "حفظ"
 msgstr "حفظ"
 
-#: templates/index_admin.html:181
+#: templates/index_admin.html:189
 msgid "الإحصائيات"
 msgstr "الإحصائيات"
 
-#: templates/index_admin.html:182
+#: templates/index_admin.html:190
 msgid "تحديث الإحصائيات"
 msgstr "تحديث الإحصائيات"
 
-#: templates/index_admin.html:188
+#: templates/index_admin.html:196
 msgid "عدد جميع محاولات تسجيل الدخول (الناجحة والفاشلة) المسجلة في السحابة."
 msgstr "عدد جميع محاولات تسجيل الدخول (الناجحة والفاشلة) المسجلة في السحابة."
 
-#: templates/index_admin.html:190
+#: templates/index_admin.html:198
 msgid "إجمالي المحاولات"
 msgstr "إجمالي المحاولات"
 
-#: templates/index_admin.html:195
+#: templates/index_admin.html:203
 msgid "عدد مرات التعرف على الوجه وتسجيل الدخول بنجاح."
 msgstr "عدد مرات التعرف على الوجه وتسجيل الدخول بنجاح."
 
-#: templates/index_admin.html:197
+#: templates/index_admin.html:205
 msgid "دخول ناجح"
 msgstr "دخول ناجح"
 
-#: templates/index_admin.html:202
+#: templates/index_admin.html:210
 msgid "عدد المرات التي فشل فيها النظام في مطابقة الوجه."
 msgstr "عدد المرات التي فشل فيها النظام في مطابقة الوجه."
 
-#: templates/index_admin.html:204
+#: templates/index_admin.html:212
 msgid "محاولات فاشلة"
 msgstr "محاولات فاشلة"
 
-#: templates/index_admin.html:210
+#: templates/index_admin.html:218
 msgid "إجمالي المرات التي أصدر فيها النظام قراراً بالحظر النهائي (تاريخياً)."
 msgstr "إجمالي المرات التي أصدر فيها النظام قراراً بالحظر النهائي (تاريخياً)."
 
-#: templates/index_admin.html:212
+#: templates/index_admin.html:220
 msgid "أحداث الحظر النهائي"
 msgstr "أحداث الحظر النهائي"
 
-#: templates/index_admin.html:218
+#: templates/index_admin.html:226
 msgid "إجمالي المرات التي تم فيها إيقاف مستخدم مؤقتاً بسبب المحاولات الخاطئة."
-msgstr ""
-"إجمالي المرات التي تم فيها إيقاف مستخدم مؤقتاً بسبب المحاولات الخاطئة."
+msgstr "إجمالي المرات التي تم فيها إيقاف مستخدم مؤقتاً بسبب المحاولات الخاطئة."
 
-#: templates/index_admin.html:220
+#: templates/index_admin.html:228
 msgid "أحداث الحظر المؤقت"
 msgstr "أحداث الحظر المؤقت"
 
-#: templates/index_admin.html:226
+#: templates/index_admin.html:234
 msgid "العدد الحالي للمستخدمين المحظورين نهائياً في هذه اللحظة."
 msgstr "العدد الحالي للمستخدمين المحظورين نهائياً في هذه اللحظة."
 
-#: templates/index_admin.html:228
+#: templates/index_admin.html:236
 msgid "مستخدمون محظورون"
 msgstr "مستخدمون محظورون"
 
-#: templates/index_admin.html:234
+#: templates/index_admin.html:242
 msgid "العدد الحالي للمستخدمين الموقوفين مؤقتاً (لمدة 5 دقائق) في هذه اللحظة."
-msgstr ""
-"العدد الحالي للمستخدمين الموقوفين مؤقتاً (لمدة 5 دقائق) في هذه اللحظة."
+msgstr "العدد الحالي للمستخدمين الموقوفين مؤقتاً (لمدة 5 دقائق) في هذه اللحظة."
 
-#: templates/index_admin.html:236
+#: templates/index_admin.html:244
 msgid "في الحظر المؤقت"
 msgstr "في الحظر المؤقت"
 
-#: templates/index_admin.html:242
+#: templates/index_admin.html:250
 msgid "إجمالي عدد الأشخاص المسجلين في قاعدة بيانات السحابة."
 msgstr "إجمالي عدد الأشخاص المسجلين في قاعدة بيانات السحابة."
 
-#: templates/index_admin.html:244
+#: templates/index_admin.html:252
 msgid "إجمالي المستخدمين"
 msgstr "إجمالي المستخدمين"
 
-#: templates/index_admin.html:255
+#: templates/index_admin.html:263
 msgid "بوابة الإدارة الآمنة. جميع العمليات مُسجَّلة في سجلات التدقيق."
 msgstr "بوابة الإدارة الآمنة. جميع العمليات مُسجَّلة في سجلات التدقيق."
 
@@ -553,106 +590,126 @@ msgstr "بوابة الإدارة الآمنة. جميع العمليات مُس
 msgid "Face-Crypt-Cloud – بوابة التحقق البيومتري."
 msgstr "Face-Crypt-Cloud – بوابة التحقق البيومتري."
 
-#: templates/verification.html:9 templates/verification.html:64
+#: templates/verification.html:9 templates/verification.html:72
 msgid "بوابة التحقق البيومتري"
 msgstr "بوابة التحقق البيومتري"
 
-#: templates/verification.html:65
+#: templates/verification.html:73
 msgid "ضع وجهك أمام الكاميرا لإتمام عملية التحقق"
 msgstr "ضع وجهك أمام الكاميرا لإتمام عملية التحقق"
 
-#: templates/verification.html:73
+#: templates/verification.html:81
 msgid "بدء عملية التحقق من الوجه – فتح الكاميرا"
 msgstr "بدء عملية التحقق من الوجه – فتح الكاميرا"
 
-#: templates/verification.html:76
+#: templates/verification.html:84
 msgid "بدء التحقق من الوجه"
 msgstr "بدء التحقق من الوجه"
 
-#: templates/verification.html:77
+#: templates/verification.html:85
 msgid "افتح الكاميرا لتسجيل دخول آمن"
 msgstr "افتح الكاميرا لتسجيل دخول آمن"
 
-#: templates/verification.html:84 templates/verification.html:87
+#: templates/verification.html:92 templates/verification.html:95
 msgid "الدخول بمفتاح المرور"
 msgstr "الدخول بمفتاح المرور"
 
-#: templates/verification.html:88
+#: templates/verification.html:96
 msgid "تسجيل دخول سريع للأجهزة المسجلة"
 msgstr "تسجيل دخول سريع للأجهزة المسجلة"
 
-#: templates/verification.html:97
+#: templates/verification.html:105
 msgid "بث الكاميرا للتحقق من الوجه"
 msgstr "بث الكاميرا للتحقق من الوجه"
 
-#: templates/verification.html:100
+#: templates/verification.html:108
 msgid "معاينة الصورة الملتقطة"
 msgstr "معاينة الصورة الملتقطة"
 
-#: templates/verification.html:107
+#: templates/verification.html:115
 msgid "التقاط صورة من الكاميرا"
 msgstr "التقاط صورة من الكاميرا"
 
-#: templates/verification.html:109
+#: templates/verification.html:117
 msgid "التقاط الصورة"
 msgstr "التقاط الصورة"
 
-#: templates/verification.html:114 templates/verification.html:116
+#: templates/verification.html:122 templates/verification.html:124
 msgid "إغلاق الكاميرا"
 msgstr "إغلاق الكاميرا"
 
-#: templates/verification.html:126
+#: templates/verification.html:134
 msgid "إرسال الصورة للتحقق"
 msgstr "إرسال الصورة للتحقق"
 
-#: templates/verification.html:128
+#: templates/verification.html:136
 msgid "إرسال للتحقق"
 msgstr "إرسال للتحقق"
 
-#: templates/verification.html:133
+#: templates/verification.html:141
 msgid "إعادة التقاط الصورة"
 msgstr "إعادة التقاط الصورة"
 
-#: templates/verification.html:135
+#: templates/verification.html:143
 msgid "إعادة التقاط"
 msgstr "إعادة التقاط"
 
-#: templates/verification.html:143
+#: templates/verification.html:151
 msgid "إلغاء عملية التحقق"
 msgstr "إلغاء عملية التحقق"
 
-#: templates/verification.html:144
+#: templates/verification.html:152
 msgid "إلغاء العملية ✖"
 msgstr "إلغاء العملية ✖"
 
-#: templates/verification.html:151 templates/verification.html:157
+#: templates/verification.html:159 templates/verification.html:165
 msgid "سياسة حماية الحساب"
 msgstr "سياسة حماية الحساب"
 
-#: templates/verification.html:159
+#: templates/verification.html:167
 msgid "قواعد الحماية"
 msgstr "قواعد الحماية"
 
-#: templates/verification.html:161
+#: templates/verification.html:169
 msgid "تحذير"
 msgstr "تحذير"
 
-#: templates/verification.html:161
+#: templates/verification.html:169
 msgid "٣ محاولات فاشلة"
 msgstr "٣ محاولات فاشلة"
 
-#: templates/verification.html:162
+#: templates/verification.html:170
 msgid "حظر مؤقت تلقائي لمدة ٥ دقائق."
 msgstr "حظر مؤقت تلقائي لمدة ٥ دقائق."
 
-#: templates/verification.html:165
+#: templates/verification.html:173
 msgid "خطر"
 msgstr "خطر"
 
-#: templates/verification.html:165
+#: templates/verification.html:173
 msgid "٥ محاولات فاشلة"
 msgstr "٥ محاولات فاشلة"
 
-#: templates/verification.html:166
+#: templates/verification.html:174
 msgid "حظر دائم — يتطلب مراجعة مسؤول النظام."
 msgstr "حظر دائم — يتطلب مراجعة مسؤول النظام."
+
+#: utils/face_utils.py:50
+#, python-format
+msgid "نوع البيانات غير مدعوم: %(dtype)s"
+msgstr ""
+
+#: utils/face_utils.py:52
+#, python-format
+msgid "شكل غير مدعوم: %(shape)s"
+msgstr ""
+
+#: utils/face_utils.py:57
+#, python-format
+msgid "فشل في ترميز الوجه: %(error)s"
+msgstr ""
+
+#: utils/face_utils.py:60
+msgid "لم يتم اكتشاف أي وجه. يرجى المحاولة مرة أخرى بصورة واضحة."
+msgstr ""
+

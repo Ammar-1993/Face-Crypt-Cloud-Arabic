@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#050A18" />
-  <title>Face-Crypt-Cloud | {{ _('الصفحة غير موجودة (404)') }}</title>
+  <title>{{ _('نظام المصادقة البيومتري') }} | {{ _('الصفحة غير موجودة (404)') }}</title>
   <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='images/favicon-32x32.png') }}">
   <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='images/favicon-16x16.png') }}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -19,7 +19,7 @@
     <nav class="top-nav" role="navigation">
       <a href="/" class="nav-logo" style="text-decoration: none;">
         <img src="{{ url_for('static', filename='images/face_crypt_cloud_logo.png') }}" alt="{{ _('شعار Face-Crypt-Cloud') }}" width="42" height="42">
-        <span class="nav-logo-text">Face Crypt Cloud</span>
+        <span class="nav-logo-text">{{ _('نظام المصادقة البيومتري') }}</span>
       </a>
     </nav>
     <main class="hero-section" id="main-content" style="min-height: 70vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">

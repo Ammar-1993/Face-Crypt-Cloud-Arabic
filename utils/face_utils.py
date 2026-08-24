@@ -10,6 +10,7 @@ import os
 import onnxruntime as ort
 import time
 import logging
+from flask_babel import gettext as _
 
 from app.config import SECRET_KEY
 from utils import firebase_utils
@@ -32,7 +33,7 @@ def load_image_from_request(file):
     file.seek(0)
     data = file.read()
     if not data:
-        raise ValueError("❌ لم يتم استلام أي بيانات للصورة.")
+        raise ValueError(_("❌ لم يتم استلام أي بيانات للصورة."))
         
     image = Image.open(BytesIO(data)).convert('RGB')
     image = image.resize((500, 500))  # Optional resize to standardize
@@ -45,18 +46,20 @@ def extract_face_encoding(image_array, face_locations=None):
     Safely extracts the face encoding from a given image (NumPy array).
     Returns the first encoding found or raises ValueError.
     """
+    from flask_babel import _
+    if image_array.dtype != np.uint8:
+        raise ValueError(_("نوع البيانات غير مدعوم: %(dtype)s", dtype=image_array.dtype))
+    if len(image_array.shape) != 3 or image_array.shape[2] != 3:
+        raise ValueError(_("شكل غير مدعوم: %(shape)s", shape=image_array.shape))
+    
     try:
-        if image_array.dtype != np.uint8:
-            raise ValueError(f"نوع البيانات غير مدعوم: {image_array.dtype}")
-        if len(image_array.shape) != 3 or image_array.shape[2] != 3:
-            raise ValueError(f"شكل غير مدعوم: {image_array.shape}")
-        
         encodings = face_recognition.face_encodings(image_array, known_face_locations=face_locations)
-        if len(encodings) == 0:
-            raise ValueError("لم يتم اكتشاف أي وجه. يرجى المحاولة مرة أخرى بصورة واضحة.")
-        return encodings[0]
     except Exception as e:
-        raise ValueError(f"فشل في ترميز الوجه: {str(e)}")
+        raise ValueError(_("فشل في ترميز الوجه: %(error)s", error=str(e)))
+        
+    if len(encodings) == 0:
+        raise ValueError(_("لم يتم اكتشاف أي وجه. يرجى المحاولة مرة أخرى بصورة واضحة."))
+    return encodings[0]
 
 
 def compare_encodings(known_encoding, unknown_encoding, tolerance=None):
@@ -68,7 +71,7 @@ def compare_encodings(known_encoding, unknown_encoding, tolerance=None):
         tolerance = firebase_utils.get_security_config().get("tolerance", 0.6)
         
     if known_encoding is None or unknown_encoding is None:
-        raise ValueError("❌ أحد التشفيرات أو كلاهما غير صالح.")
+        raise ValueError(_("❌ أحد التشفيرات أو كلاهما غير صالح."))
     results = face_recognition.compare_faces([known_encoding], unknown_encoding, tolerance=tolerance)
     return results[0]
 
@@ -126,7 +129,7 @@ def check_liveness(image_array_1, image_array_2=None, face_locations_1=None, fac
     
     # Threshold for blur (very modest to allow regular webcams)
     if laplacian_var < 30.0:
-        return False, "الصورة غير واضحة أو تبدو كصورة مطبوعة."
+        return False, _("الصورة غير واضحة أو تبدو كصورة مطبوعة.")
 
     # 2. Active Challenge (Two frames)
     if image_array_2 is not None:
@@ -135,7 +138,7 @@ def check_liveness(image_array_1, image_array_2=None, face_locations_1=None, fac
             landmarks2 = face_recognition.face_landmarks(image_array_2, face_locations=face_locations_2)
             
             if not landmarks1 or not landmarks2:
-                return False, "لم يتم اكتشاف الوجه في الإطارين."
+                return False, _("لم يتم اكتشاف الوجه في الإطارين.")
                 
             l1 = landmarks1[0]
             l2 = landmarks2[0]
@@ -151,7 +154,7 @@ def check_liveness(image_array_1, image_array_2=None, face_locations_1=None, fac
             
             # If the difference is extremely small, it's a static printed photo or a screen
             if diff < 0.5:
-                return False, "لم يتم اكتشاف أي حركة طبيعية للوجه (صورة ثابتة)."
+                return False, _("لم يتم اكتشاف أي حركة طبيعية للوجه (صورة ثابتة).")
 
             # Verify the specific random challenge if provided
             # This defends against pre-recorded replay attacks.
@@ -163,22 +166,22 @@ def check_liveness(image_array_1, image_array_2=None, face_locations_1=None, fac
                     mouth_h2 = get_distance(l2['top_lip'][3], l2['bottom_lip'][3])
                     # Require mouth to widen or open
                     if mouth_w2 - mouth_w1 < 1.0 and mouth_h2 - mouth_h1 < 1.0:
-                        return False, "لم يتم تنفيذ التحدي المطلوب (الابتسامة)."
+                        return False, _("لم يتم تنفيذ التحدي المطلوب (الابتسامة).")
                 elif challenge == "raise_eyebrows":
                     brow_dist1 = l1['left_eye'][0][1] - l1['left_eyebrow'][2][1]
                     brow_dist2 = l2['left_eye'][0][1] - l2['left_eyebrow'][2][1]
                     # Require eyebrows to go up (distance from eye increases)
                     if brow_dist2 - brow_dist1 < 1.0:
-                        return False, "لم يتم تنفيذ التحدي المطلوب (رفع الحاجبين)."
+                        return False, _("لم يتم تنفيذ التحدي المطلوب (رفع الحاجبين).")
                 elif challenge == "turn_right":
                     nose_x1 = l1['nose_tip'][2][0]
                     nose_x2 = l2['nose_tip'][2][0]
                     # Require horizontal nose movement
                     if abs(nose_x2 - nose_x1) < 3.0:
-                        return False, "لم يتم تنفيذ التحدي المطلوب (تحريك الرأس)."
+                        return False, _("لم يتم تنفيذ التحدي المطلوب (تحريك الرأس).")
                 
         except Exception as e:
-            return False, f"خطأ أثناء الفحص: {str(e)}"
+            return False, _("خطأ أثناء الفحص: %(err)s", err=str(e))
             
     # 3. MiniFASNet Anti-Spoofing Check
     if fas_session is not None:
@@ -222,11 +225,11 @@ def check_liveness(image_array_1, image_array_2=None, face_locations_1=None, fac
             
             # Require class 2 (real face) and high probability
             if predicted_class != 2 or real_prob < 0.6:
-                return False, "تم اكتشاف محاولة احتيال (فحص النماذج)."
+                return False, _("تم اكتشاف محاولة احتيال (فحص النماذج).")
                 
         except Exception as e:
-            return False, f"خطأ أثناء فحص الاحتيال: {str(e)}"
+            return False, _("خطأ أثناء فحص الاحتيال: %(err)s", err=str(e))
             
-    return True, "نجاح"
+    return True, _("نجاح")
 
 

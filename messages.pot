@@ -1,18 +1,17 @@
-# English translations for PROJECT.
+# Translations template for PROJECT.
 # Copyright (C) 2026 ORGANIZATION
 # This file is distributed under the same license as the PROJECT project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
 #
+#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2026-08-24 20:13+0000\n"
-"PO-Revision-Date: 2026-08-22 15:56+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language: en\n"
-"Language-Team: en <LL@li.org>\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -20,106 +19,106 @@ msgstr ""
 
 #: app/__init__.py:83
 msgid "المورد غير موجود (404)."
-msgstr "Page Not Found (404)"
+msgstr ""
 
 #: app/__init__.py:96
 #, python-format
 msgid "❌ خطأ داخلي: %(err)s"
-msgstr "❌ Internal error: %(err)s"
+msgstr ""
 
 #: app/__init__.py:96
 msgid "❌ خطأ داخلي في الخادم. يرجى المحاولة مرة أخرى لاحقاً."
-msgstr "❌ Internal server error. Please try again later."
+msgstr ""
 
 #: app/__init__.py:106
 msgid "❌ حجم الملف كبير جداً. الحد الأقصى المسموح به هو 5 ميغابايت."
-msgstr "❌ File size too large. Maximum allowed is 5MB."
+msgstr ""
 
 #: app/__init__.py:112
 #, python-format
 msgid "❌ عذراً، تم تجاوز الحد المسموح من الطلبات: %(desc)s"
-msgstr "❌ Sorry, request limit exceeded: %(desc)s"
+msgstr ""
 
 #: app/admin/routes.py:15 app/users/routes.py:212 app/users/routes.py:242
 msgid "غير مصرح لك بالوصول"
-msgstr "Unauthorized Access"
+msgstr ""
 
 #: app/admin/routes.py:30
 msgid "رمز التحقق (CSRF token) مفقود أو غير صالح."
-msgstr "CSRF token is missing or invalid."
+msgstr ""
 
 #: app/admin/routes.py:51
 msgid "❌ كلمة المرور مطلوبة"
-msgstr "❌ Password is required"
+msgstr ""
 
 #: app/admin/routes.py:63
 msgid "✅ أهلاً بك أيها المسؤول"
-msgstr "✅ Welcome, Administrator"
+msgstr ""
 
 #: app/admin/routes.py:68
 msgid "كلمة مرور غير صالحة"
-msgstr "Invalid password"
+msgstr ""
 
 #: app/admin/routes.py:81
 msgid "❌ حقول مطلوبة مفقودة"
-msgstr "❌ Required fields are missing"
+msgstr ""
 
 #: app/admin/routes.py:85
 msgid "❌ معرف المستخدم غير صالح (أحرف، أرقام، شرطات فقط). ومحدود بـ 50 حرف."
-msgstr "❌ Invalid user ID (letters, numbers, dashes only). Max 50 characters."
+msgstr ""
 
 #: app/admin/routes.py:87
 msgid "❌ الاسم يحتوي على رموز غير مسموحة."
-msgstr "❌ Name contains invalid characters."
+msgstr ""
 
 #: app/admin/routes.py:113
 msgid "تم إضافة المستخدم بنجاح"
-msgstr "User added successfully"
+msgstr ""
 
 #: app/admin/routes.py:125 app/admin/routes.py:231
 msgid "❌ معرف المستخدم مطلوب"
-msgstr "❌ User ID is required"
+msgstr ""
 
 #: app/admin/routes.py:129
 msgid "تم حذف المستخدم بنجاح"
-msgstr "User deleted successfully"
+msgstr ""
 
 #: app/admin/routes.py:245
 msgid "❌ لا يمكن فك الحظر: هذا المستخدم غير مسجل في قاعدة البيانات."
-msgstr "❌ Cannot unblock: This user is not registered in the database."
+msgstr ""
 
 #: app/admin/routes.py:255
 msgid "✅ تم فك حظر المستخدم بنجاح"
-msgstr "✅ User unblocked successfully"
+msgstr ""
 
 #: app/admin/routes.py:303
 #, python-format
 msgid "✅ تم مسح %(total_count)s من سجلات التدقيق."
-msgstr "✅ Cleared %(total_count)s audit logs."
+msgstr ""
 
 #: app/admin/routes.py:308
 msgid "✅ تم تسجيل الخروج بنجاح"
-msgstr "✅ Logged out successfully"
+msgstr ""
 
 #: app/admin/routes.py:321
 msgid "❌ المعلمة tolerance مطلوبة"
-msgstr "❌ Tolerance parameter is required"
+msgstr ""
 
 #: app/admin/routes.py:326
 msgid "❌ يجب أن تكون القيمة بين 0.1 و 1.0"
-msgstr "❌ Value must be between 0.1 and 1.0"
+msgstr ""
 
 #: app/admin/routes.py:336
 msgid "✅ تم تحديث دقة التعرف على الوجه بنجاح"
-msgstr "✅ Facial recognition tolerance updated successfully"
+msgstr ""
 
 #: app/users/routes.py:91
 msgid "❌ لم يتم تقديم أي صورة"
-msgstr "❌ No image provided"
+msgstr ""
 
 #: app/users/routes.py:95
 msgid "❌ اسم الملف فارغ"
-msgstr "❌ File name is empty"
+msgstr ""
 
 #: app/users/routes.py:180
 #, python-format
@@ -127,37 +126,35 @@ msgid ""
 "🚨 **فشل الأمان (مكافحة الانتحال):**\n"
 "%(reason)s"
 msgstr ""
-"🚨 **Security Failure (Anti-Spoofing):**\n"
-"%(reason)s"
 
 #: app/users/routes.py:194 app/users/routes.py:327
 #, python-format
 msgid "✅ تم تسجيل الدخول بنجاح. أهلاً بك، %(name)s"
-msgstr "✅ Successfully logged in. Welcome, %(name)s"
+msgstr ""
 
 #: app/users/routes.py:219
 msgid "المستخدم غير موجود"
-msgstr "User not found"
+msgstr ""
 
 #: app/users/routes.py:246
 msgid "لا توجد عملية تسجيل قيد التقدم"
-msgstr "No registration process in progress"
+msgstr ""
 
 #: app/users/routes.py:269
 msgid "تم تسجيل مفتاح المرور بنجاح!"
-msgstr "Passkey registered successfully!"
+msgstr ""
 
 #: app/users/routes.py:272 app/users/routes.py:337
 msgid "حدث خطأ أثناء معالجة الطلب."
-msgstr "An error occurred while processing the request."
+msgstr ""
 
 #: app/users/routes.py:291
 msgid "لا توجد عملية تسجيل دخول قيد التقدم"
-msgstr "No login process in progress"
+msgstr ""
 
 #: app/users/routes.py:300
 msgid "بيانات الاعتماد غير مسجلة"
-msgstr "Credentials not registered"
+msgstr ""
 
 #: templates/404.html:7 templates/404.html:22 templates/500.html:7
 #: templates/500.html:22 templates/index.html:9 templates/index.html:50
@@ -166,588 +163,528 @@ msgstr "Credentials not registered"
 #: templates/verification.html:9 templates/verification.html:47
 #: templates/verification.html:185
 msgid "نظام المصادقة البيومتري"
-msgstr "Face Crypt Cloud"
+msgstr ""
 
 #: templates/404.html:7
 msgid "الصفحة غير موجودة (404)"
-msgstr "Page Not Found (404)"
+msgstr ""
 
 #: templates/404.html:21 templates/500.html:21 templates/index.html:48
 #: templates/index_admin.html:32 templates/verification.html:45
 msgid "شعار Face-Crypt-Cloud"
-msgstr "Face-Crypt-Cloud Logo"
+msgstr ""
 
 #: templates/404.html:27
 msgid "الصفحة غير موجودة"
-msgstr "Page Not Found"
+msgstr ""
 
 #: templates/404.html:28
 msgid "عذراً، لم نتمكن من العثور على الصفحة التي تبحث عنها."
-msgstr "Sorry, we could not find the page you are looking for."
+msgstr ""
 
 #: templates/404.html:31 templates/500.html:31
 msgid "العودة للرئيسية"
-msgstr "Return to Home"
+msgstr ""
 
 #: templates/500.html:7
 msgid "خطأ داخلي في الخادم (500)"
-msgstr "Internal Server Error (500)"
+msgstr ""
 
 #: templates/500.html:27
 msgid "خطأ داخلي في الخادم"
-msgstr "Internal Server Error"
+msgstr ""
 
 #: templates/500.html:28
 msgid "عذراً، حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى لاحقاً."
-msgstr "Sorry, an unexpected error occurred. Please try again later."
+msgstr ""
 
 #: templates/index.html:7
 msgid ""
 "Face-Crypt-Cloud – نظام المصادقة البيومترية السحابي المشفر. تسجيل دخول "
 "آمن بتقنية التعرف على الوجه والتشفير المتقدم."
 msgstr ""
-"Face-Crypt-Cloud - Encrypted Cloud Biometric Authentication System. "
-"Secure login with facial recognition and advanced encryption."
 
 #: templates/index.html:9 templates/index.html:86
 msgid "نظام المصادقة بالوجه السحابي المشفر"
-msgstr "Encrypted Cloud Facial Authentication System"
+msgstr ""
 
 #: templates/index.html:44 templates/verification.html:42
 msgid "شريط التنقل الرئيسي"
-msgstr "Main Navigation Bar"
+msgstr ""
 
 #: templates/index.html:46 templates/verification.html:43
 msgid "Face-Crypt-Cloud الصفحة الرئيسية"
-msgstr "Face-Crypt-Cloud Home Page"
+msgstr ""
 
 #: templates/index.html:56 templates/index_admin.html:39
 #: templates/verification.html:51
 msgid "تغيير اللغة"
-msgstr "Change Language"
+msgstr ""
 
 #: templates/index.html:61 templates/verification.html:56
 msgid "حالة النظام"
-msgstr "System Status"
+msgstr ""
 
 #: templates/index.html:63 templates/verification.html:58
 msgid "النظام متاح"
-msgstr "System Online"
+msgstr ""
 
 #: templates/index.html:77
 msgid "مصادقة بيومترية سحابية مشفرة"
-msgstr "Encrypted Cloud Biometric Authentication"
+msgstr ""
 
 #: templates/index.html:90
 msgid ""
 "منصة أمنية متقدمة تجمع بين تقنية التعرف على الوجه والتشفير السحابي لضمان "
 "هوية المستخدم بدقة عالية وحماية بلا مساومة."
 msgstr ""
-"An advanced security platform combining facial recognition and cloud "
-"encryption to ensure high-accuracy user identification and uncompromising"
-" protection."
 
 #: templates/index.html:111
 msgid "رسم بياني للتعرف على الوجه ببيانات بيومترية مشفرة"
-msgstr "Facial recognition graphic with encrypted biometric data"
+msgstr ""
 
 #: templates/index.html:117
 msgid "جاهز للمسح البيومتري - انتقل إلى بوابة التحقق"
-msgstr "Ready for Biometric Scan - Go to Verification Portal"
+msgstr ""
 
 #: templates/index.html:120
 msgid "جاهز للمسح البيومتري"
-msgstr "Ready for Biometric Scan"
+msgstr ""
 
 #: templates/index.html:121
 msgid "انتقل إلى بوابة التحقق"
-msgstr "Go to Verification Portal"
+msgstr ""
 
 #: templates/index.html:127
 msgid "مميزات النظام"
-msgstr "System Features"
+msgstr ""
 
 #: templates/index.html:130
 msgid "تشفير AES-128"
-msgstr "AES-128 Encryption"
+msgstr ""
 
 #: templates/index.html:134
 msgid "سحابة Firebase"
-msgstr "Firebase Cloud"
+msgstr ""
 
 #: templates/index.html:138
 msgid "ذكاء اصطناعي"
-msgstr "Artificial Intelligence"
+msgstr ""
 
 #: templates/index.html:142
 msgid "استجابة فورية"
-msgstr "Instant Response"
+msgstr ""
 
 #: templates/index.html:155 templates/verification.html:186
 msgid "جميع الحقوق محفوظة."
-msgstr "All rights reserved."
+msgstr ""
 
 #: templates/index.html:156 templates/verification.html:187
 msgid "مبني بتقنية"
-msgstr "Built with"
+msgstr ""
 
 #: templates/index.html:161 templates/verification.html:192
 msgid "بوابة الإدارة"
-msgstr "Admin Portal"
+msgstr ""
 
 #: templates/index_admin.html:7
 msgid ""
 "بوابة الإدارة لنظام المصادقة البيومترية السحابي. تتيح للمسؤولين إدارة "
 "المستخدمين ومراقبة السجلات والإحصائيات."
 msgstr ""
-"Admin portal for the cloud biometric authentication system. Allows "
-"administrators to manage users and monitor logs and statistics."
 
 #: templates/index_admin.html:9
 msgid "سحابة الملامح المشفرة - بوابة المسؤول"
-msgstr "Face Crypt Cloud - Admin Portal"
+msgstr ""
 
 #: templates/index_admin.html:28
 msgid "شريط التنقل — بوابة المسؤول"
-msgstr "Navigation Bar - Admin Portal"
+msgstr ""
 
 #: templates/index_admin.html:30
 msgid "Face-Crypt-Cloud — بوابة المسؤول"
-msgstr "Face-Crypt-Cloud - Admin Portal"
+msgstr ""
 
 #: templates/index_admin.html:44
 msgid "وضع لوحة المسؤول"
-msgstr "Admin Panel Mode"
+msgstr ""
 
 #: templates/index_admin.html:46 templates/index_admin.html:61
 msgid "بوابة المسؤول"
-msgstr "Admin Portal"
+msgstr ""
 
 #: templates/index_admin.html:53
 msgid "تسجيل الخروج من لوحة التحكم"
-msgstr "Logout from Control Panel"
+msgstr ""
 
 #: templates/index_admin.html:55
 msgid "خروج"
-msgstr "Logout"
+msgstr ""
 
 #: templates/index_admin.html:65
 msgid "تسجيل دخول المسؤول"
-msgstr "Admin Login"
+msgstr ""
 
 #: templates/index_admin.html:67 templates/index_admin.html:69
 msgid "كلمة مرور المسؤول"
-msgstr "Admin Password"
+msgstr ""
 
 #: templates/index_admin.html:69
 msgid "أدخل كلمة المرور المعقدة..."
-msgstr "Enter the complex password..."
+msgstr ""
 
 #: templates/index_admin.html:70
 msgid "إظهار أو إخفاء كلمة المرور"
-msgstr "Show or hide password"
+msgstr ""
 
 #: templates/index_admin.html:75
 msgid "عذراً، لا يُسمح باستخدام الأحرف العربية هنا. يرجى تحويل لوحة المفاتيح."
 msgstr ""
-"Sorry, Arabic characters are not allowed here. Please switch your "
-"keyboard."
 
 #: templates/index_admin.html:77
 msgid "تسجيل الدخول"
-msgstr "Login"
+msgstr ""
 
 #: templates/index_admin.html:81
 msgid "معلومات أمان بوابة الإدارة"
-msgstr "Admin Portal Security Information"
+msgstr ""
 
 #: templates/index_admin.html:84
 msgid "بوابة آمنة ومُراقَبة"
-msgstr "Secure and Monitored Portal"
+msgstr ""
 
 #: templates/index_admin.html:85
 msgid ""
 "الوصول مقيّد بكلمة مرور معقدة. جميع العمليات الإدارية — إضافة المستخدمين،"
 " حذفهم، ومسح السجلات — مُسجَّلة تلقائياً في سجل التدقيق السحابي."
 msgstr ""
-"Access is restricted by a complex password. All administrative operations"
-" — adding users, deleting them, and clearing logs — are automatically "
-"recorded in the cloud audit log."
 
 #: templates/index_admin.html:93
 msgid "تسجيل الخروج"
-msgstr "Logout"
+msgstr ""
 
 #: templates/index_admin.html:99
 msgid "إضافة مستخدم جديد"
-msgstr "Add New User"
+msgstr ""
 
 #: templates/index_admin.html:100 templates/index_admin.html:142
 msgid "معرف المستخدم"
-msgstr "User ID"
+msgstr ""
 
 #: templates/index_admin.html:101
 msgid "الاسم"
-msgstr "Name"
+msgstr ""
 
 #: templates/index_admin.html:102
 msgid "البريد الإلكتروني"
-msgstr "Email"
+msgstr ""
 
 #: templates/index_admin.html:103
 msgid "زر اختيار صورة بصمة الوجه"
-msgstr "Button to select facial biometric image"
+msgstr ""
 
 #: templates/index_admin.html:103
 msgid "اختر صورة بصمة الوجه..."
-msgstr "Select facial biometric image..."
+msgstr ""
 
 #: templates/index_admin.html:105
 msgid "ملف صورة الوجه"
-msgstr "Face Image File"
+msgstr ""
 
 #: templates/index_admin.html:106
 msgid "إضافة مستخدم"
-msgstr "Add User"
+msgstr ""
 
 #: templates/index_admin.html:114 templates/index_admin.html:117
 msgid "حذف مستخدم"
-msgstr "Delete User"
+msgstr ""
 
 #: templates/index_admin.html:115
 msgid "البحث عن مستخدم..."
-msgstr "Search for user..."
+msgstr ""
 
 #: templates/index_admin.html:115
 msgid "البحث عن مستخدم للحذف"
-msgstr "Search for user to delete"
+msgstr ""
 
 #: templates/index_admin.html:116
 msgid "اختر معرف المستخدم للحذف"
-msgstr "Select user ID to delete"
+msgstr ""
 
 #: templates/index_admin.html:117
 msgid "حذف المستخدم المحدد"
-msgstr "Delete Selected User"
+msgstr ""
 
 #: templates/index_admin.html:126
 msgid "سجلات التدقيق"
-msgstr "Audit Logs"
+msgstr ""
 
 #: templates/index_admin.html:128
 msgid "تحديث سجلات التدقيق"
-msgstr "Refresh Audit Logs"
+msgstr ""
 
 #: templates/index_admin.html:128
 msgid "تحديث السجلات"
-msgstr "Refresh Logs"
+msgstr ""
 
 #: templates/index_admin.html:129
 msgid "مسح كافة سجلات التدقيق"
-msgstr "Clear All Audit Logs"
+msgstr ""
 
 #: templates/index_admin.html:129
 msgid "مسح السجلات"
-msgstr "Clear Logs"
+msgstr ""
 
 #: templates/index_admin.html:133
 msgid "البحث في السجلات..."
-msgstr "Search in logs..."
+msgstr ""
 
 #: templates/index_admin.html:134
 msgid "البحث في سجلات التدقيق"
-msgstr "Search in audit logs"
+msgstr ""
 
 #: templates/index_admin.html:140
 msgid "الحدث"
-msgstr "Event"
+msgstr ""
 
 #: templates/index_admin.html:141
 msgid "الحالة"
-msgstr "Status"
+msgstr ""
 
 #: templates/index_admin.html:143
 msgid "وقت التسجيل"
-msgstr "Record Time"
+msgstr ""
 
 #: templates/index_admin.html:144
 msgid "الإجراءات"
-msgstr "Actions"
+msgstr ""
 
 #: templates/index_admin.html:149
 msgid "جاري التحميل..."
-msgstr "Loading..."
+msgstr ""
 
 #: templates/index_admin.html:155
 msgid "تحميل المزيد"
-msgstr "Load More"
+msgstr ""
 
 #: templates/index_admin.html:162
 msgid "إعدادات الأمان المتقدمة"
-msgstr "Advanced Security Settings"
+msgstr ""
 
 #: templates/index_admin.html:167
 msgid "دقة التعرف على الوجه (Tolerance)"
-msgstr "Facial Recognition Accuracy (Tolerance)"
+msgstr ""
 
 #: templates/index_admin.html:168
 msgid ""
 "قم بضبط مستوى الدقة المطلوبة لمطابقة الوجوه. (قيمة أقل = دقة أعلى وأكثر "
 "صرامة ضد الاختراق، قيمة أعلى = تساهل في التعرف)."
 msgstr ""
-"Adjust the accuracy level required for face matching. (Lower value = "
-"higher accuracy and stricter against spoofing, higher value = more "
-"lenient in recognition)."
 
 #: templates/index_admin.html:180
 msgid "حفظ"
-msgstr "Save"
+msgstr ""
 
 #: templates/index_admin.html:189
 msgid "الإحصائيات"
-msgstr "Statistics"
+msgstr ""
 
 #: templates/index_admin.html:190
 msgid "تحديث الإحصائيات"
-msgstr "Refresh Statistics"
+msgstr ""
 
 #: templates/index_admin.html:196
 msgid "عدد جميع محاولات تسجيل الدخول (الناجحة والفاشلة) المسجلة في السحابة."
 msgstr ""
-"Total number of all login attempts (successful and failed) recorded in "
-"the cloud."
 
 #: templates/index_admin.html:198
 msgid "إجمالي المحاولات"
-msgstr "Total Attempts"
+msgstr ""
 
 #: templates/index_admin.html:203
 msgid "عدد مرات التعرف على الوجه وتسجيل الدخول بنجاح."
-msgstr "Number of times face recognition and login were successful."
+msgstr ""
 
 #: templates/index_admin.html:205
 msgid "دخول ناجح"
-msgstr "Successful Login"
+msgstr ""
 
 #: templates/index_admin.html:210
 msgid "عدد المرات التي فشل فيها النظام في مطابقة الوجه."
-msgstr "Number of times the system failed to match the face."
+msgstr ""
 
 #: templates/index_admin.html:212
 msgid "محاولات فاشلة"
-msgstr "Failed Attempts"
+msgstr ""
 
 #: templates/index_admin.html:218
 msgid "إجمالي المرات التي أصدر فيها النظام قراراً بالحظر النهائي (تاريخياً)."
-msgstr "Total number of times the system issued a permanent block (historically)."
+msgstr ""
 
 #: templates/index_admin.html:220
 msgid "أحداث الحظر النهائي"
-msgstr "Permanent Block Events"
+msgstr ""
 
 #: templates/index_admin.html:226
 msgid "إجمالي المرات التي تم فيها إيقاف مستخدم مؤقتاً بسبب المحاولات الخاطئة."
 msgstr ""
-"Total number of times a user was temporarily suspended due to incorrect "
-"attempts."
 
 #: templates/index_admin.html:228
 msgid "أحداث الحظر المؤقت"
-msgstr "Temporary Block Events"
+msgstr ""
 
 #: templates/index_admin.html:234
 msgid "العدد الحالي للمستخدمين المحظورين نهائياً في هذه اللحظة."
-msgstr "Current number of permanently blocked users at this moment."
+msgstr ""
 
 #: templates/index_admin.html:236
 msgid "مستخدمون محظورون"
-msgstr "Blocked Users"
+msgstr ""
 
 #: templates/index_admin.html:242
 msgid "العدد الحالي للمستخدمين الموقوفين مؤقتاً (لمدة 5 دقائق) في هذه اللحظة."
 msgstr ""
-"Current number of temporarily suspended users (for 5 minutes) at this "
-"moment."
 
 #: templates/index_admin.html:244
 msgid "في الحظر المؤقت"
-msgstr "In Temporary Block"
+msgstr ""
 
 #: templates/index_admin.html:250
 msgid "إجمالي عدد الأشخاص المسجلين في قاعدة بيانات السحابة."
-msgstr "Total number of people registered in the cloud database."
+msgstr ""
 
 #: templates/index_admin.html:252
 msgid "إجمالي المستخدمين"
-msgstr "Total Users"
+msgstr ""
 
 #: templates/index_admin.html:263
 msgid "بوابة الإدارة الآمنة. جميع العمليات مُسجَّلة في سجلات التدقيق."
-msgstr "Secure Admin Portal. All operations are recorded in the audit logs."
+msgstr ""
 
 #: templates/verification.html:7
 msgid "Face-Crypt-Cloud – بوابة التحقق البيومتري."
-msgstr "Face-Crypt-Cloud - Biometric Verification Portal."
+msgstr ""
 
 #: templates/verification.html:9 templates/verification.html:72
 msgid "بوابة التحقق البيومتري"
-msgstr "Biometric Verification Portal"
+msgstr ""
 
 #: templates/verification.html:73
 msgid "ضع وجهك أمام الكاميرا لإتمام عملية التحقق"
-msgstr "Place your face in front of the camera to complete verification"
+msgstr ""
 
 #: templates/verification.html:81
 msgid "بدء عملية التحقق من الوجه – فتح الكاميرا"
-msgstr "Start Facial Verification - Open Camera"
+msgstr ""
 
 #: templates/verification.html:84
 msgid "بدء التحقق من الوجه"
-msgstr "Start Facial Verification"
+msgstr ""
 
 #: templates/verification.html:85
 msgid "افتح الكاميرا لتسجيل دخول آمن"
-msgstr "Open camera for secure login"
+msgstr ""
 
 #: templates/verification.html:92 templates/verification.html:95
 msgid "الدخول بمفتاح المرور"
-msgstr "Login with Passkey"
+msgstr ""
 
 #: templates/verification.html:96
 msgid "تسجيل دخول سريع للأجهزة المسجلة"
-msgstr "Quick login for registered devices"
+msgstr ""
 
 #: templates/verification.html:105
 msgid "بث الكاميرا للتحقق من الوجه"
-msgstr "Camera stream for facial verification"
+msgstr ""
 
 #: templates/verification.html:108
 msgid "معاينة الصورة الملتقطة"
-msgstr "Preview of captured image"
+msgstr ""
 
 #: templates/verification.html:115
 msgid "التقاط صورة من الكاميرا"
-msgstr "Capture image from camera"
+msgstr ""
 
 #: templates/verification.html:117
 msgid "التقاط الصورة"
-msgstr "Capture Image"
+msgstr ""
 
 #: templates/verification.html:122 templates/verification.html:124
 msgid "إغلاق الكاميرا"
-msgstr "Close Camera"
+msgstr ""
 
 #: templates/verification.html:134
 msgid "إرسال الصورة للتحقق"
-msgstr "Send Image for Verification"
+msgstr ""
 
 #: templates/verification.html:136
 msgid "إرسال للتحقق"
-msgstr "Send for Verification"
+msgstr ""
 
 #: templates/verification.html:141
 msgid "إعادة التقاط الصورة"
-msgstr "Retake Image"
+msgstr ""
 
 #: templates/verification.html:143
 msgid "إعادة التقاط"
-msgstr "Retake"
+msgstr ""
 
 #: templates/verification.html:151
 msgid "إلغاء عملية التحقق"
-msgstr "Cancel Verification Process"
+msgstr ""
 
 #: templates/verification.html:152
 msgid "إلغاء العملية ✖"
-msgstr "Cancel Process ✖"
+msgstr ""
 
 #: templates/verification.html:159 templates/verification.html:165
 msgid "سياسة حماية الحساب"
-msgstr "Account Protection Policy"
+msgstr ""
 
 #: templates/verification.html:167
 msgid "قواعد الحماية"
-msgstr "Protection Rules"
+msgstr ""
 
 #: templates/verification.html:169
 msgid "تحذير"
-msgstr "Warning"
+msgstr ""
 
 #: templates/verification.html:169
 msgid "٣ محاولات فاشلة"
-msgstr "3 Failed Attempts"
+msgstr ""
 
 #: templates/verification.html:170
 msgid "حظر مؤقت تلقائي لمدة ٥ دقائق."
-msgstr "Automatic temporary block for 5 minutes."
+msgstr ""
 
 #: templates/verification.html:173
 msgid "خطر"
-msgstr "Danger"
+msgstr ""
 
 #: templates/verification.html:173
 msgid "٥ محاولات فاشلة"
-msgstr "5 Failed Attempts"
+msgstr ""
 
 #: templates/verification.html:174
 msgid "حظر دائم — يتطلب مراجعة مسؤول النظام."
-msgstr "Permanent Block - Requires Administrator Review."
+msgstr ""
 
 #: utils/face_utils.py:50
 #, python-format
 msgid "نوع البيانات غير مدعوم: %(dtype)s"
-msgstr "Unsupported data type: %(dtype)s"
+msgstr ""
 
 #: utils/face_utils.py:52
 #, python-format
 msgid "شكل غير مدعوم: %(shape)s"
-msgstr "Unsupported shape: %(shape)s"
+msgstr ""
 
 #: utils/face_utils.py:57
 #, python-format
 msgid "فشل في ترميز الوجه: %(error)s"
-msgstr "Face encoding failed: %(error)s"
+msgstr ""
 
 #: utils/face_utils.py:60
 msgid "لم يتم اكتشاف أي وجه. يرجى المحاولة مرة أخرى بصورة واضحة."
-msgstr "No face detected. Please try again with a clear photo."
+msgstr ""
 
-
-msgid "❌ **فشل تسجيل الدخول**\nالرجاء المحاولة مرة أخرى، أو التواصل مع إدارة النظام إذا استمرت المشكلة."
-msgstr "❌ **Login Failed**\nPlease try again, or contact the system administrator if the problem persists."
-
-msgid "❌ لم يتم استلام أي بيانات للصورة."
-msgstr "❌ No image data received."
-
-msgid "❌ أحد التشفيرات أو كلاهما غير صالح."
-msgstr "❌ One or both encodings are invalid."
-
-msgid "الصورة غير واضحة أو تبدو كصورة مطبوعة."
-msgstr "The image is unclear or looks like a printed photo."
-
-msgid "لم يتم اكتشاف الوجه في الإطارين."
-msgstr "Face not detected in both frames."
-
-msgid "لم يتم اكتشاف أي حركة طبيعية للوجه (صورة ثابتة)."
-msgstr "No natural face movement detected (static image)."
-
-msgid "لم يتم تنفيذ التحدي المطلوب (الابتسامة)."
-msgstr "The requested challenge (smile) was not performed."
-
-msgid "لم يتم تنفيذ التحدي المطلوب (رفع الحاجبين)."
-msgstr "The requested challenge (raise eyebrows) was not performed."
-
-msgid "لم يتم تنفيذ التحدي المطلوب (تحريك الرأس)."
-msgstr "The requested challenge (turn head) was not performed."
-
-msgid "خطأ أثناء الفحص: %(err)s"
-msgstr "Error during check: %(err)s"
-
-msgid "تم اكتشاف محاولة احتيال (فحص النماذج)."
-msgstr "Spoofing attempt detected (model check)."
-
-msgid "خطأ أثناء فحص الاحتيال: %(err)s"
-msgstr "Error during spoofing check: %(err)s"
-
-msgid "نجاح"
-msgstr "Success"
