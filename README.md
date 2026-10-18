@@ -9,7 +9,7 @@
 [![Flask](https://img.shields.io/badge/Flask-3.1.x-000000?style=for-the-badge&logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
 [![Firebase](https://img.shields.io/badge/Firebase-Firestore%20%7C%20Storage-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)](https://firebase.google.com/)
-[![Tests](https://img.shields.io/badge/Tests-26%20Passing-brightgreen?style=for-the-badge&logo=pytest&logoColor=white)]()
+[![Tests](https://img.shields.io/badge/Tests-34%20Passing-brightgreen?style=for-the-badge&logo=pytest&logoColor=white)]()
 [![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
 [![Academic](https://img.shields.io/badge/University_of_Bisha-Cybersecurity-1a4659?style=for-the-badge)]()
 
@@ -30,13 +30,13 @@ The system works by capturing a live image of the user via webcam, extracting pr
 ## ✨ Key Features
 
 * 🔐 **Passwordless Biometric Auth:** Fast, secure login via facial recognition using `dlib` / `face_recognition`. No password required at any point.
-* 🔑 **WebAuthn / Passkey Support:** Optional FIDO2 hardware-backed passkey registration after a successful face verification. Serves as a convenience layer, not a standalone replacement for the initial face enrollment.
+* 🔑 **WebAuthn / Passkey Support:** Optional FIDO2 hardware-backed passkey registration and login after an initial face verification. Serves as a convenience layer alongside biometric enrollment.
 * 🕵️ **Multi-Layer Liveness Detection:** Detects static printed photos via Laplacian blur analysis, performs real-time geometric challenge validation (MediaPipe in-browser), and runs AI-based spoof detection (MiniFASNetV2 ONNX — ~2.7ms per inference on CPU).
 * 🛡️ **Biometric Data Encryption:** Face encodings are **never stored in plaintext**. Encrypted with `cryptography.Fernet` (AES-128-CBC + HMAC-SHA256) before being persisted to Firestore.
 * 🚦 **Rate Limiting & Account Lockout:** Automatic 5-minute soft-block after 3 consecutive failures and permanent admin-mediated block after 5. Rate-limited login endpoint: 10 requests/min and 30 requests/hour per IP via `Flask-Limiter`.
 * 🕶️ **Anti-Enumeration:** All login failure states (wrong face, blocked, soft-blocked) return identical HTTP 403 responses, preventing attackers from inferring account existence or status.
 * ⏱️ **Timing-Attack Resistance:** All password and CSRF token comparisons use `hmac.compare_digest` for constant-time evaluation.
-* 📊 **Admin Dashboard:** Real-time user management, aggregation-query-based statistics (no full collection scans), and paginated audit logs.
+* 📊 **Admin Dashboard:** Real-time user management (using field projections to skip heavy biometric payloads), live security statistics, dynamic face-matching tolerance control, and cursor-paginated audit logs.
 * 📝 **Comprehensive Audit Trail:** Every authentication event (success, failure, block) is logged to Firestore with timestamp, user ID, and source IP.
 * 🌍 **Bilingual Support (AR/EN):** Full English and Arabic localization across all templates, custom alerts, JavaScript popups, and backend API responses. The interface utilizes modern CSS logical properties (`margin-inline-start`, etc.) to natively adapt and mirror layouts seamlessly between LTR and RTL reading directions.
 * 🎨 **Modern UI:** Custom "Dark Glassmorphism" design system built with Vanilla CSS3, fully responsive, and respects `prefers-reduced-motion` for accessibility.
@@ -98,6 +98,126 @@ A smooth, trustworthy transition modal upon successful admin login, featuring a 
 
 ---
 
+## 🏗️ System Architecture
+
+Face Crypt Cloud is architected around a **zero-image persistence** model and a **hybrid client/server AI pipeline**. Raw webcam frames never touch disk or database storage — they exist strictly in volatile server RAM (`NumPy` arrays) long enough to validate liveness and extract a 128-dimensional biometric vector, which is encrypted with `Fernet` (`AES-128-CBC` + `HMAC-SHA256`) before persistence.
+
+### 1. High-Level Component & Data-Boundary Topology
+
+```mermaid
+flowchart TD
+    subgraph Client["🖥️ Client Layer (Browser & Edge AI)"]
+        UI_User["User Verification Portal (/verify)"]
+        UI_Admin["Admin Dashboard (/admin)"]
+        MP["MediaPipe Tasks Vision (60 FPS 3D Face Mesh & Blendshapes)"]
+        WA_Client["WebAuthn / FIDO2 API (navigator.credentials)"]
+        CSRF_JS["Admin Fetch Wrapper (X-CSRFToken & Bilingual AR/EN)"]
+    end
+
+    subgraph Edge["🔒 Transport & WSGI Gateway"]
+        TLS["HTTPS / TLS Termination (Google Cloud Run or Nginx)"]
+        WSGI["Waitress Production WSGI Server (Multi-Threaded)"]
+    end
+
+    subgraph Middleware["🛡️ Flask Security & Routing Layer (app/)"]
+        DoS["Payload Size Guard (MAX_CONTENT_LENGTH = 5 MB)"]
+        RateLimit["Flask-Limiter (10 req/min | 30 req/hr per IP)"]
+        CSRF_Hook["Constant-Time Auth & CSRF Guard (hmac.compare_digest)"]
+        I18n["Flask-Babel Localization Engine (AR / EN)"]
+        UserRoutes["User Blueprint (app/users/routes.py)"]
+        AdminRoutes["Admin Blueprint (app/admin/routes.py)"]
+        ErrHandler["Global Error Normalizer & Anti-Enumeration Guard"]
+    end
+
+    subgraph CoreEngine["🧠 Biometric, AI Liveness & Crypto Engine (utils/)"]
+        ImgProc["In-Memory RGB Normalizer (Pillow / NumPy 500x500 — No Disk I/O)"]
+        Liveness["Server Liveness Engine (OpenCV Laplacian + MiniFASNetV2 ONNX)"]
+        Dlib["dlib ResNet-34 Engine (128-D Vector Extraction & Euclidean Match)"]
+        Fernet["Fernet Cryptographic Engine (AES-128-CBC + HMAC-SHA256)"]
+        WebAuthn_Srv["py_webauthn 2.x Verifier (FIDO2 Attestation & Sign-Count)"]
+    end
+
+    subgraph CloudDB["☁️ Cloud Persistence Layer (Google Firebase Firestore)"]
+        SDK["Firebase Admin SDK (Server-Side Privileged Channel)"]
+        Rules["firestore.rules (Client SDK Access Unconditionally Denied)"]
+        Col_Users[("users Collection (Encrypted 128-D Vectors, Lockouts, Passkeys)")]
+        Col_Logs[("audit_logs Collection (Timestamped IP & Event Trail)")]
+        Col_Config[("settings/security_config (Dynamic Matching Tolerance 0.1 - 1.0)")]
+    end
+
+    UI_User -->|"1. Live Video Stream"| MP
+    MP -->|"2. Active Challenge Passed (Single JPEG Blob)"| TLS
+    UI_User -->|"FIDO2 Passkey Ceremony"| WA_Client
+    WA_Client -->|"Signed Assertion / Attestation"| TLS
+    UI_Admin -->|"State-Changing API Calls"| CSRF_JS
+    CSRF_JS -->|"HTTPS + Session Cookie + X-CSRFToken"| TLS
+
+    TLS --> WSGI --> DoS --> RateLimit --> I18n
+    I18n --> UserRoutes
+    I18n --> CSRF_Hook --> AdminRoutes
+
+    UserRoutes -->|"Multipart Frame"| ImgProc
+    AdminRoutes -->|"Enrollment Image"| ImgProc
+    ImgProc -->|"Volatile NumPy Array"| Dlib
+    ImgProc -->|"20% Margin Face Crop (80x80)"| Liveness
+    Dlib <-->|"128-D Float Vector"| Fernet
+    UserRoutes <-->|"Challenge & Signature"| WebAuthn_Srv
+
+    UserRoutes --> ErrHandler
+    AdminRoutes --> ErrHandler
+
+    Fernet <-->|"Ciphertext Only"| SDK
+    UserRoutes <-->|"CRUD & Lockout State"| SDK
+    AdminRoutes <-->|"Stats, Unblock, Tolerance"| SDK
+
+    SDK --> Col_Users
+    SDK --> Col_Logs
+    SDK --> Col_Config
+    Rules -.->|"Blocks Direct Client Reads/Writes"| Col_Users
+    Rules -.->|"Blocks Direct Client Reads/Writes"| Col_Logs
+```
+
+### 2. End-to-End Biometric Authentication & Anti-Spoofing Flow
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User
+    participant Browser as Browser (MediaPipe + WebAuthn)
+    participant API as Flask API (/users/verify_login)
+    participant Engine as Biometric & ONNX Engine (face_utils.py)
+    participant DB as Cloud Firestore (firebase_utils.py)
+
+    User->>Browser: Open Camera & Click "Capture"
+    Browser->>Browser: Render 60 FPS Face Mesh & Prompt Random Challenge (Smile / Turn / Raise Brows)
+    User->>Browser: Performs Prompted Facial Movement
+    Browser->>Browser: Validate Blendshape Threshold & Auto-Capture Single Frame
+    Browser->>API: POST /users/verify_login (image blob)
+
+    API->>Engine: Normalize to 500x500 RGB NumPy Array (In-Memory)
+    API->>Engine: Extract 128-D Candidate Face Encoding (dlib)
+    API->>DB: Fetch Encrypted User Encodings & Dynamic Tolerance (settings/security_config)
+    API->>Engine: Decrypt Encodings in RAM (Fernet) & Compute Euclidean Distances
+
+    alt Match Found Within Tolerance
+        API->>API: Verify Account Lockout Status (Not Hard-Blocked or Soft-Blocked < 300s)
+        API->>Engine: Run check_liveness() (Laplacian Variance >= 30.0 + MiniFASNetV2 Class-2 Prob >= 0.60)
+        alt Liveness & Anti-Spoofing Passed
+            API->>DB: Reset failed_attempts = 0 & Log "User_Login" (status: success)
+            API-->>Browser: 200 OK + Authenticated Session Cookie
+            Browser-->>User: Display Clearance Modal + Optional FIDO2 Passkey Enrollment
+        else Spoof Detected (Print / Replay / Mask)
+            API->>DB: Increment failed_attempts (Soft-Block @ 3, Hard-Block @ 5) & Log "Spoofing_Attempt"
+            API-->>Browser: 403 Forbidden (Anti-Spoofing Security Alert)
+        end
+    else No Face Match OR Account Locked
+        API->>DB: Record Exact Internal Audit Event (failure / soft_block / blocked)
+        API-->>Browser: 403 Forbidden (Identical Generic Response — Anti-Enumeration)
+    end
+```
+
+---
+
 ## 🚀 Getting Started
 
 ### ✅ Recommended: Docker (Fastest & Most Reliable)
@@ -153,10 +273,10 @@ python app.py
 waitress-serve --host=0.0.0.0 --port=8080 wsgi:app
 ```
 
-| Endpoint | URL |
-|---|---|
-| User verification portal | `http://127.0.0.1:8081/verify` |
-| Admin dashboard | `http://127.0.0.1:8081/admin/` |
+| Endpoint | Local `venv` URL | Docker Compose URL |
+|---|---|---|
+| User verification portal | `http://127.0.0.1:8080/verify` | `http://localhost:8081/verify` |
+| Admin dashboard | `http://127.0.0.1:8080/admin/` | `http://localhost:8081/admin/` |
 
 ---
 
@@ -187,8 +307,12 @@ FACECRYPT_WSGI_THREADS=4
 FACECRYPT_ENABLE_LIVENESS_CHECK=True
 ```
 
-**To generate a strong random secret key:**
+**To generate the required cryptographic keys:**
 ```bash
+# 1. Generate FACECRYPT_SECRET_KEY (32-byte URL-safe Base64 Fernet key)
+python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+
+# 2. Generate FACECRYPT_FLASK_SECRET_KEY (64-char hex session secret)
 python -c "import secrets; print(secrets.token_hex(32))"
 ```
 
@@ -210,10 +334,10 @@ The test suite (`pytest.ini` constrains execution strictly to the `tests/` direc
 
 | Test File | Coverage |
 |---|---|
-| `test_user_routes.py` | Login success/failure, anti-enumeration, account lockout, per-user vs. global blocking, XSS prevention |
-| `test_admin_routes.py` | Admin authentication, CSRF protection, session authorization, XSS in audit logs |
-| `test_admin_stats.py` | Dashboard statistics, audit log pagination |
-| `test_face_utils.py` | Liveness detection, active challenge validation, WebAuthn registration |
+| `test_user_routes.py` | Login success/failure, anti-enumeration, account lockout, per-user vs. global blocking, WebAuthn registration & login (passkeys) |
+| `test_admin_routes.py` | Admin authentication, CSRF protection, session authorization, cursor-based audit log pagination, XSS prevention |
+| `test_admin_stats.py` | Admin dashboard statistics and mathematical aggregation verification |
+| `test_face_utils.py` | Euclidean face matching (`find_best_match`), MiniFASNet liveness & spoof detection, active challenge validation |
 | `test_i18n.py` | Localization switching, fallback translation logic, and JSON payload structural integrity |
 
 **34 tests — all passing.**
@@ -275,7 +399,7 @@ GitHub Actions runs `pip-audit` against `requirements.txt` on every push, pull r
 
 ---
 
-## �� Production Deployment
+## 🌐 Production Deployment
 
 The live instance of this project runs on **Google Cloud Run**, built directly from the `Dockerfile` in this repository:
 
@@ -335,12 +459,13 @@ Face-Crypt-Cloud/
 │   ├── config.py               # Environment loading, Firebase init, fail-fast guard
 │   ├── limiter.py              # Flask-Limiter instance
 │   ├── routes.py               # Root & health-check routes
-│   ├── users/                  # User-facing authentication blueprint
+│   ├── users/                  # User-facing authentication & WebAuthn blueprint
 │   └── admin/                  # Admin dashboard blueprint (CSRF-protected)
 ├── utils/
 │   ├── face_utils.py           # dlib encoding, Fernet encryption, liveness checks, MiniFASNet
 │   ├── firebase_utils.py       # Firestore helpers, audit logging, settings read/write
-│   └── models/                 # ONNX model assets (MiniFASNetV2.onnx)
+│   └── models/                 # ONNX model assets (minifasnet_v2.onnx)
+├── translations/               # Flask-Babel message catalogs (.po / .mo) for AR & EN
 ├── static/                     # CSS, JavaScript, images
 ├── templates/                  # Jinja2 HTML templates
 ├── tests/                      # pytest test suite (34 tests)
@@ -352,7 +477,8 @@ Face-Crypt-Cloud/
 ├── firestore.rules             # Firestore security rules (deny all client-side access)
 ├── pytest.ini                  # Constrains pytest execution to tests/ directory only
 ├── requirements.txt            # Pinned Python dependencies
-├── wsgi.py                     # Waitress WSGI entrypoint
+├── app.py                      # Development Flask server entrypoint
+├── wsgi.py                     # Production Waitress WSGI entrypoint
 └── .env.example                # Environment variable template
 ```
 
